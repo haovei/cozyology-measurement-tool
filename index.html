@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cozyology Measurement Tool</title>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Development mode: React app will be mounted here -->
+      <div id="dev-app"></div>
+      
+      <!-- Web Component demo -->
+      <div style="margin-top: 2rem; padding: 1rem; border-top: 1px solid #ccc;">
+        <h2>Web Component Demo:</h2>
+        <cozyology-measurement-tool 
+          data-title="Custom Measurement Tool" 
+          data-theme="light">
+        </cozyology-measurement-tool>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
