@@ -282,25 +282,26 @@ export default function MeasurementTool() {
                 )}
 
                 {currentStepData.type === 'input' && (
-                  <div className="flex gap-[75px] bg-[#F5F5F5] p-[50px]">
-                    <div className="w-[45%]  mx-auto relative not-md:w-[160px] not-md:h-[160px]">
-                      <img src={currentStepData.image} className="w-full object-cover" />
+                  <div className="flex gap-[75px] md:bg-[#F5F5F5] p-[50px] not-md:p-2 not-md:flex-col not-md:items-center not-md:gap-[15px]">
+                    <div className="w-[45%] mx-auto relative flex items-center gap-[10px] not-md:w-full not-md:bg-[#F5F5F5] not-md:p-2">
+                      <img src={currentStepData.image} className="w-full object-cover not-md:w-[50%]" />
+                      <div className="md:hidden text-[14px]">{currentStepData.description}</div>
                     </div>
-                    <div className="flex-1 flex flex-col">
-                      <div className="text-[14px] text-center">{currentStepData.description}</div>
-                      <div className="flex-1 flex flex-col justify-end gap-[30px]">
+                    <div className="flex-1 flex flex-col not-md:w-full">
+                      <div className="not-md:hidden text-[14px] text-center">{currentStepData.description}</div>
+                      <div className="flex-1 flex flex-col justify-end gap-[30px] not-md:gap-[15px]">
                         {currentStepData.options.map(option => (
-                          <div className="flex" key={option.id}>
+                          <div className="flex not-md:flex-col" key={option.id}>
                             {currentStepData.options.length > 1 && (
-                              <div className="w-[100px]">
-                                <div className="text-[24px]">{option.title}</div>
-                                <div className="text-[14px]">{option.label}</div>
+                              <div className="w-[100px] not-md:flex gap-2">
+                                <div className="text-[24px] not-md:text-[12px]">{option.title}</div>
+                                <div className="text-[14px] not-md:text-[12px]">{option.label}</div>
                               </div>
                             )}
                             <div className="flex-1 flex items-center gap-2 border border-black h-[60px] bg-white">
                               <input
                                 type="number"
-                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[24px]"
+                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[24px] not-md:text-[12px]"
                                 placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
                                 min={option.min}
                                 max={option.max}
@@ -312,7 +313,7 @@ export default function MeasurementTool() {
                         <div className="">
                           <button
                             onClick={() => handleContinue(currentStepData.jump)}
-                            className="w-full px-12 py-3 text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                            className="w-full h-[60px] not-md:h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 bg-black text-white cursor-pointer"
                           >
                             CONTINUE
                           </button>
@@ -323,33 +324,55 @@ export default function MeasurementTool() {
                 )}
 
                 {currentStepData.type === 'finished' && (
-                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] px-[120px]">
-                    <div className="text-[20px] font-medium text-black">Your recommended shade size is </div>
-                    <div className="text-[60px] text-black mt-[30px]">30”W * 20”L</div>
-                    <div className="mt-[20px] text-[16px] text-center text-[#999999]">
-                      For Inside Mount: <br />
-                      The recommended shade width size already includes the 3/8'' clearance adjustment. <br />
-                      Shade length = Maximum window height.
+                  <>
+                    <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] px-[120px] not-md:py-[25px] not-md:px-[30px]">
+                      <div className="text-[20px] font-medium text-black not-md:text-[12px]">
+                        Your recommended shade size is{' '}
+                      </div>
+                      <div className="text-[60px] text-black mt-[30px] not-md:text-[35px]">30”W * 20”L</div>
+                      <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
+                        For Inside Mount: <br />
+                        The recommended shade width size already includes the 3/8'' clearance adjustment. <br />
+                        Shade length = Maximum window height.
+                      </div>
+                      <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
+                        Tips: <span className="font-bold">Take a screenshot</span> of these measurements for when you're
+                        ready to order.
+                      </div>
+                      <div className="not-md:hidden mt-[50px] flex gap-[30px]">
+                        <button
+                          onClick={() => handleContinue(currentStepData.jump)}
+                          className="w-[300px] h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                        >
+                          SHOP NOW
+                        </button>
+                        <button
+                          onClick={handleCalculateAgain}
+                          className="w-[300px] h-[60px] text-lg font-medium transition-all duration-200 border cursor-pointer"
+                        >
+                          CALCULATE AGAIN
+                        </button>
+                      </div>
+                      <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
+                        If the shade dimensions you need are not listed on our website, please contact us at
+                        Care@CozyologyCurtains.com before making a purchase. We're here to assist you!
+                      </div>
                     </div>
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999]">
-                      Tips: <span className="font-bold">Take a screenshot</span> of these measurements for when you're
-                      ready to order.
-                    </div>
-                    <div className="my-[50px] flex gap-[30px]">
+                    <div className="md:hidden mt-[20px] flex gap-[15px]">
                       <button
                         onClick={() => handleContinue(currentStepData.jump)}
-                        className="w-[300px] px-12 py-3 text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                        className="flex-1 h-[40px] text-[12px] font-medium transition-all duration-200 bg-black text-white cursor-pointer"
                       >
                         SHOP NOW
                       </button>
                       <button
                         onClick={handleCalculateAgain}
-                        className="w-[300px] px-12 py-3 text-lg font-medium transition-all duration-200 border cursor-pointer"
+                        className="flex-1 h-[40px] text-[12px] font-medium transition-all duration-200 border cursor-pointer"
                       >
                         CALCULATE AGAIN
                       </button>
                     </div>
-                  </div>
+                  </>
                 )}
               </>
             )}
