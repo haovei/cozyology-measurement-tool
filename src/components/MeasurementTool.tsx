@@ -6,6 +6,7 @@ import { StepDataList } from '../data/mountStyles'
 export default function MeasurementTool() {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
+  const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
 
   const getCurrentMainStep = (): string => {
     if (currentStep === 'step-1') return 'step-1'
@@ -56,8 +57,9 @@ export default function MeasurementTool() {
   }
 
   const getPreviousStep = () => {
-    const currentIndex = mainSteps.indexOf(getCurrentMainStep())
-    return currentIndex > 0 ? mainSteps[currentIndex - 1] : null
+    // 基于历史记录返回上一步
+    const currentIndex = stepHistory.indexOf(currentStep)
+    return currentIndex > 0 ? stepHistory[currentIndex - 1] : null
   }
 
   const handleStepNavigation = (stepId: string) => {
@@ -66,7 +68,29 @@ export default function MeasurementTool() {
       // 根据主步骤ID找到对应的实际步骤
       const targetStep = getActualStepFromMainStep(stepId)
       setCurrentStep(targetStep)
+
+      // 如果点击的是已完成的步骤，从历史记录中找到对应的步骤
+      if (isStepCompleted(stepId) && stepId !== getCurrentMainStep()) {
+        // 从历史记录中找到最后一次访问该主步骤的具体步骤
+        const historyForMainStep = stepHistory.filter(step => {
+          const mainStep = getMainStepFromActualStep(step)
+          return mainStep === stepId
+        })
+
+        if (historyForMainStep.length > 0) {
+          const lastVisitedStep = historyForMainStep[historyForMainStep.length - 1]
+          setCurrentStep(lastVisitedStep)
+        }
+      }
     }
+  }
+
+  const getMainStepFromActualStep = (actualStep: string): string => {
+    if (actualStep === 'step-1') return 'step-1'
+    if (actualStep.startsWith('step-2')) return 'step-2'
+    if (actualStep.startsWith('step-3')) return 'step-3'
+    if (actualStep === 'step-finished') return 'step-finished'
+    return 'step-1'
   }
 
   const getActualStepFromMainStep = (mainStepId: string): string => {
@@ -92,22 +116,32 @@ export default function MeasurementTool() {
 
   const handleContinue = jump => {
     console.log('Continuing to:', jump)
+
+    // 记录当前步骤为已完成
+    if (!completedSteps.includes(currentStep)) {
+      setCompletedSteps(prev => [...prev, currentStep])
+    }
+
+    // 添加到历史记录
+    setStepHistory(prev => [...prev, jump])
+
     setCurrentStep(jump)
   }
 
   const handleCalculateAgain = () => {
     setCurrentStep('step-1')
     setCompletedSteps([])
+    setStepHistory(['step-1']) // 重置历史记录
   }
 
   const currentStepData = StepDataList[currentStep]
 
   return (
     <div className="">
-      <div className="flex flex-col md:py-6 md:gap-20 md:flex-row">
+      <div className="flex flex-col md:py-6  md:flex-row">
         {/* Desktop Sidebar */}
-        <div className="hidden md:block w-[30%] bg-white">
-          <div className="flex flex-col h-full">
+        <div className="hidden md:block w-[40%] bg-white">
+          <div className="flex flex-col h-full pt-6">
             <div className="flex-1 ">
               {steps.map((step, index) => (
                 <div key={step.id} className="flex">

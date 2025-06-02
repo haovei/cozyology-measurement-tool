@@ -39,21 +39,21 @@ export const StepDataList = {
     jump: 'step-3-1-1',
     options: [
       {
-        id: 'width-a',
+        id: 'inside-width-top',
         title: 'A',
         label: 'Width',
         min: 15,
         max: 280,
       },
       {
-        id: 'width-b',
+        id: 'inside-width-middle',
         title: 'B',
         label: 'Width',
         min: 15,
         max: 280,
       },
       {
-        id: 'width-c',
+        id: 'inside-width-bottom',
         title: 'C',
         label: 'Width',
         min: 15,
@@ -68,7 +68,7 @@ export const StepDataList = {
     jump: 'step-2-2-2',
     options: [
       {
-        id: 'width-a',
+        id: 'outside-window-width',
         title: '',
         label: '',
         min: 15,
@@ -84,13 +84,13 @@ export const StepDataList = {
     jump: 'step-3-2-1',
     options: [
       {
-        id: 'width-a',
+        id: 'outside-width-left-extension',
         title: 'A',
         label: 'Left Side',
         min: 0,
       },
       {
-        id: 'width-b',
+        id: 'outside-width-right-extension',
         title: 'B',
         label: 'Right Side',
         min: 0,
@@ -105,21 +105,21 @@ export const StepDataList = {
     jump: 'step-3-1-2',
     options: [
       {
-        id: 'height-a',
+        id: 'inside-height-left',
         title: 'A',
         label: 'Height',
         min: 20,
         max: 110,
       },
       {
-        id: 'height-b',
+        id: 'inside-height-middle',
         title: 'B',
         label: 'Height',
         min: 20,
         max: 110,
       },
       {
-        id: 'height-c',
+        id: 'inside-height-right',
         title: 'C',
         label: 'Height',
         min: 20,
@@ -132,14 +132,14 @@ export const StepDataList = {
     type: 'select',
     options: [
       {
-        id: 'inside-mount',
+        id: 'inside-length-breaks-on-frame',
         title: 'Breaks on Window Frame',
         image: '/assets/03-1-2@2x.webp',
         description: 'Custom-fit for a tailored look with full light blocking',
         jump: 'step-finished',
       },
       {
-        id: 'outside-mount',
+        id: 'inside-length-puddles-on-frame',
         title: 'Puddles on Window Frame',
         image: '/assets/03-1-3@2x.webp',
         description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
@@ -154,7 +154,7 @@ export const StepDataList = {
     jump: 'step-3-2-2',
     options: [
       {
-        id: 'height-outside',
+        id: 'outside-window-height',
         title: '',
         label: 'Height',
         min: 20,
@@ -170,7 +170,7 @@ export const StepDataList = {
     jump: 'step-3-2-3',
     options: [
       {
-        id: 'height-outside',
+        id: 'outside-height-above-extension',
         title: '',
         label: 'Height',
         min: 0,
@@ -182,14 +182,14 @@ export const StepDataList = {
     type: 'select',
     options: [
       {
-        id: 'inside-mount',
+        id: 'outside-length-breaks-on-frame',
         title: 'Breaks on Window Frame',
         image: '/assets/03-1-2@2x.webp',
         description: 'Custom-fit for a tailored look with full light blocking',
         jump: 'step-finished',
       },
       {
-        id: 'outside-mount',
+        id: 'outside-length-puddles-on-frame',
         title: 'Puddles on Window Frame',
         image: '/assets/03-1-3@2x.webp',
         description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
