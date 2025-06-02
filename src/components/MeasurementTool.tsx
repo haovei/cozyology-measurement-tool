@@ -114,9 +114,7 @@ export default function MeasurementTool() {
     }
   }
 
-  const handleContinue = jump => {
-    console.log('Continuing to:', jump)
-
+  const handleContinue = (jump: string) => {
     // 记录当前步骤为已完成
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps(prev => [...prev, currentStep])
