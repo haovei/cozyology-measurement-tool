@@ -1,14 +1,106 @@
 'use client'
 
 import { useState } from 'react'
+import { StepDataList } from '../data/mountStyles'
 
 export default function MeasurementTool() {
-  const steps = [
-    { id: 1, title: 'Choose Mount Style', active: true },
-    { id: 2, title: 'Specify Window Width', active: false },
-    { id: 3, title: 'Specify Window Height', active: false },
-    { id: 4, title: 'Panels & Fullness', active: false },
-  ]
+  const [currentStep, setCurrentStep] = useState('step-1')
+  const [completedSteps, setCompletedSteps] = useState<string[]>([])
+
+  const getCurrentMainStep = (): string => {
+    if (currentStep === 'step-1') return 'step-1'
+    if (currentStep.startsWith('step-2')) return 'step-2'
+    if (currentStep.startsWith('step-3')) return 'step-3'
+    if (currentStep === 'step-finished') return 'step-finished'
+    return 'step-1'
+  }
+
+  const isStepCompleted = (stepKey: string): boolean => {
+    switch (stepKey) {
+      case 'step-1':
+        return completedSteps.includes('step-1')
+      case 'step-2':
+        return completedSteps.some(step => step.startsWith('step-2'))
+      case 'step-3':
+        return completedSteps.some(step => step.startsWith('step-3'))
+      case 'step-finished':
+        return completedSteps.includes('step-finished')
+      default:
+        return false
+    }
+  }
+
+  // 定义主要步骤列表
+  const mainSteps = ['step-1', 'step-2', 'step-3', 'step-finished']
+  const steps = mainSteps.map((key, index) => ({
+    id: key,
+    stepNumber: index + 1,
+    title: getStepTitle(key),
+    active: getCurrentMainStep() === key,
+    completed: isStepCompleted(key),
+  }))
+
+  function getStepTitle(stepKey: string): string {
+    switch (stepKey) {
+      case 'step-1':
+        return 'Choose Mount Style'
+      case 'step-2':
+        return 'Specify Window Width'
+      case 'step-3':
+        return 'Specify Window Height'
+      case 'step-finished':
+        return 'Finished'
+      default:
+        return 'Step'
+    }
+  }
+
+  const getPreviousStep = () => {
+    const currentIndex = mainSteps.indexOf(getCurrentMainStep())
+    return currentIndex > 0 ? mainSteps[currentIndex - 1] : null
+  }
+
+  const handleStepNavigation = (stepId: string) => {
+    // 只允许点击已完成的步骤或当前步骤
+    if (isStepCompleted(stepId) || stepId === getCurrentMainStep()) {
+      // 根据主步骤ID找到对应的实际步骤
+      const targetStep = getActualStepFromMainStep(stepId)
+      setCurrentStep(targetStep)
+    }
+  }
+
+  const getActualStepFromMainStep = (mainStepId: string): string => {
+    switch (mainStepId) {
+      case 'step-1':
+        return 'step-1'
+      case 'step-2':
+        // 返回已完成的最后一个step-2子步骤，或第一个step-2步骤
+        const step2Options = ['step-2-1-1', 'step-2-2-1', 'step-2-2-2']
+        const completedStep2 = step2Options.filter(step => completedSteps.includes(step))
+        return completedStep2.length > 0 ? completedStep2[completedStep2.length - 1] : 'step-2-1-1'
+      case 'step-3':
+        // 返回已完成的最后一个step-3子步骤，或第一个step-3步骤
+        const step3Options = ['step-3-1-1', 'step-3-2-1']
+        const completedStep3 = step3Options.filter(step => completedSteps.includes(step))
+        return completedStep3.length > 0 ? completedStep3[completedStep3.length - 1] : 'step-3-1-1'
+      case 'step-finished':
+        return 'step-finished'
+      default:
+        return 'step-1'
+    }
+  }
+
+  const handleContinue = jump => {
+    console.log('Continuing to:', jump)
+    setCurrentStep(jump)
+  }
+
+  const handleCalculateAgain = () => {
+    setCurrentStep('step-1')
+    setCompletedSteps([])
+  }
+
+  const currentStepData = StepDataList[currentStep]
 
   return (
     <div className="">
@@ -23,23 +115,33 @@ export default function MeasurementTool() {
                     <div
                       className={`w-4 h-4 rounded-full border-solid transition-colors ${
                         step.active
-                          ? 'w-7.5 h-7.5 bg-black border-[#BBB3AB] border-8'
-                          : 'bg-white border-2 border-black'
+                          ? 'w-7.5 h-7.5 bg-black border-[#BBB3AB] border-8 cursor-pointer'
+                          : step.completed
+                            ? 'w-4 h-4 bg-black cursor-pointer'
+                            : 'bg-white border-2 border-black cursor-not-allowed'
                       }`}
+                      onClick={() => handleStepNavigation(step.id)}
                     />
                     {index < steps.length - 1 && <div className="w-0.5 h-15 bg-black" />}
                   </div>
                   <div
-                    className={`flex-1 transition-colors ${step.active ? 'text-black font-medium text-[22px] leading-[30px]' : 'text-[#ccc] text-[18px] leading-none'}`}
+                    className={`flex-1 transition-colors ${
+                      step.active
+                        ? 'text-black font-medium text-[22px] leading-[30px] cursor-pointer'
+                        : step.completed
+                          ? 'text-black text-[18px] leading-none cursor-pointer'
+                          : 'text-[#ccc] text-[18px] leading-none cursor-not-allowed'
+                    }`}
+                    onClick={() => handleStepNavigation(step.id)}
                   >
-                    Step {step.id} - {step.title}
+                    Step {step.stepNumber} - {step.title}
                   </div>
                 </div>
               ))}
             </div>
 
             {/* QR Code Section */}
-            <div>
+            <div className="mt-10">
               <div className="flex items-center gap-[20px]">
                 <div className="w-[130px] h-[130px] bg-black rounded flex-shrink-0">
                   <img src="/assets/code@2x.webp" />
@@ -58,16 +160,28 @@ export default function MeasurementTool() {
         <div className="md:hidden bg-[#F3F3F3] px-8 py-5 overflow-auto">
           <div className="flex justify-between">
             {steps.map((step, index) => (
-              <div key={step.id} className="flex flex-col items-center relative">
+              <div
+                key={step.id}
+                className={`flex flex-col items-center relative ${
+                  step.completed || step.active ? 'cursor-pointer' : 'cursor-not-allowed'
+                }`}
+                onClick={() => handleStepNavigation(step.id)}
+              >
                 <div
                   className={`w-2.5 h-2.5 rounded-full border-solid transition-colors border-[#DDDDDD] relative z-1 ${
-                    step.active ? 'w-4 h-4 bg-black border-4' : 'bg-white border-1 my-1'
+                    step.active
+                      ? 'w-4 h-4 bg-black border-4'
+                      : step.completed
+                        ? 'w-2.5 h-2.5 bg-black border-1 my-[3px]'
+                        : 'bg-white border-1 my-[3px]'
                   }`}
                 />
                 <div
-                  className={`text-xs mt-1 transition-colors ${step.active ? 'text-black font-medium mt-1' : 'text-gray-400'}`}
+                  className={`text-xs mt-1 transition-colors ${
+                    step.active ? 'text-black font-medium mt-1' : step.completed ? 'text-black' : 'text-gray-400'
+                  }`}
                 >
-                  Step {step.id}
+                  Step {step.stepNumber}
                 </div>
                 {index < steps.length - 1 && (
                   <div className="absolute top-2 left-1/2 w-[calc(100vw/4)] h-0.5 bg-[#DDDDDD] z-0" />
@@ -79,54 +193,132 @@ export default function MeasurementTool() {
 
         {/* Main Content */}
         <div className="flex-1">
-          <div className="md:mx-auto md:py-0 mx-4 py-5">
-            <h1 className="text-[30px] font-americana text-center mb-11 text-gray-900 not-md:text-[18px] not-md:mb-6">
-              What kind of mount style would you like?
-            </h1>
-
-            <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
-              <div className="group w-[400px] h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto">
-                <div className="p-[40px] pb-[50px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
-                  <div className="w-[320px] h-[320px] mx-auto relative not-md:w-[160px] not-md:h-[160px]">
-                    <img src="/assets/02-1@2x.webp" alt="Inside Mount" className="w-full h-full object-cover" />
+          <div className="md:mx-auto md:py-0 mx-4 py-5 relative">
+            {currentStepData && (
+              <>
+                {getPreviousStep() && (
+                  <div className="mb-4">
+                    <button
+                      onClick={() => setCurrentStep(getPreviousStep()!)}
+                      className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors cursor-pointer"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M10 12L6 8L10 4"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      Previous
+                    </button>
                   </div>
-                  <div className="flex-1 md:text-center">
-                    <h3 className="text-[24px] text-[#171717] not-md:text-[15px]">INSIDE MOUNT</h3>
-                    <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
-                    <div className="text-[16px] text-[#171717] not-md:text-[12px]">
-                      Window depth requirement for Inside Mount: At least 2 3/4 inches for Bamboo shades 2 inches for
-                      Roman shades
+                )}
+                <h1 className="text-[30px] font-americana text-center mb-11 text-gray-900 not-md:text-[18px] not-md:mb-6">
+                  {currentStepData.title}
+                </h1>
+
+                {currentStepData.type === 'select' && (
+                  <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
+                    {currentStepData.options.map(option => (
+                      <div
+                        key={option.id}
+                        className="group w-[400px] h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto"
+                        onClick={() => handleContinue(option.jump)}
+                      >
+                        <div className="p-[40px] pb-[50px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
+                          <div className="w-[320px] h-[320px] mx-auto relative not-md:w-[160px] not-md:h-[160px]">
+                            <img src={option.image} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 md:text-center">
+                            <h3 className="text-[24px] text-[#171717] not-md:text-[15px]">{option.title}</h3>
+                            <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
+                            <div className="text-[16px] text-[#171717] not-md:text-[12px]">{option.description}</div>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 hidden group-hover:block">
+                          <button className="w-full px-12 py-3 text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer">
+                            CONTINUE
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {currentStepData.type === 'input' && (
+                  <div className="flex gap-[75px] bg-[#F5F5F5] p-[50px]">
+                    <div className="w-[45%]  mx-auto relative not-md:w-[160px] not-md:h-[160px]">
+                      <img src={currentStepData.image} className="w-full object-cover" />
+                    </div>
+                    <div className="flex-1 flex flex-col">
+                      <div className="text-[14px] text-center">{currentStepData.description}</div>
+                      <div className="flex-1 flex flex-col justify-end gap-[30px]">
+                        {currentStepData.options.map(option => (
+                          <div className="flex" key={option.id}>
+                            {currentStepData.options.length > 1 && (
+                              <div className="w-[100px]">
+                                <div className="text-[24px]">{option.title}</div>
+                                <div className="text-[14px]">{option.label}</div>
+                              </div>
+                            )}
+                            <div className="flex-1 flex items-center gap-2 border border-black h-[60px] bg-white">
+                              <input
+                                type="number"
+                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[24px]"
+                                placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
+                                min={option.min}
+                                max={option.max}
+                              />
+                              <div className="h-[34px] leading-[34px] px-[20px] border-l">Inches</div>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="">
+                          <button
+                            onClick={() => handleContinue(currentStepData.jump)}
+                            className="w-full px-12 py-3 text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                          >
+                            CONTINUE
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 hidden group-hover:block">
-                  <button className="w-full px-12 py-3 text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer">
-                    CONTINUE
-                  </button>
-                </div>
-              </div>
+                )}
 
-              <div className="group w-[400px] h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto">
-                <div className="p-[40px] pb-[50px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
-                  <div className="w-[320px] h-[320px] mx-auto relative not-md:w-[160px] not-md:h-[160px]">
-                    <img src="/assets/02-2@2x.webp" alt="OUTSIDE Mount" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 md:text-center">
-                    <h3 className="text-[24px] text-[#171717] not-md:text-[15px]">OUTSIDE MOUNT</h3>
-                    <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
-                    <div className="text-[16px] text-[#171717] not-md:text-[12px]">
-                      We recommend adding a minimum of 2 inches to width and 10-12 inches to height to allow light gap
-                      coverage.
+                {currentStepData.type === 'finished' && (
+                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] px-[120px]">
+                    <div className="text-[20px] font-medium text-black">Your recommended shade size is </div>
+                    <div className="text-[60px] text-black mt-[30px]">30”W * 20”L</div>
+                    <div className="mt-[20px] text-[16px] text-center text-[#999999]">
+                      For Inside Mount: <br />
+                      The recommended shade width size already includes the 3/8'' clearance adjustment. <br />
+                      Shade length = Maximum window height.
+                    </div>
+                    <div className="mt-[50px] text-[16px] text-center text-[#999999]">
+                      Tips: <span className="font-bold">Take a screenshot</span> of these measurements for when you're
+                      ready to order.
+                    </div>
+                    <div className="my-[50px] flex gap-[30px]">
+                      <button
+                        onClick={() => handleContinue(currentStepData.jump)}
+                        className="w-[300px] px-12 py-3 text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                      >
+                        SHOP NOW
+                      </button>
+                      <button
+                        onClick={handleCalculateAgain}
+                        className="w-[300px] px-12 py-3 text-lg font-medium transition-all duration-200 border cursor-pointer"
+                      >
+                        CALCULATE AGAIN
+                      </button>
                     </div>
                   </div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 hidden group-hover:block">
-                  <button className="w-full px-12 py-3 text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer">
-                    CONTINUE
-                  </button>
-                </div>
-              </div>
-            </div>
+                )}
+              </>
+            )}
 
             {/* Mobile QR Code Section */}
             <div className="md:hidden mt-8 p-4 bg-[#F6F2EF] rounded-lg">

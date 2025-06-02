@@ -1,0 +1,205 @@
+export interface MountStyle {
+  id: string
+  title: string
+  image: string
+  alt: string
+  description: string
+}
+
+export const StepDataList = {
+  'step-1': {
+    title: 'What kind of mount style would you like?',
+    type: 'select',
+    options: [
+      {
+        id: 'inside-mount',
+        title: 'INSIDE MOUNT',
+        image: '/assets/01-1@2x.webp',
+        alt: 'Inside Mount',
+        description:
+          'Window depth requirement for Inside Mount: At least 2 3/4 inches for Bamboo shades 2 inches for Roman shades',
+        jump: 'step-2-1-1',
+      },
+      {
+        id: 'outside-mount',
+        title: 'OUTSIDE MOUNT',
+        image: '/assets/01-2@2x.webp',
+        alt: 'OUTSIDE Mount',
+        description:
+          'We recommend adding a minimum of 2 inches to width and 10-12 inches to height to allow light gap coverage.',
+        jump: 'step-2-2-1',
+      },
+    ],
+  },
+  'step-2-1-1': {
+    title: 'What is the window width (frame inner edge to edge)?',
+    type: 'input',
+    image: '/assets/02-1-1@2x.webp',
+    description: 'Measuring the top, middle, and bottom points improves accuracy',
+    jump: 'step-3-1-1',
+    options: [
+      {
+        id: 'width-a',
+        title: 'A',
+        label: 'Width',
+        min: 15,
+        max: 280,
+      },
+      {
+        id: 'width-b',
+        title: 'B',
+        label: 'Width',
+        min: 15,
+        max: 280,
+      },
+      {
+        id: 'width-c',
+        title: 'C',
+        label: 'Width',
+        min: 15,
+        max: 280,
+      },
+    ],
+  },
+  'step-2-2-1': {
+    title: 'What is the width of the window (frame outer edge to edge)?',
+    type: 'input',
+    image: '/assets/02-2-1@2x.webp',
+    jump: 'step-2-2-2',
+    options: [
+      {
+        id: 'width-a',
+        title: '',
+        label: '',
+        min: 15,
+        max: 280,
+      },
+    ],
+  },
+  'step-2-2-2': {
+    title: ' How many inches would you like to add the width?',
+    type: 'input',
+    image: '/assets/02-2-2@2x.webp',
+    description: 'We recommend to add at least 1-2 inches on each side to minimize light seepage and enhance privacy',
+    jump: 'step-3-2-1',
+    options: [
+      {
+        id: 'width-a',
+        title: 'A',
+        label: 'Left Side',
+        min: 0,
+      },
+      {
+        id: 'width-b',
+        title: 'B',
+        label: 'Right Side',
+        min: 0,
+      },
+    ],
+  },
+  'step-3-1-1': {
+    title: 'What is the height of your window?',
+    type: 'input',
+    image: '/assets/03-1-1@2x.webp',
+    description: 'Measuring the left, middle, and right points improves accuracy',
+    jump: 'step-3-1-2',
+    options: [
+      {
+        id: 'height-a',
+        title: 'A',
+        label: 'Height',
+        min: 20,
+        max: 110,
+      },
+      {
+        id: 'height-b',
+        title: 'B',
+        label: 'Height',
+        min: 20,
+        max: 110,
+      },
+      {
+        id: 'height-c',
+        title: 'C',
+        label: 'Height',
+        min: 20,
+        max: 110,
+      },
+    ],
+  },
+  'step-3-1-2': {
+    title: 'Shade Length Style?',
+    type: 'select',
+    options: [
+      {
+        id: 'inside-mount',
+        title: 'Breaks on Window Frame',
+        image: '/assets/03-1-2@2x.webp',
+        description: 'Custom-fit for a tailored look with full light blocking',
+        jump: 'step-finished',
+      },
+      {
+        id: 'outside-mount',
+        title: 'Puddles on Window Frame',
+        image: '/assets/03-1-3@2x.webp',
+        description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
+        jump: 'step-finished',
+      },
+    ],
+  },
+  'step-3-2-1': {
+    title: 'What is the height of your window (frame outer edge to edge)?',
+    type: 'input',
+    image: '/assets/03-2-1@2x.webp',
+    jump: 'step-3-2-2',
+    options: [
+      {
+        id: 'height-outside',
+        title: '',
+        label: 'Height',
+        min: 20,
+        max: 110,
+      },
+    ],
+  },
+  'step-3-2-2': {
+    title: 'How many inches above the window would you like to mount the shade?',
+    type: 'input',
+    image: '/assets/03-2-2@2x.webp',
+    description: 'We recommend adding at least 10-12 inches to allow window exposure when you roll the shades up.',
+    jump: 'step-3-2-3',
+    options: [
+      {
+        id: 'height-outside',
+        title: '',
+        label: 'Height',
+        min: 0,
+      },
+    ],
+  },
+  'step-3-2-3': {
+    title: 'Shade Length Style?',
+    type: 'select',
+    options: [
+      {
+        id: 'inside-mount',
+        title: 'Breaks on Window Frame',
+        image: '/assets/03-1-2@2x.webp',
+        description: 'Custom-fit for a tailored look with full light blocking',
+        jump: 'step-finished',
+      },
+      {
+        id: 'outside-mount',
+        title: 'Puddles on Window Frame',
+        image: '/assets/03-1-3@2x.webp',
+        description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
+        jump: 'step-finished',
+      },
+    ],
+  },
+  'step-finished': {
+    title: 'Finished',
+    type: 'finished',
+    options: [],
+  },
+}
