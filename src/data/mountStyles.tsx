@@ -16,8 +16,13 @@ export const StepDataList = {
         title: 'INSIDE MOUNT',
         image: '/assets/01-1@2x.webp',
         alt: 'Inside Mount',
-        description:
-          'Window depth requirement for Inside Mount: At least 2 3/4 inches for Bamboo shades 2 inches for Roman shades',
+        description: (
+          <div>
+            Window depth requirement for Inside Mount:
+            <br /> At least 2 3/4 inches for Bamboo shades <br /> 2 inches for Roman shades <br /> 4 inches for
+            Motorized Shades
+          </div>
+        ),
         jump: 'step-2-1-1',
       },
       {
@@ -25,8 +30,11 @@ export const StepDataList = {
         title: 'OUTSIDE MOUNT',
         image: '/assets/01-2@2x.webp',
         alt: 'OUTSIDE Mount',
-        description:
-          'We recommend adding a minimum of 2 inches to width and 10-12 inches to height to allow light gap coverage.',
+        description: (
+          <div>
+            We recommend adding a minimum of 2 inches to width and 10-12 inches to height to allow light gap coverage.
+          </div>
+        ),
         jump: 'step-2-2-1',
       },
     ],

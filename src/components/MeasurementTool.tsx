@@ -138,7 +138,7 @@ export default function MeasurementTool() {
     <div className="">
       <div className="flex flex-col md:py-6  md:flex-row">
         {/* Desktop Sidebar */}
-        <div className="hidden md:block w-[40%] bg-white">
+        <div className="hidden md:block w-[35%] bg-white">
           <div className="flex flex-col h-full pt-6">
             <div className="flex-1 ">
               {steps.map((step, index) => (
@@ -252,14 +252,14 @@ export default function MeasurementTool() {
                 </h1>
 
                 {currentStepData.type === 'select' && (
-                  <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
+                  <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch">
                     {currentStepData.options.map(option => (
                       <div
                         key={option.id}
-                        className="group w-[400px] h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto"
+                        className="group w-[400px] min-h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto"
                         onClick={() => handleContinue(option.jump)}
                       >
-                        <div className="p-[40px] pb-[50px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
+                        <div className="p-[40px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
                           <div className="w-[320px] h-[320px] mx-auto relative not-md:w-[160px] not-md:h-[160px]">
                             <img src={option.image} className="w-full h-full object-cover" />
                           </div>
