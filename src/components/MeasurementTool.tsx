@@ -7,6 +7,8 @@ export default function MeasurementTool() {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
+  const [inputValues, setInputValues] = useState<Record<string, number>>({}) // 记录所有输入值
+  const [currentStepInputs, setCurrentStepInputs] = useState<Record<string, string>>({}) // 当前步骤的输入值
 
   const getCurrentMainStep = (): string => {
     if (currentStep === 'step-1') return 'step-1'
@@ -114,7 +116,136 @@ export default function MeasurementTool() {
     }
   }
 
+  // 验证当前步骤的所有输入是否都已填写
+  const validateCurrentStepInputs = (): boolean => {
+    if (currentStepData.type !== 'input') return true
+
+    return currentStepData.options.every(option => {
+      const value = currentStepInputs[option.id]
+      const numValue = parseFloat(value)
+
+      // 检查是否有值且为有效数字
+      if (!value || isNaN(numValue)) return false
+
+      // 检查是否满足最小值要求
+      if (numValue < option.min) return false
+
+      // 检查是否满足最大值要求（如果有）
+      if (option.max && numValue > option.max) return false
+
+      return true
+    })
+  }
+
+  // 保存当前步骤的输入值
+  const saveCurrentStepInputs = () => {
+    const newInputs = { ...inputValues }
+
+    currentStepData.options.forEach(option => {
+      const value = currentStepInputs[option.id]
+      if (value) {
+        newInputs[option.id] = parseFloat(value)
+      }
+    })
+
+    setInputValues(newInputs)
+  }
+
+  // 处理输入值变化
+  const handleInputChange = (optionId: string, value: string) => {
+    setCurrentStepInputs(prev => ({
+      ...prev,
+      [optionId]: value,
+    }))
+  }
+
+  // 检查当前步骤是否可以继续
+  const canContinue = (): boolean => {
+    if (currentStepData.type === 'input') {
+      return validateCurrentStepInputs()
+    }
+    return true
+  }
+
+  // 计算最终的推荐尺寸
+  const calculateRecommendedSize = (): { width: number; height: number } => {
+    // 判断是内装还是外装
+    const isInsideMount = completedSteps.some(step => step.includes('step-2-1'))
+
+    let width = 0
+    let height = 0
+
+    if (isInsideMount) {
+      // 内装计算
+      // 宽度：取三个测量值中的最小值，然后减去 3/8 英寸间隙
+      const widthValues = [
+        inputValues['inside-width-top'],
+        inputValues['inside-width-middle'],
+        inputValues['inside-width-bottom'],
+      ].filter(v => v !== undefined)
+
+      if (widthValues.length > 0) {
+        width = Math.min(...widthValues) - 0.375 // 减去 3/8 英寸
+      }
+
+      // 高度：取三个测量值中的最大值
+      const heightValues = [
+        inputValues['inside-height-left'],
+        inputValues['inside-height-middle'],
+        inputValues['inside-height-right'],
+      ].filter(v => v !== undefined)
+
+      if (heightValues.length > 0) {
+        height = Math.max(...heightValues)
+
+        // 如果选择了 puddles 样式，增加 2 英寸
+        if (completedSteps.some(step => step.includes('puddles'))) {
+          height += 2
+        }
+      }
+    } else {
+      // 外装计算
+      // 宽度：窗户宽度 + 左侧延伸 + 右侧延伸
+      const windowWidth = inputValues['outside-window-width'] || 0
+      const leftExtension = inputValues['outside-width-left-extension'] || 0
+      const rightExtension = inputValues['outside-width-right-extension'] || 0
+      width = windowWidth + leftExtension + rightExtension
+
+      // 高度：窗户高度 + 上方延伸
+      const windowHeight = inputValues['outside-window-height'] || 0
+      const aboveExtension = inputValues['outside-height-above-extension'] || 0
+      height = windowHeight + aboveExtension
+
+      // 如果选择了 puddles 样式，增加 2 英寸
+      if (completedSteps.some(step => step.includes('puddles'))) {
+        height += 2
+      }
+    }
+
+    return {
+      width: Math.round(width * 8) / 8, // 四舍五入到最近的 1/8 英寸
+      height: Math.round(height * 8) / 8,
+    }
+  }
+
+  // 获取安装类型描述
+  const getMountTypeDescription = (): string => {
+    const isInsideMount = completedSteps.some(step => step.includes('step-2-1'))
+    return isInsideMount ? 'Inside Mount' : 'Outside Mount'
+  }
+
   const handleContinue = (jump: string) => {
+    // 如果当前步骤是输入类型，验证所有输入是否都已填写
+    if (currentStepData.type === 'input') {
+      const isValid = validateCurrentStepInputs()
+      if (!isValid) {
+        return // 如果验证失败，不继续
+      }
+
+      // 保存当前步骤的输入值
+      saveCurrentStepInputs()
+    }
+
     // 记录当前步骤为已完成
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps(prev => [...prev, currentStep])
@@ -123,6 +254,9 @@ export default function MeasurementTool() {
     // 添加到历史记录
     setStepHistory(prev => [...prev, jump])
 
+    // 清空当前步骤输入
+    setCurrentStepInputs({})
+
     setCurrentStep(jump)
   }
 
@@ -130,13 +264,15 @@ export default function MeasurementTool() {
     setCurrentStep('step-1')
     setCompletedSteps([])
     setStepHistory(['step-1']) // 重置历史记录
+    setInputValues({}) // 重置所有输入值
+    setCurrentStepInputs({}) // 重置当前步骤输入
   }
 
   const currentStepData = StepDataList[currentStep]
 
   return (
     <div className="">
-      <div className="flex flex-col md:py-6  md:flex-row">
+      <div className="flex flex-col md:flex-row">
         {/* Desktop Sidebar */}
         <div className="hidden md:block w-[35%] bg-white">
           <div className="flex flex-col h-full pt-6">
@@ -200,7 +336,7 @@ export default function MeasurementTool() {
                 onClick={() => handleStepNavigation(step.id)}
               >
                 <div
-                  className={`w-2.5 h-2.5 rounded-full border-solid transition-colors border-[#DDDDDD] relative z-1 ${
+                  className={`w-2.5 h-2.5 rounded-full border-solid transition-colors border-[#BBB3AB] relative z-1 ${
                     step.active
                       ? 'w-4 h-4 bg-black border-4'
                       : step.completed
@@ -210,7 +346,7 @@ export default function MeasurementTool() {
                 />
                 <div
                   className={`text-xs mt-1 transition-colors ${
-                    step.active ? 'text-black font-medium mt-1' : step.completed ? 'text-black' : 'text-gray-400'
+                    step.active ? 'text-black font-medium mt-1' : step.completed ? 'text-black' : 'text-[#999999]'
                   }`}
                 >
                   Step {step.stepNumber}
@@ -225,7 +361,7 @@ export default function MeasurementTool() {
 
         {/* Main Content */}
         <div className="flex-1">
-          <div className="md:mx-auto md:py-0 mx-4 py-5 relative">
+          <div className="md:mx-auto md:py-0 mx-4 pt-5 relative">
             {currentStepData && (
               <>
                 {getPreviousStep() && (
@@ -256,7 +392,7 @@ export default function MeasurementTool() {
                     {currentStepData.options.map(option => (
                       <div
                         key={option.id}
-                        className="group w-[400px] min-h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto"
+                        className="group w-[400px] md:min-h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto"
                         onClick={() => handleContinue(option.jump)}
                       >
                         <div className="p-[40px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
@@ -296,22 +432,34 @@ export default function MeasurementTool() {
                                 <div className="text-[14px] not-md:text-[12px]">{option.label}</div>
                               </div>
                             )}
-                            <div className="flex-1 flex items-center gap-2 border border-black h-[60px] bg-white">
-                              <input
-                                type="number"
-                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[24px] not-md:text-[12px]"
-                                placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
-                                min={option.min}
-                                max={option.max}
-                              />
-                              <div className="h-[34px] leading-[34px] px-[20px] border-l">Inches</div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 border border-black h-[60px] bg-white">
+                                <input
+                                  type="number"
+                                  className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[24px] not-md:text-[12px]"
+                                  placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
+                                  min={option.min}
+                                  max={option.max}
+                                  value={currentStepInputs[option.id] || ''}
+                                  onChange={e => handleInputChange(option.id, e.target.value)}
+                                  required
+                                />
+                                <div className="h-[34px] leading-[34px] px-[20px] border-l">Inches</div>
+                              </div>
+                              {/* 移除错误提示 */}
                             </div>
                           </div>
                         ))}
                         <div className="">
+                          {/* 移除整体验证提示 */}
                           <button
                             onClick={() => handleContinue(currentStepData.jump)}
-                            className="w-full h-[60px] not-md:h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                            disabled={!canContinue()}
+                            className={`w-full h-[60px] not-md:h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer ${
+                              canContinue()
+                                ? 'bg-black text-white hover:bg-gray-800'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
                           >
                             CONTINUE
                           </button>
@@ -327,11 +475,25 @@ export default function MeasurementTool() {
                       <div className="text-[20px] font-medium text-black not-md:text-[12px]">
                         Your recommended shade size is{' '}
                       </div>
-                      <div className="text-[60px] text-black mt-[30px] not-md:text-[35px]">30”W * 20”L</div>
+                      <div className="text-[60px] text-black mt-[30px] not-md:text-[35px]">
+                        {(() => {
+                          const { width, height } = calculateRecommendedSize()
+                          return `${width}"W × ${height}"L`
+                        })()}
+                      </div>
                       <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
-                        For Inside Mount: <br />
-                        The recommended shade width size already includes the 3/8'' clearance adjustment. <br />
-                        Shade length = Maximum window height.
+                        For {getMountTypeDescription()}: <br />
+                        {getMountTypeDescription() === 'Inside Mount' ? (
+                          <>
+                            The recommended shade width size already includes the 3/8" clearance adjustment. <br />
+                            Shade length = Maximum window height.
+                          </>
+                        ) : (
+                          <>
+                            Width includes your specified extensions on both sides. <br />
+                            Height includes your specified mounting height above the window.
+                          </>
+                        )}
                       </div>
                       <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
                         Tips: <span className="font-bold">Take a screenshot</span> of these measurements for when you're
