@@ -56,12 +56,18 @@ class CozyologyMeasurementTool extends HTMLElement {
     // Extract attributes as props
     const props: any = {}
 
+    // Extract shop-now-url attribute
+    const shopNowUrl = this.getAttribute('shop-now-url')
+    if (shopNowUrl) {
+      props.shopNowUrl = shopNowUrl
+    }
+
     return props
   }
 
   // Watch for attribute changes
   static get observedAttributes() {
-    return ['data-style-url']
+    return ['data-style-url', 'shop-now-url']
   }
 
   attributeChangedCallback(name: string) {
@@ -69,6 +75,11 @@ class CozyologyMeasurementTool extends HTMLElement {
       const styleUrl = this.getAttribute('data-style-url')
       if (styleUrl) {
         this.loadStyles(styleUrl)
+      }
+    } else if (name === 'shop-now-url') {
+      // Re-render component with new props when shop-now-url changes
+      if (this.root && this.shadowRoot) {
+        this.root.render(React.createElement(MeasurementTool, this.getProps()))
       }
     }
   }

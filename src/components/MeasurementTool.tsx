@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { StepDataList } from '../data/mountStyles'
 
-export default function MeasurementTool() {
+export default function MeasurementTool({ shopNowUrl }: { shopNowUrl?: string }) {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
@@ -268,6 +268,10 @@ export default function MeasurementTool() {
     setCurrentStepInputs({}) // 重置当前步骤输入
   }
 
+  const handleShopNow = () => {
+    window.open(shopNowUrl, '_blank')
+  }
+
   const currentStepData = StepDataList[currentStep]
 
   return (
@@ -503,7 +507,7 @@ export default function MeasurementTool() {
                       </div>
                       <div className="not-md:hidden mt-[50px] flex gap-[30px]">
                         <button
-                          onClick={() => handleContinue(currentStepData.jump)}
+                          onClick={handleShopNow}
                           className="w-[300px] h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
                         >
                           SHOP NOW
@@ -522,7 +526,7 @@ export default function MeasurementTool() {
                     </div>
                     <div className="md:hidden mt-[20px] flex gap-[15px]">
                       <button
-                        onClick={() => handleContinue(currentStepData.jump)}
+                        onClick={handleShopNow}
                         className="flex-1 h-[40px] text-[12px] font-medium transition-all duration-200 bg-black text-white cursor-pointer"
                       >
                         SHOP NOW
