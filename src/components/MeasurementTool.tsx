@@ -271,7 +271,7 @@ export default function MeasurementTool() {
   const currentStepData = StepDataList[currentStep]
 
   return (
-    <div className="">
+    <div className="container mx-auto">
       <div className="flex flex-col md:flex-row">
         {/* Desktop Sidebar */}
         <div className="hidden md:block w-[35%] bg-white">
@@ -311,8 +311,8 @@ export default function MeasurementTool() {
             {/* QR Code Section */}
             <div className="mt-10">
               <div className="flex items-center gap-[20px]">
-                <div className="w-[130px] h-[130px] bg-black rounded flex-shrink-0">
-                  <img src="/assets/code@2x.webp" />
+                <div className="w-[130px] h-[130px] rounded flex-shrink-0">
+                  <div className="qr-code-image image-qr-code" />
                 </div>
                 <div className="text-[14px]">
                   <div className="font-medium text-black">Need help with measurements?</div>
@@ -397,7 +397,7 @@ export default function MeasurementTool() {
                       >
                         <div className="p-[40px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
                           <div className="w-[320px] h-[320px] mx-auto relative not-md:w-[160px] not-md:h-[160px]">
-                            <img src={option.image} className="w-full h-full object-cover" />
+                            <div className={`option-image ${option.imageClass}`} />
                           </div>
                           <div className="flex-1 md:text-center">
                             <h3 className="text-[24px] text-[#171717] not-md:text-[15px]">{option.title}</h3>
@@ -418,7 +418,9 @@ export default function MeasurementTool() {
                 {currentStepData.type === 'input' && (
                   <div className="flex gap-[75px] md:bg-[#F5F5F5] p-[50px] not-md:p-2 not-md:flex-col not-md:items-center not-md:gap-[15px]">
                     <div className="w-[45%] mx-auto relative flex items-center gap-[10px] not-md:w-full not-md:bg-[#F5F5F5] not-md:p-2">
-                      <img src={currentStepData.image} className="w-full object-cover not-md:w-[50%]" />
+                      <div className="w-full not-md:w-[50%]">
+                        <div className={`step-image ${currentStepData.imageClass}`} />
+                      </div>
                       <div className="md:hidden text-[14px]">{currentStepData.description}</div>
                     </div>
                     <div className="flex-1 flex flex-col not-md:w-full">
@@ -545,8 +547,8 @@ export default function MeasurementTool() {
                   <div className="font-medium text-black">Scan the QR code or add us on</div>
                   <div className="text-gray-500 mt-[10px]">WhatsApp: (917) 701-2145</div>
                 </div>
-                <div className="w-[65px] h-[65px] bg-black flex-shrink-0">
-                  <img src="/assets/code@2x.webp" />
+                <div className="w-[65px] h-[65px] flex-shrink-0">
+                  <div className="qr-code-image image-qr-code" />
                 </div>
               </div>
             </div>

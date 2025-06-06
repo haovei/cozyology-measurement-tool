@@ -20,8 +20,29 @@ class CozyologyMeasurementTool extends HTMLElement {
   }
 
   private mountComponent(container: HTMLElement) {
+    // Load external styles if provided
+    const styleUrl = this.getAttribute('data-style-url')
+    if (styleUrl) {
+      this.loadStyles(styleUrl)
+    }
+
     this.root = ReactDOM.createRoot(container)
     this.root.render(React.createElement(MeasurementTool, this.getProps()))
+  }
+
+  private loadStyles(styleUrl: string) {
+    const shadow = this.shadowRoot
+    if (!shadow) return
+
+    // Remove existing style links
+    const existingLinks = shadow.querySelectorAll('link[rel="stylesheet"]')
+    existingLinks.forEach(link => link.remove())
+
+    // Create and append new style link
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = styleUrl
+    shadow.appendChild(link)
   }
 
   disconnectedCallback() {
@@ -35,26 +56,20 @@ class CozyologyMeasurementTool extends HTMLElement {
     // Extract attributes as props
     const props: any = {}
 
-    // Example: data-title attribute becomes title prop
-    if (this.hasAttribute('data-title')) {
-      props.title = this.getAttribute('data-title')
-    }
-
-    if (this.hasAttribute('data-theme')) {
-      props.theme = this.getAttribute('data-theme')
-    }
-
     return props
   }
 
   // Watch for attribute changes
   static get observedAttributes() {
-    return ['data-title', 'data-theme']
+    return ['data-style-url']
   }
 
-  attributeChangedCallback() {
-    if (this.root) {
-      this.root.render(React.createElement(MeasurementTool, this.getProps()))
+  attributeChangedCallback(name: string) {
+    if (name === 'data-style-url') {
+      const styleUrl = this.getAttribute('data-style-url')
+      if (styleUrl) {
+        this.loadStyles(styleUrl)
+      }
     }
   }
 }

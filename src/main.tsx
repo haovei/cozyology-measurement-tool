@@ -7,13 +7,11 @@ import MeasurementTool from './components/MeasurementTool'
 import './index'
 
 // Development mode: Mount React component directly
-const devRoot = document.getElementById('dev-app')
+const devRoot = document.getElementById('measurement-tool-app')
 if (devRoot) {
   ReactDOM.createRoot(devRoot).render(
     <React.StrictMode>
-      <div className="container mx-auto">
-        <MeasurementTool />
-      </div>
+      <MeasurementTool />
     </React.StrictMode>
   )
 }

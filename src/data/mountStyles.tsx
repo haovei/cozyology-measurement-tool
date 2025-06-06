@@ -1,7 +1,7 @@
 export interface MountStyle {
   id: string
   title: string
-  image: string
+  imageClass: string
   alt: string
   description: string
 }
@@ -14,7 +14,7 @@ export const StepDataList = {
       {
         id: 'inside-mount',
         title: 'INSIDE MOUNT',
-        image: '/assets/01-1@2x.webp',
+        imageClass: 'image-inside-mount',
         alt: 'Inside Mount',
         description: (
           <div>
@@ -28,7 +28,7 @@ export const StepDataList = {
       {
         id: 'outside-mount',
         title: 'OUTSIDE MOUNT',
-        image: '/assets/01-2@2x.webp',
+        imageClass: 'image-outside-mount',
         alt: 'OUTSIDE Mount',
         description: (
           <div>
@@ -42,7 +42,7 @@ export const StepDataList = {
   'step-2-1-1': {
     title: 'What is the window width (frame inner edge to edge)?',
     type: 'input',
-    image: '/assets/02-1-1@2x.webp',
+    imageClass: 'image-inside-width',
     description: 'Measuring the top, middle, and bottom points improves accuracy',
     jump: 'step-3-1-1',
     options: [
@@ -72,7 +72,7 @@ export const StepDataList = {
   'step-2-2-1': {
     title: 'What is the width of the window (frame outer edge to edge)?',
     type: 'input',
-    image: '/assets/02-2-1@2x.webp',
+    imageClass: 'image-outside-window-width',
     jump: 'step-2-2-2',
     options: [
       {
@@ -87,7 +87,7 @@ export const StepDataList = {
   'step-2-2-2': {
     title: ' How many inches would you like to add the width?',
     type: 'input',
-    image: '/assets/02-2-2@2x.webp',
+    imageClass: 'image-outside-width-extension',
     description: 'We recommend to add at least 1-2 inches on each side to minimize light seepage and enhance privacy',
     jump: 'step-3-2-1',
     options: [
@@ -108,7 +108,7 @@ export const StepDataList = {
   'step-3-1-1': {
     title: 'What is the height of your window?',
     type: 'input',
-    image: '/assets/03-1-1@2x.webp',
+    imageClass: 'image-inside-height',
     description: 'Measuring the left, middle, and right points improves accuracy',
     jump: 'step-3-1-2',
     options: [
@@ -142,14 +142,14 @@ export const StepDataList = {
       {
         id: 'inside-length-breaks-on-frame',
         title: 'Breaks on Window Frame',
-        image: '/assets/03-1-2@2x.webp',
+        imageClass: 'image-inside-length-breaks',
         description: 'Custom-fit for a tailored look with full light blocking',
         jump: 'step-finished',
       },
       {
         id: 'inside-length-puddles-on-frame',
         title: 'Puddles on Window Frame',
-        image: '/assets/03-1-3@2x.webp',
+        imageClass: 'image-inside-length-puddles',
         description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
         jump: 'step-finished',
       },
@@ -158,7 +158,7 @@ export const StepDataList = {
   'step-3-2-1': {
     title: 'What is the height of your window (frame outer edge to edge)?',
     type: 'input',
-    image: '/assets/03-2-1@2x.webp',
+    imageClass: 'image-outside-window-height',
     jump: 'step-3-2-2',
     options: [
       {
@@ -173,7 +173,7 @@ export const StepDataList = {
   'step-3-2-2': {
     title: 'How many inches above the window would you like to mount the shade?',
     type: 'input',
-    image: '/assets/03-2-2@2x.webp',
+    imageClass: 'image-outside-height-extension',
     description: 'We recommend adding at least 10-12 inches to allow window exposure when you roll the shades up.',
     jump: 'step-3-2-3',
     options: [
@@ -192,14 +192,14 @@ export const StepDataList = {
       {
         id: 'outside-length-breaks-on-frame',
         title: 'Breaks on Window Frame',
-        image: '/assets/03-1-2@2x.webp',
+        imageClass: 'image-inside-length-breaks',
         description: 'Custom-fit for a tailored look with full light blocking',
         jump: 'step-finished',
       },
       {
         id: 'outside-length-puddles-on-frame',
         title: 'Puddles on Window Frame',
-        image: '/assets/03-1-3@2x.webp',
+        imageClass: 'image-inside-length-puddles',
         description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
         jump: 'step-finished',
       },

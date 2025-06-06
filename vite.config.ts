@@ -4,24 +4,29 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   plugins: [react(), tailwindcss()],
   build: {
-    lib: {
-      entry: './src/index.ts',
-      name: 'CozyologyMeasurementTool',
-      fileName: (format) => `cozyology-measurement-tool.${format}.js`
-    },
+    assetsDir: 'assets',
+    assetsInlineLimit: 4096,
     rollupOptions: {
-      external: ['react', 'react-dom'],
       output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM'
-        }
-      }
-    }
+        assetFileNames: assetInfo => {
+          const info = assetInfo.name?.split('.') || []
+          const extType = info[info.length - 1]
+
+          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name || '')) {
+            return `assets/images/[name].[hash][extname]`
+          }
+          if (/\.(woff|woff2|eot|ttf|otf)$/i.test(assetInfo.name || '')) {
+            return `assets/fonts/[name].[hash][extname]`
+          }
+          return `assets/[name].[hash][extname]`
+        },
+      },
+    },
   },
   define: {
-    'process.env.NODE_ENV': '"production"'
-  }
+    'process.env.NODE_ENV': '"production"',
+  },
 })
