@@ -7,22 +7,12 @@ export default defineConfig({
   base: './',
   plugins: [react(), tailwindcss()],
   build: {
-    assetsDir: 'assets',
     assetsInlineLimit: 4096,
     rollupOptions: {
       output: {
-        assetFileNames: assetInfo => {
-          const info = assetInfo.name?.split('.') || []
-          const extType = info[info.length - 1]
-
-          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name || '')) {
-            return `assets/images/[name].[hash][extname]`
-          }
-          if (/\.(woff|woff2|eot|ttf|otf)$/i.test(assetInfo.name || '')) {
-            return `assets/fonts/[name].[hash][extname]`
-          }
-          return `assets/[name].[hash][extname]`
-        },
+        entryFileNames: 'assets/cmt-[name]-[hash].js',
+        chunkFileNames: 'assets/cmt-[name]-[hash].js',
+        assetFileNames: 'assets/cmt-[name]-[hash].[ext]'
       },
     },
   },
