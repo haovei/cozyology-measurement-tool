@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { StepDataList } from '../data/mountStyles'
 
-export default function MeasurementTool({ shopNowUrl }: { shopNowUrl?: string }) {
+interface MeasurementToolProps {
+  shopNowUrl?: string
+  stepConfig: any
+}
+
+export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementToolProps) {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
@@ -272,13 +276,13 @@ export default function MeasurementTool({ shopNowUrl }: { shopNowUrl?: string })
     window.open(shopNowUrl, '_blank')
   }
 
-  const currentStepData = StepDataList[currentStep]
+  const currentStepData = stepConfig[currentStep]
 
   return (
     <div className="flex flex-col md:flex-row">
       {/* Desktop Sidebar */}
       <div className="hidden md:block w-[35%] bg-white">
-        <div className="flex flex-col h-full pt-6">
+        <div className="flex flex-col h-full">
           <div className="flex-1 ">
             {steps.map((step, index) => (
               <div key={step.id} className="flex">
@@ -368,7 +372,7 @@ export default function MeasurementTool({ shopNowUrl }: { shopNowUrl?: string })
           {currentStepData && (
             <>
               {getPreviousStep() && (
-                <div className="mb-4">
+                <div className="mb-4 absolute">
                   <button
                     onClick={() => setCurrentStep(getPreviousStep()!)}
                     className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors cursor-pointer"
@@ -440,7 +444,6 @@ export default function MeasurementTool({ shopNowUrl }: { shopNowUrl?: string })
                           <div className="flex-1">
                             <div className="flex items-center gap-2 border border-black h-[60px] bg-white">
                               <input
-                                type="number"
                                 className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[24px] not-md:text-[12px]"
                                 placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
                                 min={option.min}

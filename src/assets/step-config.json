@@ -1,0 +1,195 @@
+{
+  "step-1": {
+    "title": "What kind of mount style would you like?",
+    "type": "select",
+    "options": [
+      {
+        "id": "inside-mount",
+        "title": "INSIDE MOUNT",
+        "imageClass": "image-inside-mount",
+        "alt": "Inside Mount",
+        "description": "Window depth requirement for Inside Mount:\nAt least 2 3/4 inches for Handwoven shades\n2 inches for Roman shades\n4 inches for Motorized Shades",
+        "jump": "step-2-1-1"
+      },
+      {
+        "id": "outside-mount",
+        "title": "OUTSIDE MOUNT",
+        "imageClass": "image-outside-mount",
+        "alt": "OUTSIDE Mount",
+        "description": "We recommend adding a minimum of 2 inches to width and 4-6 inches to height to allow light gap coverage.",
+        "jump": "step-2-2-1"
+      }
+    ]
+  },
+  "step-2-1-1": {
+    "title": "What is the window width (frame inner edge to edge)?",
+    "type": "input",
+    "imageClass": "image-inside-width",
+    "description": "Measuring the top, middle, and bottom points improves accuracy",
+    "jump": "step-3-1-1",
+    "options": [
+      {
+        "id": "inside-width-top",
+        "title": "A",
+        "label": "Width",
+        "min": 15,
+        "max": 280
+      },
+      {
+        "id": "inside-width-middle",
+        "title": "B",
+        "label": "Width",
+        "min": 15,
+        "max": 280
+      },
+      {
+        "id": "inside-width-bottom",
+        "title": "C",
+        "label": "Width",
+        "min": 15,
+        "max": 280
+      }
+    ]
+  },
+  "step-2-2-1": {
+    "title": "What is the width of the window (frame outer edge to edge)?",
+    "type": "input",
+    "imageClass": "image-outside-window-width",
+    "jump": "step-2-2-2",
+    "options": [
+      {
+        "id": "outside-window-width",
+        "title": "",
+        "label": "",
+        "min": 15,
+        "max": 280
+      }
+    ]
+  },
+  "step-2-2-2": {
+    "title": " How many inches would you like to add the width?",
+    "type": "input",
+    "imageClass": "image-outside-width-extension",
+    "description": "We recommend to add at least 1-2 inches on each side to minimize light seepage and enhance privacy",
+    "jump": "step-3-2-1",
+    "options": [
+      {
+        "id": "outside-width-left-extension",
+        "title": "A",
+        "label": "Left Side",
+        "min": 0
+      },
+      {
+        "id": "outside-width-right-extension",
+        "title": "B",
+        "label": "Right Side",
+        "min": 0
+      }
+    ]
+  },
+  "step-3-1-1": {
+    "title": "What is the height of your window?",
+    "type": "input",
+    "imageClass": "image-inside-height",
+    "description": "Measuring the left, middle, and right points improves accuracy",
+    "jump": "step-3-1-2",
+    "options": [
+      {
+        "id": "inside-height-left",
+        "title": "A",
+        "label": "Height",
+        "min": 20,
+        "max": 110
+      },
+      {
+        "id": "inside-height-middle",
+        "title": "B",
+        "label": "Height",
+        "min": 20,
+        "max": 110
+      },
+      {
+        "id": "inside-height-right",
+        "title": "C",
+        "label": "Height",
+        "min": 20,
+        "max": 110
+      }
+    ]
+  },
+  "step-3-1-2": {
+    "title": "Shade Length Style?",
+    "type": "select",
+    "options": [
+      {
+        "id": "inside-length-breaks-on-frame",
+        "title": "Breaks on Window Frame",
+        "imageClass": "image-inside-length-breaks",
+        "description": "Custom-fit for a tailored look with full light blocking",
+        "jump": "step-finished"
+      },
+      {
+        "id": "inside-length-puddles-on-frame",
+        "title": "Puddles on Window Frame",
+        "imageClass": "image-inside-length-puddles",
+        "description": "Added 2\" for better light coverage and a cozy, softly stacked finish",
+        "jump": "step-finished"
+      }
+    ]
+  },
+  "step-3-2-1": {
+    "title": "What is the height of your window (frame outer edge to edge)?",
+    "type": "input",
+    "imageClass": "image-outside-window-height",
+    "jump": "step-3-2-2",
+    "options": [
+      {
+        "id": "outside-window-height",
+        "title": "",
+        "label": "Height",
+        "min": 20,
+        "max": 110
+      }
+    ]
+  },
+  "step-3-2-2": {
+    "title": "How many inches above the window would you like to mount the shade?",
+    "type": "input",
+    "imageClass": "image-outside-height-extension",
+    "description": "We recommend adding at least 4-6 inches to allow window exposure when you roll the shades up.",
+    "jump": "step-3-2-3",
+    "options": [
+      {
+        "id": "outside-height-above-extension",
+        "title": "",
+        "label": "Height",
+        "min": 0
+      }
+    ]
+  },
+  "step-3-2-3": {
+    "title": "Shade Length Style?",
+    "type": "select",
+    "options": [
+      {
+        "id": "outside-length-breaks-on-frame",
+        "title": "Breaks on Window Frame",
+        "imageClass": "image-inside-length-breaks",
+        "description": "Custom-fit for a tailored look with full light blocking",
+        "jump": "step-finished"
+      },
+      {
+        "id": "outside-length-puddles-on-frame",
+        "title": "Puddles on Window Frame",
+        "imageClass": "image-inside-length-puddles",
+        "description": "Added 2\" for better light coverage and a cozy, softly stacked finish",
+        "jump": "step-finished"
+      }
+    ]
+  },
+  "step-finished": {
+    "title": "Finished",
+    "type": "finished",
+    "options": []
+  }
+}
