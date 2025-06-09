@@ -56,7 +56,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
       case 'step-3':
         return 'Specify Window Height'
       case 'step-finished':
-        return 'Finished'
+        return 'Ready to Order'
       default:
         return 'Step'
     }
@@ -425,19 +425,19 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               {currentStepData.type === 'input' && (
                 <div className="flex gap-[75px] md:bg-[#F5F5F5] p-[50px] not-md:p-2 not-md:flex-col not-md:items-center not-md:gap-[15px]">
                   <div className="w-[45%] mx-auto relative flex items-center gap-[10px] not-md:w-full not-md:bg-[#F5F5F5] not-md:p-2">
-                    <div className="w-full not-md:w-[50%]">
+                    <div className="w-full not-md:w-[60%]">
                       <div className={`step-image ${currentStepData.imageClass}`} />
                     </div>
-                    <div className="md:hidden not-md:w-[50%] text-[14px]">{currentStepData.description}</div>
+                    <div className="md:hidden not-md:w-[40%] text-[14px]">{currentStepData.description}</div>
                   </div>
                   <div className="flex-1 flex flex-col not-md:w-full">
-                    <div className="not-md:hidden text-[14px] text-center">{currentStepData.description}</div>
+                    <div className="not-md:hidden text-[16px] text-center">{currentStepData.description}</div>
                     <div className="flex-1 flex flex-col justify-end gap-[30px] not-md:gap-[15px]">
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
                           {currentStepData.options.length > 1 && (
                             <div className="w-[80px] not-md:flex gap-2">
-                              <div className="text-[16px] not-md:text-[12px]">{option.title}</div>
+                              <div className="text-[18px] not-md:text-[12px]">{option.title}</div>
                               <div className="text-[12px] not-md:text-[12px]">{option.label}</div>
                             </div>
                           )}
