@@ -282,8 +282,8 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     <div className="flex flex-col md:flex-row">
       {/* Desktop Sidebar */}
       <div className="hidden md:block w-[35%] bg-white">
-        <div className="flex flex-col h-full">
-          <div className="flex-1 ">
+        <div className="flex flex-col h-full justify-center">
+          <div className="">
             {steps.map((step, index) => (
               <div key={step.id} className="flex">
                 <div className="flex flex-col items-center mr-4 w-[30px]">
@@ -302,10 +302,10 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                 <div
                   className={`flex-1 transition-colors ${
                     step.active
-                      ? 'text-black font-medium text-[22px] leading-[30px] cursor-pointer'
+                      ? 'text-black font-medium text-[20px] leading-[30px] cursor-pointer'
                       : step.completed
-                        ? 'text-black text-[18px] leading-none cursor-pointer'
-                        : 'text-[#ccc] text-[18px] leading-none cursor-not-allowed'
+                        ? 'text-black text-[16px] leading-none cursor-pointer'
+                        : 'text-[#ccc] text-[16px] leading-none cursor-not-allowed'
                   }`}
                   onClick={() => handleStepNavigation(step.id)}
                 >
@@ -372,7 +372,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
           {currentStepData && (
             <>
               {getPreviousStep() && (
-                <div className="mb-4 absolute">
+                <div className="mb-4">
                   <button
                     onClick={() => setCurrentStep(getPreviousStep()!)}
                     className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors cursor-pointer"
@@ -428,7 +428,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                     <div className="w-full not-md:w-[50%]">
                       <div className={`step-image ${currentStepData.imageClass}`} />
                     </div>
-                    <div className="md:hidden text-[14px]">{currentStepData.description}</div>
+                    <div className="md:hidden not-md:w-[50%] text-[14px]">{currentStepData.description}</div>
                   </div>
                   <div className="flex-1 flex flex-col not-md:w-full">
                     <div className="not-md:hidden text-[14px] text-center">{currentStepData.description}</div>
@@ -436,15 +436,15 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
                           {currentStepData.options.length > 1 && (
-                            <div className="w-[100px] not-md:flex gap-2">
-                              <div className="text-[24px] not-md:text-[12px]">{option.title}</div>
-                              <div className="text-[14px] not-md:text-[12px]">{option.label}</div>
+                            <div className="w-[80px] not-md:flex gap-2">
+                              <div className="text-[16px] not-md:text-[12px]">{option.title}</div>
+                              <div className="text-[12px] not-md:text-[12px]">{option.label}</div>
                             </div>
                           )}
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 border border-black h-[60px] bg-white">
+                            <div className="flex items-center gap-2 border border-black h-[42px] bg-white">
                               <input
-                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[24px] not-md:text-[12px]"
+                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
                                 placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
                                 min={option.min}
                                 max={option.max}
@@ -452,7 +452,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                                 onChange={e => handleInputChange(option.id, e.target.value)}
                                 required
                               />
-                              <div className="h-[34px] leading-[34px] px-[20px] border-l">Inches</div>
+                              <div className="h-[34px] leading-[34px] px-[20px] border-l text-[16px]">Inches</div>
                             </div>
                             {/* 移除错误提示 */}
                           </div>
@@ -463,7 +463,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                         <button
                           onClick={() => handleContinue(currentStepData.jump)}
                           disabled={!canContinue()}
-                          className={`w-full h-[60px] not-md:h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer ${
+                          className={`w-full h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer ${
                             canContinue()
                               ? 'bg-black text-white hover:bg-gray-800'
                               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
