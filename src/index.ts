@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import MeasurementTool from './components/MeasurementTool'
+import stepConfig from './assets/step-config.json'
 
 // Web Component wrapper for React component
 class CozyologyMeasurementTool extends HTMLElement {
@@ -20,6 +21,9 @@ class CozyologyMeasurementTool extends HTMLElement {
   }
 
   private mountComponent(container: HTMLElement) {
+    // Load Tailwind CSS first
+    this.loadTailwindStyles()
+
     // Load external styles if provided
     const styleUrl = this.getAttribute('data-style-url')
     if (styleUrl) {
@@ -30,13 +34,39 @@ class CozyologyMeasurementTool extends HTMLElement {
     this.root.render(React.createElement(MeasurementTool, this.getProps()))
   }
 
-  private loadStyles(styleUrl: string) {
+  private loadTailwindStyles() {
     const shadow = this.shadowRoot
     if (!shadow) return
 
-    // Remove existing style links
-    const existingLinks = shadow.querySelectorAll('link[rel="stylesheet"]')
-    existingLinks.forEach(link => link.remove())
+    const style = document.createElement('style')
+    style.textContent = `
+      :host {
+        --tw-border-style: solid;
+        --tw-leading: initial;
+        --tw-font-weight: initial;
+        --tw-shadow: 0 0 #0000;
+        --tw-shadow-color: initial;
+        --tw-shadow-alpha: 100%;
+        --tw-inset-shadow: 0 0 #0000;
+        --tw-inset-shadow-color: initial;
+        --tw-inset-shadow-alpha: 100%;
+        --tw-ring-color: initial;
+        --tw-ring-shadow: 0 0 #0000;
+        --tw-inset-ring-color: initial;
+        --tw-inset-ring-shadow: 0 0 #0000;
+        --tw-ring-inset: initial;
+        --tw-ring-offset-width: 0px;
+        --tw-ring-offset-color: #fff;
+        --tw-ring-offset-shadow: 0 0 #0000;
+        --tw-duration: initial;
+      }
+    `
+    shadow.appendChild(style)
+  }
+
+  private loadStyles(styleUrl: string) {
+    const shadow = this.shadowRoot
+    if (!shadow) return
 
     // Create and append new style link
     const link = document.createElement('link')
@@ -54,7 +84,9 @@ class CozyologyMeasurementTool extends HTMLElement {
 
   private getProps() {
     // Extract attributes as props
-    const props: any = {}
+    const props: any = {
+      stepConfig,
+    }
 
     // Extract shop-now-url attribute
     const shopNowUrl = this.getAttribute('shop-now-url')
@@ -67,16 +99,11 @@ class CozyologyMeasurementTool extends HTMLElement {
 
   // Watch for attribute changes
   static get observedAttributes() {
-    return ['data-style-url', 'shop-now-url']
+    return ['shop-now-url']
   }
 
   attributeChangedCallback(name: string) {
-    if (name === 'data-style-url') {
-      const styleUrl = this.getAttribute('data-style-url')
-      if (styleUrl) {
-        this.loadStyles(styleUrl)
-      }
-    } else if (name === 'shop-now-url') {
+    if (name === 'shop-now-url') {
       // Re-render component with new props when shop-now-url changes
       if (this.root && this.shadowRoot) {
         this.root.render(React.createElement(MeasurementTool, this.getProps()))

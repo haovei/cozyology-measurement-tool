@@ -188,7 +188,7 @@
     ]
   },
   "step-finished": {
-    "title": "Finished",
+    "title": "Ready to Order",
     "type": "finished",
     "options": []
   }

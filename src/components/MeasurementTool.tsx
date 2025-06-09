@@ -13,6 +13,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
   const [inputValues, setInputValues] = useState<Record<string, number>>({}) // 记录所有输入值
   const [currentStepInputs, setCurrentStepInputs] = useState<Record<string, string>>({}) // 当前步骤的输入值
+  const [inputErrors, setInputErrors] = useState<Record<string, string>>({}) // 输入错误信息
 
   const getCurrentMainStep = (): string => {
     if (currentStep === 'step-1') return 'step-1'
@@ -120,25 +121,42 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     }
   }
 
-  // 验证当前步骤的所有输入是否都已填写
-  const validateCurrentStepInputs = (): boolean => {
-    if (currentStepData.type !== 'input') return true
+  // 验证当前步骤的所有输入是否都已填写，返回验证结果和错误信息
+  const validateCurrentStepInputs = (): { isValid: boolean; errors: string[] } => {
+    if (currentStepData.type !== 'input') return { isValid: true, errors: [] }
 
-    return currentStepData.options.every(option => {
+    const errors: string[] = []
+
+    currentStepData.options.forEach(option => {
       const value = currentStepInputs[option.id]
       const numValue = parseFloat(value)
+      const fieldName = option.title || option.label || option.id
 
       // 检查是否有值且为有效数字
-      if (!value || isNaN(numValue)) return false
+      if (!value || value.trim() === '') {
+        errors.push(`${fieldName} is required`)
+        return
+      }
+
+      if (isNaN(numValue)) {
+        errors.push(`${fieldName} must be a valid number`)
+        return
+      }
 
       // 检查是否满足最小值要求
-      if (numValue < option.min) return false
+      if (numValue < option.min) {
+        errors.push(`${fieldName} must be at least ${option.min} inches`)
+        return
+      }
 
       // 检查是否满足最大值要求（如果有）
-      if (option.max && numValue > option.max) return false
-
-      return true
+      if (option.max && numValue > option.max) {
+        errors.push(`${fieldName} must be no more than ${option.max} inches`)
+        return
+      }
     })
+
+    return { isValid: errors.length === 0, errors }
   }
 
   // 保存当前步骤的输入值
@@ -161,14 +179,35 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
       ...prev,
       [optionId]: value,
     }))
+
+    // 实时验证当前输入
+    validateSingleInput(optionId, value)
   }
 
-  // 检查当前步骤是否可以继续
-  const canContinue = (): boolean => {
-    if (currentStepData.type === 'input') {
-      return validateCurrentStepInputs()
+  // 验证单个输入字段
+  const validateSingleInput = (optionId: string, value: string) => {
+    const option = currentStepData.options.find(opt => opt.id === optionId)
+    if (!option) return
+
+    const fieldName = option.title || option.label || option.id
+    let error = ''
+
+    if (value && value.trim() !== '') {
+      const numValue = parseFloat(value)
+
+      if (isNaN(numValue)) {
+        error = `${fieldName} must be a valid number`
+      } else if (numValue < option.min) {
+        error = `${fieldName} must be at least ${option.min} inches`
+      } else if (option.max && numValue > option.max) {
+        error = `${fieldName} must be no more than ${option.max} inches`
+      }
     }
-    return true
+
+    setInputErrors(prev => ({
+      ...prev,
+      [optionId]: error,
+    }))
   }
 
   // 计算最终的推荐尺寸
@@ -241,8 +280,11 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
   const handleContinue = (jump: string) => {
     // 如果当前步骤是输入类型，验证所有输入是否都已填写
     if (currentStepData.type === 'input') {
-      const isValid = validateCurrentStepInputs()
-      if (!isValid) {
+      const validation = validateCurrentStepInputs()
+      if (!validation.isValid) {
+        // 弹窗提示用户具体的错误信息
+        const errorMessage = validation.errors.join('\n')
+        alert(`Please fix the following issues:\n\n${errorMessage}`)
         return // 如果验证失败，不继续
       }
 
@@ -260,6 +302,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
 
     // 清空当前步骤输入
     setCurrentStepInputs({})
+    setInputErrors({}) // 清空错误信息
 
     setCurrentStep(jump)
   }
@@ -270,6 +313,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     setStepHistory(['step-1']) // 重置历史记录
     setInputValues({}) // 重置所有输入值
     setCurrentStepInputs({}) // 重置当前步骤输入
+    setInputErrors({}) // 重置错误信息
   }
 
   const handleShopNow = () => {
@@ -432,7 +476,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                   </div>
                   <div className="flex-1 flex flex-col not-md:w-full">
                     <div className="not-md:hidden text-[16px] text-center">{currentStepData.description}</div>
-                    <div className="flex-1 flex flex-col justify-end gap-[30px] not-md:gap-[15px]">
+                    <div className="flex-1 flex flex-col justify-end gap-[20px] not-md:gap-[15px]">
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
                           {currentStepData.options.length > 1 && (
@@ -442,7 +486,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                             </div>
                           )}
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 border border-black h-[42px] bg-white">
+                            <div className={`flex items-center gap-2 border h-[42px] bg-white`}>
                               <input
                                 className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
                                 placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
@@ -454,7 +498,6 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                               />
                               <div className="h-[34px] leading-[34px] px-[20px] border-l text-[16px]">Inches</div>
                             </div>
-                            {/* 移除错误提示 */}
                           </div>
                         </div>
                       ))}
@@ -462,12 +505,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                         {/* 移除整体验证提示 */}
                         <button
                           onClick={() => handleContinue(currentStepData.jump)}
-                          disabled={!canContinue()}
-                          className={`w-full h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer ${
-                            canContinue()
-                              ? 'bg-black text-white hover:bg-gray-800'
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                          }`}
+                          className="w-full h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer bg-black text-white hover:bg-gray-800"
                         >
                           CONTINUE
                         </button>
