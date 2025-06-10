@@ -480,7 +480,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
                           {currentStepData.options.length > 1 && (
-                            <div className="w-[80px] not-md:flex gap-2">
+                            <div className="w-[80px] not-md:flex not-md:font-bold gap-2">
                               <div className="text-[18px] not-md:text-[12px]">{option.title}</div>
                               <div className="text-[12px] not-md:text-[12px]">{option.label}</div>
                             </div>
@@ -496,7 +496,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                                 onChange={e => handleInputChange(option.id, e.target.value)}
                                 required
                               />
-                              <div className="h-[34px] leading-[34px] px-[20px] border-l text-[16px]">Inches</div>
+                              <div className="h-[25px] leading-[25px] px-[20px] border-l text-[12px]">Inches</div>
                             </div>
                           </div>
                         </div>
