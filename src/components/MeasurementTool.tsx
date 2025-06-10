@@ -74,7 +74,6 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     if (isStepCompleted(stepId) || stepId === getCurrentMainStep()) {
       // 根据主步骤ID找到对应的实际步骤
       const targetStep = getActualStepFromMainStep(stepId)
-      setCurrentStep(targetStep)
 
       // 如果点击的是已完成的步骤，从历史记录中找到对应的步骤
       if (isStepCompleted(stepId) && stepId !== getCurrentMainStep()) {
@@ -87,8 +86,13 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
         if (historyForMainStep.length > 0) {
           const lastVisitedStep = historyForMainStep[historyForMainStep.length - 1]
           setCurrentStep(lastVisitedStep)
+          restoreInputsForStep(lastVisitedStep)
+          return
         }
       }
+
+      setCurrentStep(targetStep)
+      restoreInputsForStep(targetStep)
     }
   }
 
@@ -210,8 +214,56 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     }))
   }
 
+  // 恢复指定步骤的输入值
+  const restoreInputsForStep = (stepId: string) => {
+    const stepData = stepConfig[stepId]
+    if (stepData && stepData.type === 'input') {
+      const restoredInputs: Record<string, string> = {}
+
+      stepData.options.forEach(option => {
+        const savedValue = inputValues[option.id]
+        if (savedValue !== undefined) {
+          restoredInputs[option.id] = savedValue.toString()
+        }
+      })
+
+      setCurrentStepInputs(restoredInputs)
+    } else {
+      setCurrentStepInputs({})
+    }
+  }
+
+  // 将小数转换为分数格式的函数
+  const convertToFraction = (decimal: number): string => {
+    const wholeNumber = Math.floor(decimal)
+    const fractionalPart = decimal - wholeNumber
+
+    // 转换为最接近的 1/8 英寸
+    const eighths = Math.round(fractionalPart * 8)
+
+    if (eighths === 0) {
+      return wholeNumber.toString()
+    }
+
+    if (eighths === 8) {
+      return (wholeNumber + 1).toString()
+    }
+
+    // 简化分数
+    const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
+    const divisor = gcd(eighths, 8)
+    const numerator = eighths / divisor
+    const denominator = 8 / divisor
+
+    if (wholeNumber === 0) {
+      return `${numerator}/${denominator}`
+    }
+
+    return `${wholeNumber} ${numerator}/${denominator}`
+  }
+
   // 计算最终的推荐尺寸
-  const calculateRecommendedSize = (): { width: number; height: number } => {
+  const calculateRecommendedSize = (): { width: string; height: string } => {
     // 判断是内装还是外装
     const isInsideMount = completedSteps.some(step => step.includes('step-2-1'))
 
@@ -266,8 +318,8 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     }
 
     return {
-      width: Math.round(width * 8) / 8, // 四舍五入到最近的 1/8 英寸
-      height: Math.round(height * 8) / 8,
+      width: convertToFraction(width),
+      height: convertToFraction(height),
     }
   }
 
@@ -282,29 +334,67 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     if (currentStepData.type === 'input') {
       const validation = validateCurrentStepInputs()
       if (!validation.isValid) {
-        // 弹窗提示用户具体的错误信息
-        const errorMessage = validation.errors.join('\n')
-        alert(`Please fix the following issues:\n\n${errorMessage}`)
-        return // 如果验证失败，不继续
+        // 构建简化的错误提示
+        const errorMessages = currentStepData.options
+          .map(option => {
+            const value = currentStepInputs[option.id]
+            const fieldName = option.title || option.label || option.id
+
+            if (!value || value.trim() === '' || isNaN(parseFloat(value))) {
+              if (option.max) {
+                return `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
+              } else {
+                return `${fieldName}: Please enter a number between ${option.min} and above`
+              }
+            }
+
+            const numValue = parseFloat(value)
+            if (numValue < option.min || (option.max && numValue > option.max)) {
+              if (option.max) {
+                return `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
+              } else {
+                return `${fieldName}: Please enter a number between ${option.min} and above`
+              }
+            }
+
+            return null
+          })
+          .filter(msg => msg !== null)
+
+        if (errorMessages.length > 0) {
+          alert(errorMessages.join('\n\n'))
+          return // 如果验证失败，不继续
+        }
       }
 
       // 保存当前步骤的输入值
       saveCurrentStepInputs()
     }
 
-    // 记录当前步骤为已完成
-    if (!completedSteps.includes(currentStep)) {
-      setCompletedSteps(prev => [...prev, currentStep])
+    // 如果当前步骤是 step-1 且历史记录中有超过一个步骤，说明用户重新选择了第一步
+    // 需要清空之前的历史和已完成步骤，重新开始
+    if (currentStep === 'step-1' && stepHistory.length > 1) {
+      setCompletedSteps([currentStep])
+      setStepHistory(['step-1', jump])
+      setInputValues({}) // 清空所有之前的输入值
+    } else {
+      // 记录当前步骤为已完成
+      if (!completedSteps.includes(currentStep)) {
+        setCompletedSteps(prev => [...prev, currentStep])
+      }
+
+      // 添加到历史记录
+      setStepHistory(prev => [...prev, jump])
     }
 
-    // 添加到历史记录
-    setStepHistory(prev => [...prev, jump])
-
-    // 清空当前步骤输入
+    // 清空当前步骤输入和错误信息
     setCurrentStepInputs({})
-    setInputErrors({}) // 清空错误信息
+    setInputErrors({})
 
     setCurrentStep(jump)
+
+    // 如果跳转到输入步骤，恢复之前保存的输入值
+    restoreInputsForStep(jump)
   }
 
   const handleCalculateAgain = () => {
@@ -360,7 +450,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
           </div>
 
           {/* QR Code Section */}
-          <div className="mt-10">
+          <div className="mt-20">
             <div className="flex items-center gap-[20px]">
               <div className="w-[130px] h-[130px] rounded flex-shrink-0">
                 <div className="qr-code-image image-qr-code" />
@@ -418,7 +508,11 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               {getPreviousStep() && (
                 <div className="mb-4">
                   <button
-                    onClick={() => setCurrentStep(getPreviousStep()!)}
+                    onClick={() => {
+                      const prevStep = getPreviousStep()!
+                      setCurrentStep(prevStep)
+                      restoreInputsForStep(prevStep)
+                    }}
                     className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors cursor-pointer"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -434,10 +528,12 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                   </button>
                 </div>
               )}
-              <h1 className="text-[30px] font-americana text-center mb-11 text-gray-900 not-md:text-[18px] not-md:mb-6">
-                {currentStepData.title}
-              </h1>
-
+              <div className="text-center mb-11 text-gray-900 not-md:mb-6">
+                <h1 className="text-[30px] font-americana not-md:text-[18px]">{currentStepData.title}</h1>
+                <div className="text-[16px] not-md:text-[12px] text-[#333]">
+                  For accuracy, please use a steel measuring tape.
+                </div>
+              </div>
               {currentStepData.type === 'select' && (
                 <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch">
                   {currentStepData.options.map(option => (
@@ -502,7 +598,6 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                         </div>
                       ))}
                       <div className="">
-                        {/* 移除整体验证提示 */}
                         <button
                           onClick={() => handleContinue(currentStepData.jump)}
                           className="w-full h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer bg-black text-white hover:bg-gray-800"
