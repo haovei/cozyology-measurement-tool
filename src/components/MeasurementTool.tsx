@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 interface MeasurementToolProps {
   shopNowUrl?: string
@@ -432,6 +432,11 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
 
     // 如果跳转到输入步骤，恢复之前保存的输入值
     restoreInputsForStep(jump)
+
+    // 移动端点击 CONTINUE 后滚动到顶部
+    if (window.innerWidth < 768 && stepWrapRef.current) {
+      stepWrapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   const handleCalculateAgain = () => {
@@ -450,8 +455,10 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
 
   const currentStepData = stepConfig[currentStep]
 
+  const stepWrapRef = useRef<HTMLDivElement>(null)
+
   return (
-    <div className="flex flex-col md:flex-row">
+    <div className="flex flex-col md:flex-row" ref={stepWrapRef}>
       {/* Desktop Sidebar */}
       <div className="hidden md:block w-[35%] bg-white">
         <div className="flex flex-col h-full justify-center">
@@ -488,7 +495,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
           </div>
 
           {/* QR Code Section */}
-          <div className="mt-20">
+          <div className="mt-30">
             <div className="flex items-center gap-[20px]">
               <div className="w-[130px] h-[130px] rounded flex-shrink-0">
                 <div className="qr-code-image image-qr-code" />
@@ -557,7 +564,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       setCurrentStep(prevStep)
                       restoreInputsForStep(prevStep)
                     }}
-                    className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors cursor-pointer"
+                    className="flex items-center gap-2 cursor-pointer"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -572,7 +579,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                   </button>
                 </div>
               )}
-              <div className="text-center mb-11 text-gray-900 not-md:mb-6">
+              <div className="text-center mb-7 text-gray-900 not-md:mb-6">
                 <h1 className="text-[30px] font-americana not-md:text-[18px]">{currentStepData.title}</h1>
                 {currentStepData.type === 'input' && (
                   <div className="text-[16px] not-md:text-[12px] text-[#333]">
@@ -617,7 +624,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                     <div className="md:hidden not-md:w-[40%] text-[14px]">{currentStepData.description}</div>
                   </div>
                   <div className="flex-1 flex flex-col not-md:w-full">
-                    <div className="not-md:hidden text-[16px] text-center">{currentStepData.description}</div>
+                    <div className="not-md:hidden text-[16px]">{currentStepData.description}</div>
                     <div className="flex-1 flex flex-col justify-end gap-[20px] not-md:gap-[15px]">
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
@@ -646,7 +653,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       <div className="">
                         <button
                           onClick={() => handleContinue(currentStepData.jump)}
-                          className="w-full h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer bg-black text-white hover:bg-gray-800"
+                          className="w-full h-[40px] text-lg not-md:text-[12px] font-medium transition-all duration-200 cursor-pointer bg-black text-white"
                         >
                           CONTINUE
                         </button>
@@ -671,22 +678,12 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                     </div>
                     <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
                     <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
-                      For {getMountTypeDescription()}: <br />
-                      {getMountTypeDescription() === 'Inside Mount' ? (
-                        <>
-                          The recommended shade width size already includes the 3/8" clearance adjustment. <br />
-                          Shade length = Maximum window height.
-                        </>
-                      ) : (
-                        <>
-                          Width includes your specified extensions on both sides. <br />
-                          Height includes your specified mounting height above the window.
-                        </>
-                      )}
+                      Use the size listed above when placing your order. We’ve handled all the calculations for you—no
+                      need to make any manual adjustments.
                     </div>
                     <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
-                      Tips: <span className="font-bold underline">Take a screenshot</span> of these measurements for
-                      when you're ready to order.
+                      For your records, please <span className="font-bold underline">take a screenshot</span> before
+                      proceeding.
                     </div>
 
                     <div className="mt-[50px] flex w-full text-center">
@@ -714,13 +711,13 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                         CALCULATE AGAIN
                       </button>
                     </div>
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
+                    {/* <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
                       If the shade dimensions you need are not listed on our website, please contact us at&nbsp;
                       <a href="mailto:Care@CozyologyCurtains.com" target="_blank" className="text-[#c16452]">
                         Care@CozyologyCurtains.com
                       </a>
                       &nbsp;before making a purchase. We're here to assist you!
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="md:hidden mt-[20px] flex gap-[15px]">
