@@ -14,6 +14,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
   const [inputValues, setInputValues] = useState<Record<string, number>>({}) // 记录所有输入值
   const [currentStepInputs, setCurrentStepInputs] = useState<Record<string, string>>({}) // 当前步骤的输入值
   const [inputErrors, setInputErrors] = useState<Record<string, string>>({}) // 输入错误信息
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({}) // 记录每个步骤选择的选项ID
 
   const getCurrentMainStep = (): string => {
     if (currentStep === 'step-1') return 'step-1'
@@ -329,7 +330,42 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     return isInsideMount ? 'Inside Mount' : 'Outside Mount'
   }
 
-  const handleContinue = (jump: string) => {
+  // 获取长度样式描述
+  const getLengthStyleDescription = (): string => {
+    // 检查 step-3-1-2 (Inside Mount 长度样式)
+    const insideLengthOption = selectedOptions['step-3-1-2']
+    if (insideLengthOption) {
+      if (insideLengthOption === 'inside-length-breaks-on-frame') {
+        return 'Breaks on Window Frame'
+      }
+      if (insideLengthOption === 'inside-length-puddles-on-frame') {
+        return 'Puddles on Window Frame'
+      }
+    }
+
+    // 检查 step-3-2-3 (Outside Mount 长度样式)
+    const outsideLengthOption = selectedOptions['step-3-2-3']
+    if (outsideLengthOption) {
+      if (outsideLengthOption === 'outside-length-breaks-on-frame') {
+        return 'Breaks on Window Frame'
+      }
+      if (outsideLengthOption === 'outside-length-puddles-on-frame') {
+        return 'Puddles on Window Frame'
+      }
+    }
+
+    return 'Standard Length'
+  }
+
+  const handleContinue = (jump: string, optionId?: string) => {
+    // 如果当前步骤是选择类型，记录选择的选项ID
+    if (currentStepData.type === 'select' && optionId) {
+      setSelectedOptions(prev => ({
+        ...prev,
+        [currentStep]: optionId,
+      }))
+    }
+
     // 如果当前步骤是输入类型，验证所有输入是否都已填写
     if (currentStepData.type === 'input') {
       const validation = validateCurrentStepInputs()
@@ -377,6 +413,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
       setCompletedSteps([currentStep])
       setStepHistory(['step-1', jump])
       setInputValues({}) // 清空所有之前的输入值
+      setSelectedOptions({}) // 清空所有之前的选择
     } else {
       // 记录当前步骤为已完成
       if (!completedSteps.includes(currentStep)) {
@@ -404,6 +441,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     setInputValues({}) // 重置所有输入值
     setCurrentStepInputs({}) // 重置当前步骤输入
     setInputErrors({}) // 重置错误信息
+    setSelectedOptions({}) // 重置选择的选项
   }
 
   const handleShopNow = () => {
@@ -548,7 +586,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                     <div
                       key={option.id}
                       className="group w-[400px] md:min-h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto"
-                      onClick={() => handleContinue(option.jump)}
+                      onClick={() => handleContinue(option.jump, option.id)}
                     >
                       <div className="p-[40px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
                         <div className="w-[320px] h-[320px] mx-auto relative not-md:w-[160px] not-md:h-[160px]">
@@ -650,6 +688,18 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       Tips: <span className="font-bold underline">Take a screenshot</span> of these measurements for
                       when you're ready to order.
                     </div>
+
+                    <div className="mt-[50px] flex w-full text-center">
+                      <div className="flex-1 flex flex-col items-center">
+                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">MOUNT STYLE</div>
+                        <div className="text-[16px] font-americana">{getMountTypeDescription()}</div>
+                      </div>
+                      <div className="flex-1 flex flex-col items-center border-l border-[#DDD]">
+                        <div className="text-[16px] text-[#999] font-americana  mb-[24px]">LENGTH STYLE</div>
+                        <div className="text-[16px] font-americana">{getLengthStyleDescription()}</div>
+                      </div>
+                    </div>
+
                     <div className="not-md:hidden mt-[50px] flex gap-[30px]">
                       <button
                         onClick={handleShopNow}
@@ -672,6 +722,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       &nbsp;before making a purchase. We're here to assist you!
                     </div>
                   </div>
+
                   <div className="md:hidden mt-[20px] flex gap-[15px]">
                     <button
                       onClick={handleShopNow}
