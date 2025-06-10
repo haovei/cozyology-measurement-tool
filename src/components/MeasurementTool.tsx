@@ -457,7 +457,13 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               </div>
               <div className="text-[14px]">
                 <div className="font-medium text-black">Need help with measurements?</div>
-                <div className="font-medium text-black">Scan the QR code or add us on</div>
+                <div className="font-medium text-black">
+                  Scan the QR code or&nbsp;
+                  <a href="mailto:care@cozyology.com" className="text-[#c16452]" target="_blank">
+                    add us
+                  </a>
+                  &nbsp; on
+                </div>
                 <div className="text-gray-500 mt-[20px]">WhatsApp: (917) 701-2145</div>
               </div>
             </div>
@@ -530,9 +536,11 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               )}
               <div className="text-center mb-11 text-gray-900 not-md:mb-6">
                 <h1 className="text-[30px] font-americana not-md:text-[18px]">{currentStepData.title}</h1>
-                <div className="text-[16px] not-md:text-[12px] text-[#333]">
-                  For accuracy, please use a steel measuring tape.
-                </div>
+                {currentStepData.type === 'input' && (
+                  <div className="text-[16px] not-md:text-[12px] text-[#333]">
+                    For accuracy, please use a steel measuring tape.
+                  </div>
+                )}
               </div>
               {currentStepData.type === 'select' && (
                 <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch">
@@ -614,14 +622,16 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                 <>
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] px-[120px] not-md:py-[25px] not-md:px-[30px]">
                     <div className="text-[20px] font-medium text-black not-md:text-[12px]">
-                      Your recommended shade size is{' '}
+                      Your recommended shade size is&nbsp;
                     </div>
-                    <div className="text-[60px] text-black mt-[30px] not-md:text-[35px]">
+                    <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
+                    <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
                       {(() => {
                         const { width, height } = calculateRecommendedSize()
                         return `${width}"W × ${height}"L`
                       })()}
                     </div>
+                    <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
                     <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
                       For {getMountTypeDescription()}: <br />
                       {getMountTypeDescription() === 'Inside Mount' ? (
@@ -637,8 +647,8 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       )}
                     </div>
                     <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
-                      Tips: <span className="font-bold">Take a screenshot</span> of these measurements for when you're
-                      ready to order.
+                      Tips: <span className="font-bold underline">Take a screenshot</span> of these measurements for
+                      when you're ready to order.
                     </div>
                     <div className="not-md:hidden mt-[50px] flex gap-[30px]">
                       <button
@@ -655,8 +665,11 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       </button>
                     </div>
                     <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
-                      If the shade dimensions you need are not listed on our website, please contact us at
-                      Care@CozyologyCurtains.com before making a purchase. We're here to assist you!
+                      If the shade dimensions you need are not listed on our website, please contact us at&nbsp;
+                      <a href="mailto:Care@CozyologyCurtains.com" target="_blank" className="text-[#c16452]">
+                        Care@CozyologyCurtains.com
+                      </a>
+                      &nbsp;before making a purchase. We're here to assist you!
                     </div>
                   </div>
                   <div className="md:hidden mt-[20px] flex gap-[15px]">
@@ -683,7 +696,13 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
             <div className="flex items-center justify-between">
               <div className="flex-1 text-[12px]">
                 <div className="font-medium text-black">Need help with measurements?</div>
-                <div className="font-medium text-black">Scan the QR code or add us on</div>
+                <div className="font-medium text-black">
+                  Scan the QR code or&nbsp;
+                  <a href="mailto:care@cozyology.com" className="text-[#c16452]" target="_blank">
+                    add us
+                  </a>
+                  &nbsp; on
+                </div>
                 <div className="text-gray-500 mt-[10px]">WhatsApp: (917) 701-2145</div>
               </div>
               <div className="w-[65px] h-[65px] flex-shrink-0">
