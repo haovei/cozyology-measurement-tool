@@ -435,7 +435,9 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
 
     // 移动端点击 CONTINUE 后滚动到顶部
     if (window.innerWidth < 768 && stepWrapRef.current) {
-      stepWrapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const elementRect = stepWrapRef.current.getBoundingClientRect()
+      const targetPosition = window.pageYOffset + elementRect.top - 90
+      window.scrollTo({ top: targetPosition, behavior: 'smooth' })
     }
   }
 
@@ -458,9 +460,9 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
   const stepWrapRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="flex flex-col md:flex-row" ref={stepWrapRef}>
+    <div className="flex flex-col lg:flex-row" ref={stepWrapRef}>
       {/* Desktop Sidebar */}
-      <div className="hidden md:block w-[35%] bg-white">
+      <div className="hidden lg:block w-[35%] bg-white">
         <div className="flex flex-col h-full justify-center">
           <div className="">
             {steps.map((step, index) => (
@@ -501,15 +503,28 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                 <div className="qr-code-image image-qr-code" />
               </div>
               <div className="text-[14px]">
-                <div className="font-medium text-black">Need help with measurements?</div>
-                <div className="font-medium text-black">
-                  Scan the QR code or&nbsp;
-                  <a href="mailto:care@cozyology.com" className="text-[#c16452]" target="_blank">
-                    add us
-                  </a>
-                  &nbsp; on
+                <div className="font-bold text-black">Want to double-check your sizing?</div>
+                <div className="mt-[10px] text-gray-500">
+                  <div>Send us a quick photo via</div>
+                  <div>
+                    <a
+                      href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                      className="text-[#ba6352] underline"
+                      target="_blank"
+                    >
+                      WhatsApp
+                    </a>
+                    : (917) 701-2145
+                  </div>
+                  <div>
+                    email&nbsp;
+                    <a href="mailto:care@cozyology.com" className="text-[#ba6352] underline" target="_blank">
+                      Care@Cozyology.com
+                    </a>
+                    .
+                  </div>
+                  <div>and we'll do the rest.</div>
                 </div>
-                <div className="text-gray-500 mt-[20px]">WhatsApp: (917) 701-2145</div>
               </div>
             </div>
           </div>
@@ -517,7 +532,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
       </div>
 
       {/* Mobile Step Indicator */}
-      <div className="md:hidden bg-[#F3F3F3] px-8 py-5 overflow-auto">
+      <div className="lg:hidden bg-[#F3F3F3] px-8 py-5 md:mb-4 overflow-auto">
         <div className="flex justify-between">
           {steps.map((step, index) => (
             <div
@@ -592,11 +607,11 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                   {currentStepData.options.map(option => (
                     <div
                       key={option.id}
-                      className="group w-[400px] md:min-h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto"
+                      className="group md:min-h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto md:flex-1"
                       onClick={() => handleContinue(option.jump, option.id)}
                     >
                       <div className="p-[40px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
-                        <div className="w-[320px] h-[320px] mx-auto relative not-md:w-[160px] not-md:h-[160px]">
+                        <div className="w-[320px] aspect-square mx-auto relative md:w-[240px] not-md:w-[160px] not-md:h-[160px]">
                           <div className={`option-image ${option.imageClass}`} />
                         </div>
                         <div className="flex-1 md:text-center">
@@ -682,7 +697,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       need to make any manual adjustments.
                     </div>
                     <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
-                      For your records, please <span className="font-bold underline">take a screenshot</span> before
+                      For your records, please <span className="text-[#ba6352]">take a screenshot</span> before
                       proceeding.
                     </div>
 
@@ -743,15 +758,24 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
           <div className="md:hidden mt-8 p-4 bg-[#F6F2EF] rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex-1 text-[12px]">
-                <div className="font-medium text-black">Need help with measurements?</div>
-                <div className="font-medium text-black">
+                <div className="font-bold text-black">Need help with measurements?</div>
+                <div className="font-bold text-black">
                   Scan the QR code or&nbsp;
                   <a href="mailto:care@cozyology.com" className="text-[#c16452]" target="_blank">
                     add us
                   </a>
                   &nbsp; on
                 </div>
-                <div className="text-gray-500 mt-[10px]">WhatsApp: (917) 701-2145</div>
+                <div className="text-gray-500 mt-[10px]">
+                  <a
+                    href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                    className="text-[#ba6352] underline"
+                    target="_blank"
+                  >
+                    WhatsApp
+                  </a>
+                  : (917) 701-2145
+                </div>
               </div>
               <div className="w-[65px] h-[65px] flex-shrink-0">
                 <div className="qr-code-image image-qr-code" />
