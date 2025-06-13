@@ -680,7 +680,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
 
               {currentStepData.type === 'finished' && (
                 <>
-                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] px-[120px] not-md:py-[25px] not-md:px-[30px]">
+                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] px-[30px] xl:px-[120px]">
                     <div className="text-[20px] font-medium text-black not-md:text-[12px]">
                       Your recommended shade size is&nbsp;
                     </div>
@@ -712,16 +712,16 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                       </div>
                     </div>
 
-                    <div className="not-md:hidden mt-[50px] flex gap-[30px]">
+                    <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full">
                       <button
                         onClick={handleShopNow}
-                        className="w-[300px] h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                        className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
                       >
                         SHOP NOW
                       </button>
                       <button
                         onClick={handleCalculateAgain}
-                        className="w-[300px] h-[60px] text-lg font-medium transition-all duration-200 border cursor-pointer"
+                        className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 border cursor-pointer"
                       >
                         CALCULATE AGAIN
                       </button>
