@@ -26,14 +26,14 @@ class CozyologyMeasurementTool extends HTMLElement {
     this.mountComponent(container)
   }
 
-  private mountComponent(container: HTMLElement) {
+  private async mountComponent(container: HTMLElement) {
     // Load Tailwind CSS first
     this.loadTailwindStyles()
 
-    // Load external styles if provided
+    // Load external styles if provided and wait for completion
     const styleUrl = this.getAttribute('data-style-url')
     if (styleUrl) {
-      this.loadStyles(styleUrl)
+      await this.loadStyles(styleUrl)
     }
 
     this.root = ReactDOM.createRoot(container)
@@ -70,15 +70,24 @@ class CozyologyMeasurementTool extends HTMLElement {
     shadow.appendChild(style)
   }
 
-  private loadStyles(styleUrl: string) {
-    const shadow = this.shadowRoot
-    if (!shadow) return
+  private loadStyles(styleUrl: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const shadow = this.shadowRoot
+      if (!shadow) {
+        resolve()
+        return
+      }
 
-    // Create and append new style link
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = styleUrl
-    shadow.appendChild(link)
+      // Create and append new style link
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = styleUrl
+      
+      link.onload = () => resolve()
+      link.onerror = () => reject(new Error(`Failed to load styles from ${styleUrl}`))
+      
+      shadow.appendChild(link)
+    })
   }
 
   disconnectedCallback() {
