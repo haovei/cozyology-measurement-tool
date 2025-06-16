@@ -51,12 +51,13 @@ npm run preview
 
 ```tsx
 import { MeasurementTool } from './components/MeasurementTool'
+import stepConfig from './assets/step-config.json'
 
 function App() {
   return (
     <MeasurementTool 
-      title="我的测量工具" 
-      theme="light" 
+      stepConfig={stepConfig}
+      shopNowUrl="https://example.com/shop"
     />
   )
 }
@@ -66,18 +67,67 @@ function App() {
 
 ```html
 <cozyology-measurement-tool 
-  data-title="Custom Measurement Tool" 
-  data-theme="dark">
+  shop-now-url="https://example.com/shop">
 </cozyology-measurement-tool>
 ```
 
-## 测量步骤
+### 自定义配置
 
-1. 上传图像文件
-2. 设置比例尺（像素/单位）
-3. 选择测量单位
-4. 在图像上点击两点进行测量
-5. 查看测量结果
+您可以通过全局变量 `window.CozyologyMeasurementConfig` 来自定义步骤配置：
+
+```html
+<script>
+// 在加载 web component 之前设置全局配置
+window.CozyologyMeasurementConfig = {
+  "step-1": {
+    "title": "自定义标题",
+    "type": "select",
+    "options": [
+      {
+        "id": "custom-option",
+        "title": "自定义选项",
+        "imageClass": "custom-image-class",
+        "description": "自定义描述",
+        "jump": "next-step"
+      }
+    ]
+  }
+  // 更多自定义配置...
+};
+</script>
+
+<cozyology-measurement-tool shop-now-url="https://example.com/shop">
+</cozyology-measurement-tool>
+```
+
+#### 配置结构
+
+配置文件结构如下，支持多种类型的步骤：
+
+- `select` - 选择类型步骤，用户从多个选项中选择一个
+- `input` - 输入类型步骤，用户输入数值
+- `finished` - 完成步骤
+
+每个步骤可以包含：
+- `title` - 步骤标题
+- `type` - 步骤类型（select/input/finished）
+- `imageClass` - 图片 CSS 类名
+- `description` - 步骤描述
+- `jump` - 下一步的步骤 ID
+- `options` - 选项列表（针对 select 和 input 类型）
+
+查看 `example-custom-config.html` 文件获取完整的自定义配置示例。
+
+## 使用方法
+
+### 基本使用
+
+工具提供了多种安装方式的测量指导：
+
+1. **选择安装方式** - 内装式或外装式
+2. **测量尺寸** - 根据提示测量窗户宽度和高度
+3. **选择样式** - 确定最终的遮阳帘长度样式
+4. **获取结果** - 获得准确的测量数据用于订购
 
 ## 许可证
 

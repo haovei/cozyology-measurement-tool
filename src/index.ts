@@ -2,7 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import MeasurementTool from './components/MeasurementTool'
-import stepConfig from './assets/step-config.json'
+
+// 将 stepConfig 设为全局变量
+declare global {
+  interface Window {
+    CozyologyMeasurementConfig: any
+  }
+}
 
 // Web Component wrapper for React component
 class CozyologyMeasurementTool extends HTMLElement {
@@ -85,7 +91,7 @@ class CozyologyMeasurementTool extends HTMLElement {
   private getProps() {
     // Extract attributes as props
     const props: any = {
-      stepConfig,
+      stepConfig: window.CozyologyMeasurementConfig || {}, // 优先使用全局配置
     }
 
     // Extract shop-now-url attribute
