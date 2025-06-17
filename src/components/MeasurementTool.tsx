@@ -50,18 +50,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
   }))
 
   function getStepTitle(stepKey: string): string {
-    switch (stepKey) {
-      case 'step-1':
-        return 'Choose Mount Style'
-      case 'step-2':
-        return 'Specify Window Width'
-      case 'step-3':
-        return 'Specify Window Height'
-      case 'step-finished':
-        return 'Ready to Order'
-      default:
-        return 'Step'
-    }
+    return window.CozyologyConfig?.stepTitles?.[stepKey] || 'Step'
   }
 
   const getPreviousStep = () => {
@@ -502,30 +491,12 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               <div className="w-[130px] h-[130px] rounded flex-shrink-0">
                 <div className="qr-code-image image-qr-code" />
               </div>
-              <div className="text-[14px]">
-                <div className="font-bold text-black">Want to double-check your sizing?</div>
-                <div className="mt-[10px] text-gray-500">
-                  <div>Send us a quick photo via</div>
-                  <div>
-                    <a
-                      href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
-                      className="text-[#ba6352] underline"
-                      target="_blank"
-                    >
-                      WhatsApp
-                    </a>
-                    : (917) 701-2145
-                  </div>
-                  <div>
-                    email&nbsp;
-                    <a href="mailto:care@cozyology.com" className="text-[#ba6352] underline" target="_blank">
-                      Care@Cozyology.com
-                    </a>
-                    .
-                  </div>
-                  <div>and we'll do the rest.</div>
-                </div>
-              </div>
+              <div
+                className="text-[14px]"
+                dangerouslySetInnerHTML={{
+                  __html: window.CozyologyConfig?.contactDetails,
+                }}
+              ></div>
             </div>
           </div>
         </div>
@@ -596,10 +567,8 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               )}
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
                 <h1 className="text-[30px] font-americana not-md:text-[18px]">{currentStepData.title}</h1>
-                {currentStepData.type === 'input' && (
-                  <div className="text-[16px] not-md:text-[12px] text-[#333]">
-                    For accuracy, please use a steel measuring tape.
-                  </div>
+                {currentStepData.subTitle && (
+                  <div className="text-[16px] not-md:text-[12px] text-[#333]">{currentStepData.subTitle}</div>
                 )}
               </div>
               {currentStepData.type === 'select' && (
@@ -693,12 +662,18 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                     </div>
                     <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
                     <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
-                      Use the size listed above when placing your order. We’ve handled all the calculations for you—no
-                      need to make any manual adjustments.
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: window.CozyologyConfig?.resultTexts?.orderInstructions || '',
+                        }}
+                      />
                     </div>
                     <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
-                      For your records, please <span className="text-[#ba6352]">take a screenshot</span> before
-                      proceeding.
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: window.CozyologyConfig?.resultTexts?.screenshotReminder || '',
+                        }}
+                      />
                     </div>
 
                     <div className="mt-[50px] flex w-full text-center">
@@ -726,13 +701,6 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                         CALCULATE AGAIN
                       </button>
                     </div>
-                    {/* <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
-                      If the shade dimensions you need are not listed on our website, please contact us at&nbsp;
-                      <a href="mailto:Care@CozyologyCurtains.com" target="_blank" className="text-[#c16452]">
-                        Care@CozyologyCurtains.com
-                      </a>
-                      &nbsp;before making a purchase. We're here to assist you!
-                    </div> */}
                   </div>
 
                   <div className="md:hidden mt-[20px] flex gap-[15px]">
@@ -755,28 +723,14 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
           )}
 
           {/* Mobile QR Code Section */}
-          <div className="md:hidden mt-8 p-4 bg-[#F6F2EF] rounded-lg">
+          <div className="lg:hidden mt-8 p-4 bg-[#F6F2EF] rounded-lg">
             <div className="flex items-center justify-between">
-              <div className="flex-1 text-[12px]">
-                <div className="font-bold text-black">Need help with measurements?</div>
-                <div className="font-bold text-black">
-                  Scan the QR code or&nbsp;
-                  <a href="mailto:care@cozyology.com" className="text-[#c16452]" target="_blank">
-                    add us
-                  </a>
-                  &nbsp; on
-                </div>
-                <div className="text-gray-500 mt-[10px]">
-                  <a
-                    href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
-                    className="text-[#ba6352] underline"
-                    target="_blank"
-                  >
-                    WhatsApp
-                  </a>
-                  : (917) 701-2145
-                </div>
-              </div>
+              <div
+                className="flex-1 text-[12px]"
+                dangerouslySetInnerHTML={{
+                  __html: window.CozyologyConfig?.contactDetailsMobile,
+                }}
+              ></div>
               <div className="w-[65px] h-[65px] flex-shrink-0">
                 <div className="qr-code-image image-qr-code" />
               </div>

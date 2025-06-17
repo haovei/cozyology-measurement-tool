@@ -10,9 +10,9 @@ export default defineConfig({
     assetsInlineLimit: 4096,
     rollupOptions: {
       output: {
-        entryFileNames: 'assets/cmt-[name]-[hash].js',
-        chunkFileNames: 'assets/cmt-[name]-[hash].js',
-        assetFileNames: 'assets/cmt-[name]-[hash].[ext]'
+        entryFileNames: 'assets/cmt-[name].js',
+        chunkFileNames: 'assets/cmt-[name].js',
+        assetFileNames: 'assets/cmt-[name].[ext]'
       },
     },
   },

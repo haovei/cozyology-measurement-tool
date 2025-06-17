@@ -12,202 +12,264 @@
     />
     <title>Cozyology Measurement Tool</title>
     <script>
-      window.CozyologyMeasurementConfig = {
-        'step-1': {
-          title: 'What kind of mount style would you like?',
-          type: 'select',
-          options: [
-            {
-              id: 'inside-mount',
-              title: 'INSIDE MOUNT',
-              imageClass: 'image-inside-mount',
-              alt: 'Inside Mount',
-              description:
-                'Window depth requirement for Inside Mount:\nAt least 2 3/4 inches for Handwoven shades\n2 inches for Roman shades\n4 inches for Motorized Shades',
-              jump: 'step-2-1-1',
-            },
-            {
-              id: 'outside-mount',
-              title: 'OUTSIDE MOUNT',
-              imageClass: 'image-outside-mount',
-              alt: 'OUTSIDE Mount',
-              description:
-                'We recommend adding a minimum of 2 inches to width and 4-6 inches to height to allow light gap coverage.',
-              jump: 'step-2-2-1',
-            },
-          ],
+      // 统一的全局配置对象
+      window.CozyologyConfig = {
+        stepTitles: {
+          'step-1': 'Choose Mount Style',
+          'step-2': 'Specify Window Width',
+          'step-3': 'Specify Window Height',
+          'step-finished': 'Ready to Order',
         },
-        'step-2-1-1': {
-          title: 'What is the window width (frame inner edge to edge)?',
-          type: 'input',
-          imageClass: 'image-inside-width',
-          description: 'Measuring the top, middle, and bottom points improves accuracy',
-          jump: 'step-3-1-1',
-          options: [
-            {
-              id: 'inside-width-top',
-              title: 'A',
-              label: 'Width',
-              min: 15,
-              max: 280,
-            },
-            {
-              id: 'inside-width-middle',
-              title: 'B',
-              label: 'Width',
-              min: 15,
-              max: 280,
-            },
-            {
-              id: 'inside-width-bottom',
-              title: 'C',
-              label: 'Width',
-              min: 15,
-              max: 280,
-            },
-          ],
+        resultTexts: {
+          orderInstructions:
+            "Use the size listed above when placing your order. We've handled all the calculations for you—no need to make any manual adjustments.",
+          screenshotReminder:
+            'For your records, please <span class="text-[#ba6352]">take a screenshot</span> before proceeding.',
         },
-        'step-2-2-1': {
-          title: 'What is the width of the window (frame outer edge to edge)?',
-          type: 'input',
-          imageClass: 'image-outside-window-width',
-          jump: 'step-2-2-2',
-          options: [
-            {
-              id: 'outside-window-width',
-              title: '',
-              label: '',
-              min: 15,
-              max: 280,
-            },
-          ],
-        },
-        'step-2-2-2': {
-          title: ' How many inches would you like to add the width?',
-          type: 'input',
-          imageClass: 'image-outside-width-extension',
-          description:
-            'We recommend to add at least 1-2 inches on each side to minimize light seepage and enhance privacy',
-          jump: 'step-3-2-1',
-          options: [
-            {
-              id: 'outside-width-left-extension',
-              title: 'A',
-              label: 'Left Side',
-              min: 0,
-            },
-            {
-              id: 'outside-width-right-extension',
-              title: 'B',
-              label: 'Right Side',
-              min: 0,
-            },
-          ],
-        },
-        'step-3-1-1': {
-          title: 'What is the height of your window?',
-          type: 'input',
-          imageClass: 'image-inside-height',
-          description: 'Measuring the left, middle, and right points improves accuracy',
-          jump: 'step-3-1-2',
-          options: [
-            {
-              id: 'inside-height-left',
-              title: 'A',
-              label: 'Height',
-              min: 20,
-              max: 110,
-            },
-            {
-              id: 'inside-height-middle',
-              title: 'B',
-              label: 'Height',
-              min: 20,
-              max: 110,
-            },
-            {
-              id: 'inside-height-right',
-              title: 'C',
-              label: 'Height',
-              min: 20,
-              max: 110,
-            },
-          ],
-        },
-        'step-3-1-2': {
-          title: 'Shade Length Style?',
-          type: 'select',
-          options: [
-            {
-              id: 'inside-length-breaks-on-frame',
-              title: 'Breaks on Window Frame',
-              imageClass: 'image-inside-length-breaks',
-              description: 'Custom-fit for a tailored look with full light blocking',
-              jump: 'step-finished',
-            },
-            {
-              id: 'inside-length-puddles-on-frame',
-              title: 'Puddles on Window Frame',
-              imageClass: 'image-inside-length-puddles',
-              description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
-              jump: 'step-finished',
-            },
-          ],
-        },
-        'step-3-2-1': {
-          title: 'What is the height of your window (frame outer edge to edge)?',
-          type: 'input',
-          imageClass: 'image-outside-window-height',
-          jump: 'step-3-2-2',
-          options: [
-            {
-              id: 'outside-window-height',
-              title: '',
-              label: 'Height',
-              min: 20,
-              max: 110,
-            },
-          ],
-        },
-        'step-3-2-2': {
-          title: 'How many inches above the window would you like to mount the shade?',
-          type: 'input',
-          imageClass: 'image-outside-height-extension',
-          description: 'We recommend adding at least 4-6 inches to allow window exposure when you roll the shades up.',
-          jump: 'step-3-2-3',
-          options: [
-            {
-              id: 'outside-height-above-extension',
-              title: '',
-              label: 'Height',
-              min: 0,
-            },
-          ],
-        },
-        'step-3-2-3': {
-          title: 'Shade Length Style?',
-          type: 'select',
-          options: [
-            {
-              id: 'outside-length-breaks-on-frame',
-              title: 'Breaks on Window Frame',
-              imageClass: 'image-inside-length-breaks',
-              description: 'Custom-fit for a tailored look with full light blocking',
-              jump: 'step-finished',
-            },
-            {
-              id: 'outside-length-puddles-on-frame',
-              title: 'Puddles on Window Frame',
-              imageClass: 'image-inside-length-puddles',
-              description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
-              jump: 'step-finished',
-            },
-          ],
-        },
-        'step-finished': {
-          title: '',
-          type: 'finished',
-          options: [],
+        contactDetails: `<div class="font-bold text-black">Want to double-check your sizing?</div>
+                <div class="mt-[10px] text-gray-500">
+                  <div>Send us a quick photo via</div>
+                  <div>
+                    <a
+                      href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                      class="text-[#ba6352] underline"
+                      target="_blank"
+                    >
+                      WhatsApp
+                    </a>
+                    : (917) 701-2145
+                  </div>
+                  <div>
+                    email&nbsp;
+                    <a href="mailto:care@cozyology.com" class="text-[#ba6352] underline" target="_blank">
+                      Care@Cozyology.com
+                    </a>
+                    .
+                  </div>
+                  <div>and we'll do the rest.</div>
+                </div>`,
+        contactDetailsMobile: `<div class="font-bold text-black">Need help with measurements?</div>
+                <div class="font-bold text-black">
+                  Scan the QR code or&nbsp;
+                  <a href="mailto:care@cozyology.com" class="text-[#c16452]" target="_blank">
+                    add us
+                  </a>
+                  &nbsp; on
+                </div>
+                <div class="text-gray-500 mt-[10px]">
+                  <a
+                    href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                    class="text-[#ba6352] underline"
+                    target="_blank"
+                  >
+                    WhatsApp
+                  </a>
+                  : (917) 701-2145
+                </div>`,
+        measurementConfig: {
+          'step-1': {
+            type: 'select',
+            title: 'What kind of mount style would you like?',
+            options: [
+              {
+                id: 'inside-mount',
+                title: 'INSIDE MOUNT',
+                imageClass: 'image-inside-mount',
+                alt: 'Inside Mount',
+                description:
+                  'Window depth requirement for Inside Mount:\nAt least 2 3/4 inches for Handwoven shades\n2 inches for Roman shades\n4 inches for Motorized Shades',
+                jump: 'step-2-1-1',
+              },
+              {
+                id: 'outside-mount',
+                title: 'OUTSIDE MOUNT',
+                imageClass: 'image-outside-mount',
+                alt: 'OUTSIDE Mount',
+                description:
+                  'We recommend adding a minimum of 2 inches to width and 4-6 inches to height to allow light gap coverage.',
+                jump: 'step-2-2-1',
+              },
+            ],
+          },
+          'step-2-1-1': {
+            type: 'input',
+            title: 'What is the window width (frame inner edge to edge)?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-inside-width',
+            description: 'Measuring the top, middle, and bottom points improves accuracy',
+            jump: 'step-3-1-1',
+            options: [
+              {
+                id: 'inside-width-top',
+                title: 'A',
+                label: 'Width',
+                min: 15,
+                max: 280,
+              },
+              {
+                id: 'inside-width-middle',
+                title: 'B',
+                label: 'Width',
+                min: 15,
+                max: 280,
+              },
+              {
+                id: 'inside-width-bottom',
+                title: 'C',
+                label: 'Width',
+                min: 15,
+                max: 280,
+              },
+            ],
+          },
+          'step-2-2-1': {
+            type: 'input',
+            title: 'What is the width of the window (frame outer edge to edge)?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-outside-window-width',
+            jump: 'step-2-2-2',
+            options: [
+              {
+                id: 'outside-window-width',
+                title: '',
+                label: '',
+                min: 15,
+                max: 280,
+              },
+            ],
+          },
+          'step-2-2-2': {
+            type: 'input',
+            title: ' How many inches would you like to add the width?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-outside-width-extension',
+            description:
+              'We recommend to add at least 1-2 inches on each side to minimize light seepage and enhance privacy',
+            jump: 'step-3-2-1',
+            options: [
+              {
+                id: 'outside-width-left-extension',
+                title: 'A',
+                label: 'Left Side',
+                min: 0,
+              },
+              {
+                id: 'outside-width-right-extension',
+                title: 'B',
+                label: 'Right Side',
+                min: 0,
+              },
+            ],
+          },
+          'step-3-1-1': {
+            type: 'input',
+            title: 'What is the height of your window?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-inside-height',
+            description: 'Measuring the left, middle, and right points improves accuracy',
+            jump: 'step-3-1-2',
+            options: [
+              {
+                id: 'inside-height-left',
+                title: 'A',
+                label: 'Height',
+                min: 20,
+                max: 110,
+              },
+              {
+                id: 'inside-height-middle',
+                title: 'B',
+                label: 'Height',
+                min: 20,
+                max: 110,
+              },
+              {
+                id: 'inside-height-right',
+                title: 'C',
+                label: 'Height',
+                min: 20,
+                max: 110,
+              },
+            ],
+          },
+          'step-3-1-2': {
+            type: 'select',
+            title: 'Shade Length Style?',
+            options: [
+              {
+                id: 'inside-length-breaks-on-frame',
+                title: 'Breaks on Window Frame',
+                imageClass: 'image-inside-length-breaks',
+                description: 'Custom-fit for a tailored look with full light blocking',
+                jump: 'step-finished',
+              },
+              {
+                id: 'inside-length-puddles-on-frame',
+                title: 'Puddles on Window Frame',
+                imageClass: 'image-inside-length-puddles',
+                description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
+                jump: 'step-finished',
+              },
+            ],
+          },
+          'step-3-2-1': {
+            type: 'input',
+            title: 'What is the height of your window (frame outer edge to edge)?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-outside-window-height',
+            jump: 'step-3-2-2',
+            options: [
+              {
+                id: 'outside-window-height',
+                title: '',
+                label: 'Height',
+                min: 20,
+                max: 110,
+              },
+            ],
+          },
+          'step-3-2-2': {
+            type: 'input',
+            title: 'How many inches above the window would you like to mount the shade?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-outside-height-extension',
+            description:
+              'We recommend adding at least 4-6 inches to allow window exposure when you roll the shades up.',
+            jump: 'step-3-2-3',
+            options: [
+              {
+                id: 'outside-height-above-extension',
+                title: '',
+                label: 'Height',
+                min: 0,
+              },
+            ],
+          },
+          'step-3-2-3': {
+            type: 'select',
+            title: 'Shade Length Style?',
+            options: [
+              {
+                id: 'outside-length-breaks-on-frame',
+                title: 'Breaks on Window Frame',
+                imageClass: 'image-inside-length-breaks',
+                description: 'Custom-fit for a tailored look with full light blocking',
+                jump: 'step-finished',
+              },
+              {
+                id: 'outside-length-puddles-on-frame',
+                title: 'Puddles on Window Frame',
+                imageClass: 'image-inside-length-puddles',
+                description: 'Added 2" for better light coverage and a cozy, softly stacked finish',
+                jump: 'step-finished',
+              },
+            ],
+          },
+          'step-finished': {
+            title: '',
+            type: 'finished',
+            options: [],
+          },
         },
       }
     </script>
@@ -220,7 +282,7 @@
       <!-- Web Component demo -->
       <!-- <div class="mt-5">
         <h2>Web Component Demo:</h2>
-        <cozyology-measurement-tool data-style-url="/assets/measurement-tool.css" shop-now-url="https://www.google.com" />
+        <cozyology-measurement-tool data-style-url="./assets/cmt-index.css" shop-now-url="https://www.google.com" />
       </div> -->
     </div>
     <script type="module" src="/src/main.tsx"></script>

@@ -1,6 +1,17 @@
 declare global {
   interface Window {
-    CozyologyMeasurementConfig: any
+    CozyologyConfig: {
+      stepTitles: Record<string, string>
+      resultTexts: {
+        orderInstructions: string
+        screenshotReminder: string
+        mountStyleLabel?: string
+        lengthStyleLabel?: string
+      }
+      contactDetails: string
+      contactDetailsMobile: string
+      measurementConfig: any
+    }
   }
 }
 

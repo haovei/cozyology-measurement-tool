@@ -3,13 +3,6 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import MeasurementTool from './components/MeasurementTool'
 
-// 将 stepConfig 设为全局变量
-declare global {
-  interface Window {
-    CozyologyMeasurementConfig: any
-  }
-}
-
 // Web Component wrapper for React component
 class CozyologyMeasurementTool extends HTMLElement {
   private root: ReactDOM.Root | null = null
@@ -28,7 +21,7 @@ class CozyologyMeasurementTool extends HTMLElement {
 
   private async mountComponent(container: HTMLElement) {
     // Load Tailwind CSS first
-    this.loadTailwindStyles()
+    // this.loadTailwindStyles()
 
     // Load external styles if provided and wait for completion
     const styleUrl = this.getAttribute('data-style-url')
@@ -82,10 +75,10 @@ class CozyologyMeasurementTool extends HTMLElement {
       const link = document.createElement('link')
       link.rel = 'stylesheet'
       link.href = styleUrl
-      
+
       link.onload = () => resolve()
       link.onerror = () => reject(new Error(`Failed to load styles from ${styleUrl}`))
-      
+
       shadow.appendChild(link)
     })
   }
@@ -100,7 +93,7 @@ class CozyologyMeasurementTool extends HTMLElement {
   private getProps() {
     // Extract attributes as props
     const props: any = {
-      stepConfig: window.CozyologyMeasurementConfig || {}, // 优先使用全局配置
+      stepConfig: window.CozyologyConfig?.measurementConfig || {},
     }
 
     // Extract shop-now-url attribute

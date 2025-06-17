@@ -73,26 +73,38 @@ function App() {
 
 ### 自定义配置
 
-您可以通过全局变量 `window.CozyologyMeasurementConfig` 来自定义步骤配置：
+您可以通过统一的全局变量 `window.CozyologyConfig` 来自定义配置：
 
 ```html
 <script>
 // 在加载 web component 之前设置全局配置
-window.CozyologyMeasurementConfig = {
-  "step-1": {
-    "title": "自定义标题",
-    "type": "select",
-    "options": [
-      {
-        "id": "custom-option",
-        "title": "自定义选项",
-        "imageClass": "custom-image-class",
-        "description": "自定义描述",
-        "jump": "next-step"
-      }
-    ]
+window.CozyologyConfig = {
+  stepTitles: {
+    'step-1': '选择安装方式',
+    'step-2': '指定窗户宽度', 
+    'step-3': '指定窗户高度',
+    'step-finished': '准备订购'
+  },
+  resultTexts: {
+    orderInstructions: "使用上面列出的尺寸下订单。我们已为您处理了所有计算——无需手动调整。",
+    screenshotReminder: '为了您的记录，请在继续之前<span class="text-[#ba6352]">截图保存</span>。'
+  },
+  measurementConfig: {
+    "step-1": {
+      "title": "自定义标题",
+      "type": "select",
+      "options": [
+        {
+          "id": "custom-option",
+          "title": "自定义选项", 
+          "imageClass": "custom-image-class",
+          "description": "自定义描述",
+          "jump": "next-step"
+        }
+      ]
+    }
+    // 更多自定义配置...
   }
-  // 更多自定义配置...
 };
 </script>
 
