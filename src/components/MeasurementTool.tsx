@@ -586,7 +586,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                         <div className="flex-1 md:text-center">
                           <h3 className="text-[24px] text-[#171717] not-md:text-[15px]">{option.title}</h3>
                           <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
-                          <div className="text-[16px] text-[#171717] not-md:text-[12px]">{option.description}</div>
+                          <div className="text-[16px] text-[#171717] not-md:text-[12px]" dangerouslySetInnerHTML={{ __html: option.description }} />
                         </div>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 hidden group-hover:block">
