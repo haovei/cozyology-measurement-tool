@@ -29,14 +29,14 @@
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.10",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
-    "@vitejs/plugin-react": "^4.5",
-    "prettier": "^3.5.3",
+    "@vitejs/plugin-react": "^4.6.0",
+    "prettier": "^3.6.0",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^7.0.0"
   },
   "peerDependencies": {
     "react": ">=19.1.0",
