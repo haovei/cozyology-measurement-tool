@@ -92,9 +92,7 @@ class CozyologyMeasurementTool extends HTMLElement {
 
   private getProps() {
     // Extract attributes as props
-    const props: any = {
-      stepConfig: window.CozyologyConfig?.measurementConfig || {},
-    }
+    const props: any = {}
 
     // Extract shop-now-url attribute
     const shopNowUrl = this.getAttribute('shop-now-url')

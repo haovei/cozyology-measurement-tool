@@ -4,10 +4,11 @@ import { useRef, useState } from 'react'
 
 interface MeasurementToolProps {
   shopNowUrl?: string
-  stepConfig: any
 }
 
-export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementToolProps) {
+const CozyologyConfig = window.CozyologyConfig
+
+export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
@@ -50,7 +51,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
   }))
 
   function getStepTitle(stepKey: string): string {
-    return window.CozyologyConfig?.stepTitles?.[stepKey] || 'Step'
+    return CozyologyConfig.stepTitles?.[stepKey] || 'Step'
   }
 
   const getPreviousStep = () => {
@@ -206,7 +207,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
 
   // 恢复指定步骤的输入值
   const restoreInputsForStep = (stepId: string) => {
-    const stepData = stepConfig[stepId]
+    const stepData = CozyologyConfig.measurementConfig[stepId]
     if (stepData && stepData.type === 'input') {
       const restoredInputs: Record<string, string> = {}
 
@@ -444,7 +445,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
     window.open(shopNowUrl, '_blank')
   }
 
-  const currentStepData = stepConfig[currentStep]
+  const currentStepData = CozyologyConfig.measurementConfig[currentStep]
 
   const stepWrapRef = useRef<HTMLDivElement>(null)
 
@@ -494,7 +495,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               <div
                 className="text-[14px]"
                 dangerouslySetInnerHTML={{
-                  __html: window.CozyologyConfig?.contactDetails,
+                  __html: CozyologyConfig.contactDetails,
                 }}
               ></div>
             </div>
@@ -586,7 +587,10 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                         <div className="flex-1 md:text-center">
                           <h3 className="text-[24px] text-[#171717] not-md:text-[15px]">{option.title}</h3>
                           <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
-                          <div className="text-[16px] text-[#171717] not-md:text-[12px]" dangerouslySetInnerHTML={{ __html: option.description }} />
+                          <div
+                            className="text-[16px] text-[#171717] not-md:text-[12px]"
+                            dangerouslySetInnerHTML={{ __html: option.description }}
+                          />
                         </div>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 hidden group-hover:block">
@@ -664,14 +668,14 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
                     <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: window.CozyologyConfig?.resultTexts?.orderInstructions || '',
+                          __html: CozyologyConfig.resultTexts?.orderInstructions || '',
                         }}
                       />
                     </div>
                     <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: window.CozyologyConfig?.resultTexts?.screenshotReminder || '',
+                          __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
                         }}
                       />
                     </div>
@@ -728,7 +732,7 @@ export default function MeasurementTool({ shopNowUrl, stepConfig }: MeasurementT
               <div
                 className="flex-1 text-[12px]"
                 dangerouslySetInnerHTML={{
-                  __html: window.CozyologyConfig?.contactDetailsMobile,
+                  __html: CozyologyConfig.contactDetailsMobile,
                 }}
               ></div>
               <div className="w-[65px] h-[65px] flex-shrink-0">
