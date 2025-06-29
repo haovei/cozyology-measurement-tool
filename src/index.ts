@@ -2,6 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import MeasurementTool from './components/MeasurementTool'
+import MeasurementDrapery from './components/MeasurementDrapery'
+
+// 定义组件类型
+type ComponentType = 'measurement' | 'drapery'
 
 // Web Component wrapper for React component
 class CozyologyMeasurementTool extends HTMLElement {
@@ -30,7 +34,12 @@ class CozyologyMeasurementTool extends HTMLElement {
     }
 
     this.root = ReactDOM.createRoot(container)
-    this.root.render(React.createElement(MeasurementTool, this.getProps()))
+
+    // 根据 type 属性决定渲染哪个组件
+    const componentType = this.getComponentType()
+    const Component = componentType === 'drapery' ? MeasurementDrapery : MeasurementTool
+
+    this.root.render(React.createElement(Component, this.getProps()))
   }
 
   private loadTailwindStyles() {
@@ -90,29 +99,30 @@ class CozyologyMeasurementTool extends HTMLElement {
     }
   }
 
+  private getComponentType(): ComponentType {
+    const type = this.getAttribute('type')
+    return type === 'drapery' ? 'drapery' : 'measurement'
+  }
+
   private getProps() {
     // Extract attributes as props
     const props: any = {}
-
-    // Extract shop-now-url attribute
-    const shopNowUrl = this.getAttribute('shop-now-url')
-    if (shopNowUrl) {
-      props.shopNowUrl = shopNowUrl
-    }
 
     return props
   }
 
   // Watch for attribute changes
   static get observedAttributes() {
-    return ['shop-now-url']
+    return ['type']
   }
 
   attributeChangedCallback(name: string) {
-    if (name === 'shop-now-url') {
-      // Re-render component with new props when shop-now-url changes
+    if (name === 'type') {
+      // Re-render component with new props when attributes change
       if (this.root && this.shadowRoot) {
-        this.root.render(React.createElement(MeasurementTool, this.getProps()))
+        const componentType = this.getComponentType()
+        const Component = componentType === 'drapery' ? MeasurementDrapery : MeasurementTool
+        this.root.render(React.createElement(Component, this.getProps()))
       }
     }
   }
@@ -121,4 +131,4 @@ class CozyologyMeasurementTool extends HTMLElement {
 // Register the custom element
 customElements.define('cozyology-measurement-tool', CozyologyMeasurementTool)
 
-export { CozyologyMeasurementTool, MeasurementTool }
+export { CozyologyMeasurementTool, MeasurementTool, MeasurementDrapery, type ComponentType }

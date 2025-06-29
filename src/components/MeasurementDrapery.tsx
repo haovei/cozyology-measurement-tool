@@ -2,258 +2,9 @@
 
 import { useRef, useState } from 'react'
 
-interface MeasurementToolProps {
-  shopNowUrl?: string
-}
+const CozyologyConfig = window.CozyologyConfig_Drapery
 
-// const CozyologyConfig = window.CozyologyConfig_Drapery
-const CozyologyConfig = {
-  stepTitles: {
-    'step-1': 'Choose Header Style',
-    'step-2': 'Specify the Width',
-    'step-3': 'Specify the Height',
-    'step-4': 'Panels',
-  },
-  resultTexts: {
-    orderInstructions: '',
-    screenshotReminder:
-      'For your records, please <span class="text-[#ba6352]">take a screenshot</span> before proceeding.',
-  },
-  contactDetails: `<div class="font-bold text-black">Want to double-check your sizing?</div>
-                <div class="mt-[10px] text-gray-500">
-                  <div>Send us a quick photo via</div>
-                  <div>
-                    <a
-                      href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
-                      class="text-[#ba6352] underline"
-                      target="_blank"
-                    >
-                      WhatsApp
-                    </a>
-                    : (917) 701-2145
-                  </div>
-                  <div>
-                    email&nbsp;
-                    <a href="mailto:care@cozyology.com" class="text-[#ba6352] underline" target="_blank">
-                      Care@Cozyology.com
-                    </a>
-                    .
-                  </div>
-                  <div>and we'll do the rest.</div>
-                </div>`,
-  contactDetailsMobile: `<div class="font-bold text-black">Need help with measurements?</div>
-                <div class="font-bold text-black">
-                  Scan the QR code or&nbsp;
-                  <a href="mailto:care@cozyology.com" class="text-[#c16452]" target="_blank">
-                    add us
-                  </a>
-                  &nbsp; on
-                </div>
-                <div class="text-gray-500 mt-[10px]">
-                  <a
-                    href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
-                    class="text-[#ba6352] underline"
-                    target="_blank"
-                  >
-                    WhatsApp
-                  </a>
-                  : (917) 701-2145
-                </div>`,
-  measurementConfig: {
-    'step-1': {
-      type: 'select',
-      title: 'Which Drape Header Style Do You Prefer?',
-      options: [
-        {
-          id: 'soft-top',
-          title: 'SOFT TOP',
-          imageClass: 'image-soft-top',
-          alt: 'Soft Top',
-          description: 'For a soft natural look<br />· Rod Pocket',
-          jump: 'step-2-0',
-        },
-        {
-          id: 'pleated',
-          title: 'PLEATED',
-          imageClass: 'image-pleated',
-          alt: 'Pleated',
-          description: 'For a luxurious full look<br />· Double pinch pleat <br />· tripple pinch pleat',
-          jump: 'step-2-0',
-        },
-        {
-          id: 'grommets',
-          title: 'GROMMETS',
-          imageClass: 'image-grommets',
-          alt: 'Grommets',
-          description: 'For a structured modern look <br />· Grommets',
-          jump: 'step-2-0',
-        },
-      ],
-    },
-    'step-2-0': {
-      type: 'select',
-      title: 'Drapery Rod Installed?',
-      options: [
-        {
-          id: 'rod-installed-yes',
-          title: 'Yes',
-          imageClass: 'image-drapery-02-1',
-          description: 'I have a rod installed already',
-          jump: 'step-2-1-1',
-        },
-        {
-          id: 'rod-installed-no',
-          title: 'No',
-          imageClass: 'image-drapery-02-2',
-          description: `I don't have a rod installed yet<br />For more accurate measurement, we recommend you have the rod or track installed`,
-          jump: 'step-2-2-1',
-        },
-      ],
-    },
-    'step-2-1-1': {
-      type: 'input',
-      title: 'Rod Length?',
-      subTitle: 'For accuracy, please use a steel measuring tape.',
-      imageClass: 'image-drapery-02-3',
-      jump: 'step-3-1-1',
-      options: [
-        {
-          id: 'rod-width-top',
-          title: 'A',
-          label: 'Width',
-          min: 0,
-          max: 280,
-        },
-      ],
-    },
-    'step-2-2-1': {
-      type: 'input',
-      title: 'Window Width? (Frame outer edge to edge)',
-      subTitle: 'For accuracy, please use a steel measuring tape.',
-      imageClass: 'image-drapery-02-4',
-      jump: 'step-2-2-2',
-      options: [
-        {
-          id: 'norod-window-width',
-          title: '',
-          label: '',
-          min: 0,
-          max: 280,
-        },
-      ],
-    },
-    'step-2-2-2': {
-      type: 'input',
-      title: 'Rod Extension Width Beyond Frame?',
-      subTitle: 'For accuracy, please use a steel measuring tape.',
-      imageClass: 'image-drapery-02-5',
-      jump: 'step-3-1-1',
-      options: [
-        {
-          id: 'norod-width-left-extension',
-          title: 'A',
-          label: 'Left Side',
-          min: 0,
-          max: 280,
-        },
-        {
-          id: 'norod-width-right-extension',
-          title: 'B',
-          label: 'Right Side',
-          min: 0,
-          max: 280,
-        },
-      ],
-    },
-    'step-3-1-1': {
-      type: 'input',
-      title: 'Window Top to Floor Height?',
-      subTitle: 'For accuracy, please use a steel measuring tape.',
-      imageClass: 'image-drapery-03-1',
-      jump: 'step-3-1-2',
-      options: [
-        {
-          id: 'top-to-floor-height',
-          title: 'A',
-          label: 'Height',
-          min: 0,
-          max: 280,
-        },
-      ],
-    },
-    'step-3-1-2': {
-      type: 'input',
-      title: 'Rod Extension Above Frame?',
-      subTitle: 'For accuracy, please use a steel measuring tape.',
-      imageClass: 'image-drapery-03-2',
-      description: `Ceiling under 10 ft: Mount 3–5" below the ceiling to make the space feel taller and more refined. <br />
-Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain balanced proportions.<br />
-Pleated: Measure from the rod to the floor. We automatically subtract 1 inches for the ring's radius.`,
-      jump: 'step-3-1-3',
-      options: [
-        {
-          id: 'rod-extension-above-frame',
-          title: '',
-          label: 'Height',
-          min: 0,
-          max: 280,
-        },
-      ],
-    },
-    'step-3-1-3': {
-      type: 'select',
-      title: 'Curtain Length Style?',
-      options: [
-        {
-          id: 'length-style-above-floor',
-          title: '1/2‘’ ABOVE FLOOR',
-          imageClass: 'image-drapery-03-3',
-          description: 'Most recommended<br />Easy upkeep, smooth operation, with a sleek look.',
-          jump: 'step-4-1',
-        },
-        {
-          id: 'length-style-breaks-on-floor',
-          title: 'BREAK ON THE FLOOR',
-          imageClass: 'image-drapery-03-4',
-          description: 'The Custom-Fit<br />A polished appearance, demands precise  measurement.',
-          jump: 'step-4-1',
-        },
-        {
-          id: 'length-style-puddles-on-floor',
-          title: 'SLIGHT PUDDLE ON FLOOR',
-          imageClass: 'image-drapery-03-5',
-          description: 'The Plush Choice<br />Rich and striking, but requires more cleaning',
-          jump: 'step-4-1',
-        },
-      ],
-    },
-    'step-4-1': {
-      title: 'Single or Split Panels?',
-      type: 'select',
-      options: [
-        {
-          id: 'single-panels',
-          title: 'SINGLE',
-          imageClass: 'image-drapery-04-1',
-          jump: 'step-4-2',
-        },
-        {
-          id: 'split-panels',
-          title: 'SPLIT',
-          imageClass: 'image-drapery-04-2',
-          jump: 'step-4-2',
-        },
-      ],
-    },
-    'step-4-2': {
-      title: 'Finished',
-      type: 'finished',
-      options: [],
-    },
-  },
-}
-
-export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
+export default function MeasurementTool() {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
@@ -504,7 +255,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
   // 计算最终的推荐尺寸
   const calculateRecommendedSize = (): { width: string; height: string } => {
     // 判断是否已安装窗帘杆
-    const hasRodInstalled = completedSteps.some(step => step.includes('rod-installed-yes'))
+    const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
 
     let width = 0
     let height = 0
@@ -522,29 +273,45 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
 
     // 计算高度
     const windowTopToFloorHeight = inputValues['top-to-floor-height'] || 0
-    const rodExtensionAboveFrame = inputValues['rod-extension-above-frame'] || 0
 
-    // 基础高度：窗户顶部到地面的高度减去杆在窗框上方的延伸
-    height = windowTopToFloorHeight - rodExtensionAboveFrame
+    // 如果已安装杆，rod-extension-above-frame 为0（因为杆已经安装，不需要考虑安装位置）
+    const rodExtensionAboveFrame = hasRodInstalled ? 0 : inputValues['rod-extension-above-frame'] || 0
 
-    // 根据选择的帘头样式调整高度
+    // 第一步：计算杆到地面的距离
+    // 杆到地面的高度 = 窗户顶部到地面的高度 + 杆在窗框上方的延伸
+    const rodToFloorHeight = windowTopToFloorHeight + rodExtensionAboveFrame
+
+    // 第二步：根据帘头样式调整起始高度
     const headerStyle = selectedOptions['step-1']
-    if (headerStyle === 'pleated') {
-      // 褶皱样式：自动减去1英寸用于环的半径
-      height -= 1
-    }
+    let curtainHeight = rodToFloorHeight
 
-    // 根据窗帘长度样式调整高度
+    if (headerStyle === 'pleated') {
+      // 褶皱样式：从杆到地面的距离减去1英寸用于环的半径
+      curtainHeight = rodToFloorHeight - 1
+    }
+    // 对于其他样式（soft-top, grommets），直接使用杆到地面的距离
+
+    // 第三步：根据窗帘长度样式调整最终高度
     const lengthStyle = selectedOptions['step-3-1-3']
     if (lengthStyle === 'length-style-above-floor') {
       // 离地面1/2英寸
-      height -= 0.5
+      height = curtainHeight - 0.5
     } else if (lengthStyle === 'length-style-breaks-on-floor') {
-      // 接触地面：不调整
-      // height = height
+      // 接触地面：使用计算出的高度
+      height = curtainHeight
     } else if (lengthStyle === 'length-style-puddles-on-floor') {
       // 轻微堆积在地面：增加2英寸
-      height += 2
+      height = curtainHeight + 2
+    } else {
+      // 默认情况
+      height = curtainHeight
+    }
+
+    // 根据面板类型调整宽度
+    const panelType = selectedOptions['step-4-1']
+    if (panelType === 'split-panels') {
+      // 分割面板：宽度减半
+      width = width / 2
     }
 
     // 确保宽度和高度都是正数
@@ -559,7 +326,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
 
   // 获取安装类型描述
   const getMountTypeDescription = (): string => {
-    const hasRodInstalled = completedSteps.some(step => step.includes('rod-installed-yes'))
+    const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
     return hasRodInstalled ? 'Rod Installed' : 'Rod Not Installed'
   }
 
@@ -661,11 +428,21 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
       saveCurrentStepInputs()
     }
 
+    // 动态调整跳转目标：如果从step-3-1-1且Rod Installed为Yes，跳过step-3-1-2
+    let actualJump = jump
+    if (currentStep === 'step-3-1-1') {
+      // 检查是否选择了Rod Installed为Yes
+      const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
+      if (hasRodInstalled && jump === 'step-3-1-2') {
+        actualJump = 'step-3-1-3'
+      }
+    }
+
     // 如果当前步骤是 step-1 且历史记录中有超过一个步骤，说明用户重新选择了第一步
     // 需要清空之前的历史和已完成步骤，重新开始
     if (currentStep === 'step-1' && stepHistory.length > 1) {
       setCompletedSteps([currentStep])
-      setStepHistory(['step-1', jump])
+      setStepHistory(['step-1', actualJump])
       setInputValues({}) // 清空所有之前的输入值
       setSelectedOptions({}) // 清空所有之前的选择
     } else {
@@ -675,17 +452,17 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
       }
 
       // 添加到历史记录
-      setStepHistory(prev => [...prev, jump])
+      setStepHistory(prev => [...prev, actualJump])
     }
 
     // 清空当前步骤输入和错误信息
     setCurrentStepInputs({})
     setInputErrors({})
 
-    setCurrentStep(jump)
+    setCurrentStep(actualJump)
 
     // 如果跳转到输入步骤，恢复之前保存的输入值
-    restoreInputsForStep(jump)
+    restoreInputsForStep(actualJump)
 
     // 移动端点击 CONTINUE 后滚动到顶部
     if (window.innerWidth < 768 && stepWrapRef.current) {
@@ -706,7 +483,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
   }
 
   const handleShopNow = () => {
-    window.open(shopNowUrl, '_blank')
+    window.open(CozyologyConfig.shopNowUrl, '_blank')
   }
 
   const currentStepData = CozyologyConfig.measurementConfig[currentStep]
@@ -845,7 +622,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
                       onClick={() => handleContinue(option.jump, option.id)}
                     >
                       <div className="p-[40px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
-                        <div className="w-[320px] aspect-square mx-auto relative md:w-[240px] not-md:w-[160px] not-md:h-[160px]">
+                        <div className="w-full aspect-square mx-auto relative not-md:w-[50%]">
                           <div className={`option-image ${option.imageClass}`} />
                         </div>
                         <div className="flex-1 md:text-center">

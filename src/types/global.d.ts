@@ -1,6 +1,7 @@
 declare global {
   interface Window {
     CozyologyConfig: {
+      shopNowUrl?: string
       stepTitles: Record<string, string>
       resultTexts: {
         orderInstructions: string
@@ -13,6 +14,7 @@ declare global {
       measurementConfig: any
     }
     CozyologyConfig_Drapery: {
+      shopNowUrl?: string
       stepTitles: Record<string, string>
       resultTexts: {
         orderInstructions: string

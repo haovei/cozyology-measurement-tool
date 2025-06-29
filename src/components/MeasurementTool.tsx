@@ -2,13 +2,9 @@
 
 import { useRef, useState } from 'react'
 
-interface MeasurementToolProps {
-  shopNowUrl?: string
-}
-
 const CozyologyConfig = window.CozyologyConfig
 
-export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
+export default function MeasurementTool() {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
@@ -442,7 +438,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
   }
 
   const handleShopNow = () => {
-    window.open(shopNowUrl, '_blank')
+    window.open(CozyologyConfig.shopNowUrl, '_blank')
   }
 
   const currentStepData = CozyologyConfig.measurementConfig[currentStep]
