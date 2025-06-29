@@ -12,6 +12,18 @@ declare global {
       contactDetailsMobile: string
       measurementConfig: any
     }
+    CozyologyConfig_Drapery: {
+      stepTitles: Record<string, string>
+      resultTexts: {
+        orderInstructions: string
+        screenshotReminder: string
+        mountStyleLabel?: string
+        lengthStyleLabel?: string
+      }
+      contactDetails: string
+      contactDetailsMobile: string
+      measurementConfig: any
+    }
   }
 }
 

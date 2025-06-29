@@ -73,6 +73,98 @@
   background-repeat: no-repeat;
 }
 
+/* Drapery */
+.image-soft-top {
+  background-image: url('../assets/drapery-01-1.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-pleated {
+  background-image: url('../assets/drapery-01-2.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-grommets {
+  background-image: url('../assets/drapery-01-3.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-02-1 {
+  background-image: url('../assets/drapery-02-1.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-02-2 {
+  background-image: url('../assets/drapery-02-2.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-02-3 {
+  background-image: url('../assets/drapery-02-3.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-02-4 {
+  background-image: url('../assets/drapery-02-4.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-02-5 {
+  background-image: url('../assets/drapery-02-5.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-03-1 {
+  background-image: url('../assets/drapery-03-1.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-03-2 {
+  background-image: url('../assets/drapery-03-2.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-03-3 {
+  background-image: url('../assets/drapery-03-3.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-03-4 {
+  background-image: url('../assets/drapery-03-4.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-03-5 {
+  background-image: url('../assets/drapery-03-5.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-04-1 {
+  background-image: url('../assets/drapery-04-1.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.image-drapery-04-2 {
+  background-image: url('../assets/drapery-04-2.webp');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* QR Code */
 .image-qr-code {
   background-image: url('../assets/code@2x.webp');
