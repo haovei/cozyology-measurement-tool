@@ -12,11 +12,10 @@ const CozyologyConfig = {
     'step-1': 'Choose Header Style',
     'step-2': 'Specify the Width',
     'step-3': 'Specify the Height',
-    'step-finished': 'Panels',
+    'step-4': 'Panels',
   },
   resultTexts: {
-    orderInstructions:
-      "Use the size listed above when placing your order. We've handled all the calculations for you—no need to make any manual adjustments.",
+    orderInstructions: '',
     screenshotReminder:
       'For your records, please <span class="text-[#ba6352]">take a screenshot</span> before proceeding.',
   },
@@ -148,7 +147,7 @@ const CozyologyConfig = {
       title: 'Rod Extension Width Beyond Frame?',
       subTitle: 'For accuracy, please use a steel measuring tape.',
       imageClass: 'image-drapery-02-5',
-      jump: 'step-3-2-1',
+      jump: 'step-3-1-1',
       options: [
         {
           id: 'norod-width-left-extension',
@@ -247,7 +246,7 @@ Pleated: Measure from the rod to the floor. We automatically subtract 1 inches f
       ],
     },
     'step-4-2': {
-      title: '',
+      title: 'Finished',
       type: 'finished',
       options: [],
     },
@@ -267,7 +266,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
     if (currentStep === 'step-1') return 'step-1'
     if (currentStep.startsWith('step-2')) return 'step-2'
     if (currentStep.startsWith('step-3')) return 'step-3'
-    if (currentStep === 'step-finished') return 'step-finished'
+    if (currentStep.startsWith('step-4')) return 'step-4'
     return 'step-1'
   }
 
@@ -279,15 +278,15 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
         return completedSteps.some(step => step.startsWith('step-2'))
       case 'step-3':
         return completedSteps.some(step => step.startsWith('step-3'))
-      case 'step-finished':
-        return completedSteps.includes('step-finished')
+      case 'step-4':
+        return completedSteps.some(step => step.startsWith('step-4'))
       default:
         return false
     }
   }
 
   // 定义主要步骤列表
-  const mainSteps = ['step-1', 'step-2', 'step-3', 'step-finished']
+  const mainSteps = ['step-1', 'step-2', 'step-3', 'step-4']
   const steps = mainSteps.map((key, index) => ({
     id: key,
     stepNumber: index + 1,
@@ -337,7 +336,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
     if (actualStep === 'step-1') return 'step-1'
     if (actualStep.startsWith('step-2')) return 'step-2'
     if (actualStep.startsWith('step-3')) return 'step-3'
-    if (actualStep === 'step-finished') return 'step-finished'
+    if (actualStep.startsWith('step-4')) return 'step-4'
     return 'step-1'
   }
 
@@ -347,16 +346,19 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
         return 'step-1'
       case 'step-2':
         // 返回已完成的最后一个step-2子步骤，或第一个step-2步骤
-        const step2Options = ['step-2-1-1', 'step-2-2-1', 'step-2-2-2']
+        const step2Options = ['step-2-0', 'step-2-1-1', 'step-2-2-1', 'step-2-2-2']
         const completedStep2 = step2Options.filter(step => completedSteps.includes(step))
-        return completedStep2.length > 0 ? completedStep2[completedStep2.length - 1] : 'step-2-1-1'
+        return completedStep2.length > 0 ? completedStep2[completedStep2.length - 1] : 'step-2-0'
       case 'step-3':
         // 返回已完成的最后一个step-3子步骤，或第一个step-3步骤
-        const step3Options = ['step-3-1-1', 'step-3-2-1']
+        const step3Options = ['step-3-1-1', 'step-3-1-2', 'step-3-1-3']
         const completedStep3 = step3Options.filter(step => completedSteps.includes(step))
         return completedStep3.length > 0 ? completedStep3[completedStep3.length - 1] : 'step-3-1-1'
-      case 'step-finished':
-        return 'step-finished'
+      case 'step-4':
+        // 返回已完成的最后一个step-4子步骤，或第一个step-4步骤
+        const step4Options = ['step-4-1', 'step-4-2']
+        const completedStep4 = step4Options.filter(step => completedSteps.includes(step))
+        return completedStep4.length > 0 ? completedStep4[completedStep4.length - 1] : 'step-4-1'
       default:
         return 'step-1'
     }
@@ -501,58 +503,53 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
 
   // 计算最终的推荐尺寸
   const calculateRecommendedSize = (): { width: string; height: string } => {
-    // 判断是内装还是外装
-    const isInsideMount = completedSteps.some(step => step.includes('step-2-1'))
+    // 判断是否已安装窗帘杆
+    const hasRodInstalled = completedSteps.some(step => step.includes('rod-installed-yes'))
 
     let width = 0
     let height = 0
 
-    if (isInsideMount) {
-      // 内装计算
-      // 宽度：取三个测量值中的最小值，然后减去 3/8 英寸间隙
-      const widthValues = [
-        inputValues['inside-width-top'],
-        inputValues['inside-width-middle'],
-        inputValues['inside-width-bottom'],
-      ].filter(v => v !== undefined)
-
-      if (widthValues.length > 0) {
-        width = Math.min(...widthValues) - 0.375 // 减去 3/8 英寸
-      }
-
-      // 高度：取三个测量值中的最大值
-      const heightValues = [
-        inputValues['inside-height-left'],
-        inputValues['inside-height-middle'],
-        inputValues['inside-height-right'],
-      ].filter(v => v !== undefined)
-
-      if (heightValues.length > 0) {
-        height = Math.max(...heightValues)
-
-        // 如果选择了 puddles 样式，增加 2 英寸
-        if (completedSteps.some(step => step.includes('puddles'))) {
-          height += 2
-        }
-      }
+    if (hasRodInstalled) {
+      // 已安装杆的情况：直接使用杆长度
+      width = inputValues['rod-width-top'] || 0
     } else {
-      // 外装计算
-      // 宽度：窗户宽度 + 左侧延伸 + 右侧延伸
-      const windowWidth = inputValues['outside-window-width'] || 0
-      const leftExtension = inputValues['outside-width-left-extension'] || 0
-      const rightExtension = inputValues['outside-width-right-extension'] || 0
+      // 未安装杆的情况：窗户宽度 + 左右延伸
+      const windowWidth = inputValues['norod-window-width'] || 0
+      const leftExtension = inputValues['norod-width-left-extension'] || 0
+      const rightExtension = inputValues['norod-width-right-extension'] || 0
       width = windowWidth + leftExtension + rightExtension
-
-      // 高度：窗户高度 + 上方延伸
-      const windowHeight = inputValues['outside-window-height'] || 0
-      const aboveExtension = inputValues['outside-height-above-extension'] || 0
-      height = windowHeight + aboveExtension
-
-      // 如果选择了 puddles 样式，增加 2 英寸
-      if (completedSteps.some(step => step.includes('puddles'))) {
-        height += 2
-      }
     }
+
+    // 计算高度
+    const windowTopToFloorHeight = inputValues['top-to-floor-height'] || 0
+    const rodExtensionAboveFrame = inputValues['rod-extension-above-frame'] || 0
+
+    // 基础高度：窗户顶部到地面的高度减去杆在窗框上方的延伸
+    height = windowTopToFloorHeight - rodExtensionAboveFrame
+
+    // 根据选择的帘头样式调整高度
+    const headerStyle = selectedOptions['step-1']
+    if (headerStyle === 'pleated') {
+      // 褶皱样式：自动减去1英寸用于环的半径
+      height -= 1
+    }
+
+    // 根据窗帘长度样式调整高度
+    const lengthStyle = selectedOptions['step-3-1-3']
+    if (lengthStyle === 'length-style-above-floor') {
+      // 离地面1/2英寸
+      height -= 0.5
+    } else if (lengthStyle === 'length-style-breaks-on-floor') {
+      // 接触地面：不调整
+      // height = height
+    } else if (lengthStyle === 'length-style-puddles-on-floor') {
+      // 轻微堆积在地面：增加2英寸
+      height += 2
+    }
+
+    // 确保宽度和高度都是正数
+    width = Math.max(width, 0)
+    height = Math.max(height, 0)
 
     return {
       width: convertToFraction(width),
@@ -562,35 +559,56 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
 
   // 获取安装类型描述
   const getMountTypeDescription = (): string => {
-    const isInsideMount = completedSteps.some(step => step.includes('step-2-1'))
-    return isInsideMount ? 'Inside Mount' : 'Outside Mount'
+    const hasRodInstalled = completedSteps.some(step => step.includes('rod-installed-yes'))
+    return hasRodInstalled ? 'Rod Installed' : 'Rod Not Installed'
   }
 
   // 获取长度样式描述
   const getLengthStyleDescription = (): string => {
-    // 检查 step-3-1-2 (Inside Mount 长度样式)
-    const insideLengthOption = selectedOptions['step-3-1-2']
-    if (insideLengthOption) {
-      if (insideLengthOption === 'inside-length-breaks-on-frame') {
-        return 'Breaks on Window Frame'
-      }
-      if (insideLengthOption === 'inside-length-puddles-on-frame') {
-        return 'Puddles on Window Frame'
-      }
+    const lengthStyle = selectedOptions['step-3-1-3']
+
+    if (lengthStyle === 'length-style-above-floor') {
+      return '1/2" ABOVE FLOOR'
+    }
+    if (lengthStyle === 'length-style-breaks-on-floor') {
+      return 'BREAK ON THE FLOOR'
+    }
+    if (lengthStyle === 'length-style-puddles-on-floor') {
+      return 'SLIGHT PUDDLE ON FLOOR'
     }
 
-    // 检查 step-3-2-3 (Outside Mount 长度样式)
-    const outsideLengthOption = selectedOptions['step-3-2-3']
-    if (outsideLengthOption) {
-      if (outsideLengthOption === 'outside-length-breaks-on-frame') {
-        return 'Breaks on Window Frame'
-      }
-      if (outsideLengthOption === 'outside-length-puddles-on-frame') {
-        return 'Puddles on Window Frame'
-      }
+    return 'STANDARD LENGTH'
+  }
+
+  // 获取帘头样式描述
+  const getHeaderStyleDescription = (): string => {
+    const headerStyle = selectedOptions['step-1']
+
+    if (headerStyle === 'soft-top') {
+      return 'SOFT TOP'
+    }
+    if (headerStyle === 'pleated') {
+      return 'PLEATED'
+    }
+    if (headerStyle === 'grommets') {
+      return 'GROMMETS'
     }
 
-    return 'Standard Length'
+    return 'STANDARD'
+  }
+
+  // 获取面板类型描述
+  const getPanelTypeDescription = (): string => {
+    const panelType = selectedOptions['step-4-1']
+
+    if (panelType === 'single-panels') {
+      return 'SINGLE PANEL'
+    }
+    if (panelType === 'split-panels') {
+      return 'SPLIT PANELS'
+    }
+
+    return 'STANDARD PANEL'
   }
 
   const handleContinue = (jump: string, optionId?: string) => {
@@ -907,7 +925,7 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
                 <>
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] px-[30px] xl:px-[120px]">
                     <div className="text-[20px] font-medium text-black not-md:text-[12px]">
-                      Your recommended shade size is&nbsp;
+                      Your recommended drapery size is&nbsp;
                     </div>
                     <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
                     <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
@@ -934,12 +952,16 @@ export default function MeasurementTool({ shopNowUrl }: MeasurementToolProps) {
 
                     <div className="mt-[50px] flex w-full text-center">
                       <div className="flex-1 flex flex-col items-center">
-                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">MOUNT STYLE</div>
-                        <div className="text-[16px] font-americana">{getMountTypeDescription()}</div>
+                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Header</div>
+                        <div className="text-[16px] font-americana">{getHeaderStyleDescription()}</div>
                       </div>
                       <div className="flex-1 flex flex-col items-center border-l border-[#DDD]">
-                        <div className="text-[16px] text-[#999] font-americana  mb-[24px]">LENGTH STYLE</div>
-                        <div className="text-[16px] font-americana">{getLengthStyleDescription()}</div>
+                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Bottom</div>
+                        <div className="text-[16px] font-americana ">{getLengthStyleDescription()}</div>
+                      </div>
+                      <div className="flex-1 flex flex-col items-center border-l border-[#DDD]">
+                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Panel Type</div>
+                        <div className="text-[16px] font-americana">{getPanelTypeDescription()}</div>
                       </div>
                     </div>
 
