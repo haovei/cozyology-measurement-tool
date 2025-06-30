@@ -223,33 +223,36 @@ export default function MeasurementTool() {
     }
   }
 
-  // 将小数转换为分数格式的函数
-  const convertToFraction = (decimal: number): string => {
+  // 将小数转换为小数格式的函数，应用自定义四舍五入规则
+  const convertToDecimal = (decimal: number): string => {
     const wholeNumber = Math.floor(decimal)
     const fractionalPart = decimal - wholeNumber
 
-    // 转换为最接近的 1/8 英寸
-    const eighths = Math.round(fractionalPart * 8)
-
-    if (eighths === 0) {
-      return wholeNumber.toString()
+    // 应用自定义四舍五入规则
+    let adjustedFractionalPart: number
+    if (fractionalPart >= 0.1 && fractionalPart <= 0.3) {
+      adjustedFractionalPart = 0.0
+    } else if (fractionalPart > 0.3 && fractionalPart <= 0.7) {
+      adjustedFractionalPart = 0.5
+    } else if (fractionalPart > 0.7) {
+      adjustedFractionalPart = 1.0
+    } else {
+      // 对于小于0.1的值，保持为0
+      adjustedFractionalPart = fractionalPart < 0.1 ? 0.0 : fractionalPart
     }
 
-    if (eighths === 8) {
+    // 如果调整后的小数部分是1.0，则进位到整数部分
+    if (adjustedFractionalPart >= 1.0) {
       return (wholeNumber + 1).toString()
     }
 
-    // 简化分数
-    const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
-    const divisor = gcd(eighths, 8)
-    const numerator = eighths / divisor
-    const denominator = 8 / divisor
-
-    if (wholeNumber === 0) {
-      return `${numerator}/${denominator}`
+    // 如果调整后的小数部分是0，则只返回整数部分
+    if (adjustedFractionalPart === 0) {
+      return wholeNumber.toString()
     }
 
-    return `${wholeNumber} ${numerator}/${denominator}`
+    // 返回小数格式
+    return (wholeNumber + adjustedFractionalPart).toString()
   }
 
   // 计算最终的推荐尺寸
@@ -288,20 +291,23 @@ export default function MeasurementTool() {
     if (headerStyle === 'pleated') {
       // 褶皱样式：从杆到地面的距离减去1英寸用于环的半径
       curtainHeight = rodToFloorHeight - 1
+    } else if (headerStyle === 'soft-top') {
+      curtainHeight = rodToFloorHeight + 0.9
+    } else if (headerStyle === 'grommets') {
+      curtainHeight = rodToFloorHeight + 2.8
     }
-    // 对于其他样式（soft-top, grommets），直接使用杆到地面的距离
 
     // 第三步：根据窗帘长度样式调整最终高度
     const lengthStyle = selectedOptions['step-3-1-3']
     if (lengthStyle === 'length-style-above-floor') {
-      // 离地面1/2英寸
-      height = curtainHeight - 0.5
+      // 离地面1英寸
+      height = curtainHeight - 1
     } else if (lengthStyle === 'length-style-breaks-on-floor') {
       // 接触地面：使用计算出的高度
       height = curtainHeight
     } else if (lengthStyle === 'length-style-puddles-on-floor') {
-      // 轻微堆积在地面：增加2英寸
-      height = curtainHeight + 2
+      // 轻微堆积在地面：增加1英寸
+      height = curtainHeight + 1
     } else {
       // 默认情况
       height = curtainHeight
@@ -319,8 +325,8 @@ export default function MeasurementTool() {
     height = Math.max(height, 0)
 
     return {
-      width: convertToFraction(width),
-      height: convertToFraction(height),
+      width: convertToDecimal(width),
+      height: convertToDecimal(height),
     }
   }
 
@@ -335,7 +341,7 @@ export default function MeasurementTool() {
     const lengthStyle = selectedOptions['step-3-1-3']
 
     if (lengthStyle === 'length-style-above-floor') {
-      return '1/2" ABOVE FLOOR'
+      return '1" ABOVE FLOOR'
     }
     if (lengthStyle === 'length-style-breaks-on-floor') {
       return 'BREAK ON THE FLOOR'
@@ -708,7 +714,7 @@ export default function MeasurementTool() {
                     <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
                       {(() => {
                         const { width, height } = calculateRecommendedSize()
-                        return `${width}"W × ${height}"L`
+                        return `${width}" W × ${height}" L`
                       })()}
                     </div>
                     <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
