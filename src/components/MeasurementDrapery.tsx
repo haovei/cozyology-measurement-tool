@@ -12,6 +12,7 @@ export default function MeasurementTool() {
   const [currentStepInputs, setCurrentStepInputs] = useState<Record<string, string>>({}) // 当前步骤的输入值
   const [inputErrors, setInputErrors] = useState<Record<string, string>>({}) // 输入错误信息
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({}) // 记录每个步骤选择的选项ID
+  const [showTooltip, setShowTooltip] = useState(false) // 控制工具提示显示
 
   const getCurrentMainStep = (): string => {
     if (currentStep === 'step-1') return 'step-1'
@@ -341,16 +342,16 @@ export default function MeasurementTool() {
     const lengthStyle = selectedOptions['step-3-1-3']
 
     if (lengthStyle === 'length-style-above-floor') {
-      return '1" ABOVE FLOOR'
+      return '1" Above Floor'
     }
     if (lengthStyle === 'length-style-breaks-on-floor') {
-      return 'BREAK ON THE FLOOR'
+      return 'Break On The Floor'
     }
     if (lengthStyle === 'length-style-puddles-on-floor') {
-      return 'SLIGHT PUDDLE ON FLOOR'
+      return 'Slight Puddle On Floor'
     }
 
-    return 'STANDARD LENGTH'
+    return 'Standard Length'
   }
 
   // 获取帘头样式描述
@@ -358,16 +359,16 @@ export default function MeasurementTool() {
     const headerStyle = selectedOptions['step-1']
 
     if (headerStyle === 'soft-top') {
-      return 'SOFT TOP'
+      return 'Soft Top'
     }
     if (headerStyle === 'pleated') {
-      return 'PLEATED'
+      return 'Pleated'
     }
     if (headerStyle === 'grommets') {
-      return 'GROMMETS'
+      return 'Grommets'
     }
 
-    return 'STANDARD'
+    return 'Standard'
   }
 
   // 获取面板类型描述
@@ -375,13 +376,13 @@ export default function MeasurementTool() {
     const panelType = selectedOptions['step-4-1']
 
     if (panelType === 'single-panels') {
-      return 'SINGLE PANEL'
+      return 'Single Panel'
     }
     if (panelType === 'split-panels') {
-      return 'SPLIT PANELS'
+      return 'Split Panels'
     }
 
-    return 'STANDARD PANEL'
+    return 'Standard Panel'
   }
 
   const handleContinue = (jump: string, optionId?: string) => {
@@ -653,20 +654,62 @@ export default function MeasurementTool() {
               {currentStepData.type === 'input' && (
                 <div className="flex gap-[75px] md:bg-[#F5F5F5] p-[50px] not-md:p-2 not-md:flex-col not-md:items-center not-md:gap-[15px]">
                   <div className="w-[45%] mx-auto relative flex items-center gap-[10px] not-md:w-full not-md:bg-[#F5F5F5] not-md:p-2">
-                    <div className="w-full not-md:w-[60%]">
+                    <div className="w-full not-md:w-[50%]">
                       <div className={`step-image ${currentStepData.imageClass}`} />
                     </div>
-                    <div
-                      className="md:hidden not-md:w-[40%] text-[14px]"
-                      dangerouslySetInnerHTML={{ __html: currentStepData.description }}
-                    />
+                    <div className="md:hidden not-md:w-[50%] text-[12px] flex flex-col justify-between gap-[10px]">
+                      <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
+                      <div>
+                        {currentStepData.additionalInfo && (
+                          <div className="relative">
+                            <button
+                              onClick={() => setShowTooltip(!showTooltip)}
+                              className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+                              type="button"
+                            >
+                              ?
+                            </button>
+                            {showTooltip && (
+                              <>
+                                <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
+                                <div className="absolute bottom-6 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                  <div className="text-sm text-gray-700">{currentStepData.additionalInfo}</div>
+                                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 flex flex-col not-md:w-full">
-                    <div
-                      className="not-md:hidden text-[16px]"
-                      dangerouslySetInnerHTML={{ __html: currentStepData.description }}
-                    />
-                    <div className="flex-1 flex flex-col justify-end gap-[20px] not-md:gap-[15px]">
+                  <div className="flex-1 flex flex-col gap-[10px] not-md:w-full">
+                    <div className="flex-1 not-md:hidden text-[16px] flex flex-col justify-between gap-[10px]">
+                      <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
+                      <div>
+                        {currentStepData.additionalInfo && (
+                          <div className="relative">
+                            <button
+                              onClick={() => setShowTooltip(!showTooltip)}
+                              className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+                              type="button"
+                            >
+                              ?
+                            </button>
+                            {showTooltip && (
+                              <>
+                                <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
+                                <div className="absolute bottom-6 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                  <div className="text-sm text-gray-700">{currentStepData.additionalInfo}</div>
+                                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col justify-end gap-[20px] not-md:gap-[15px]">
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
                           {currentStepData.options.length > 1 && (
