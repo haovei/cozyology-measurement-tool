@@ -540,7 +540,7 @@ export default function MeasurementTool() {
           {currentStepData && (
             <>
               {getPreviousStep() && (
-                <div className="mb-4">
+                <div className="lg:absolute top-0 left-0">
                   <button
                     onClick={() => {
                       const prevStep = getPreviousStep()!
@@ -563,7 +563,7 @@ export default function MeasurementTool() {
                 </div>
               )}
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
-                <h1 className="text-[30px] font-americana not-md:text-[18px]">{currentStepData.title}</h1>
+                <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">{currentStepData.title}</h1>
                 {currentStepData.subTitle && (
                   <div className="text-[16px] not-md:text-[12px] text-[#333]">{currentStepData.subTitle}</div>
                 )}

@@ -102,10 +102,15 @@ export default function MeasurementTool() {
         const completedStep2 = step2Options.filter(step => completedSteps.includes(step))
         return completedStep2.length > 0 ? completedStep2[completedStep2.length - 1] : 'step-2-0'
       case 'step-3':
-        // 返回已完成的最后一个step-3子步骤，或第一个step-3步骤
-        const step3Options = ['step-3-1-1', 'step-3-1-2', 'step-3-1-3']
+        // 返回已完成的最后一个step-3子步骤，或根据Rod Installed状态确定第一个step-3步骤
+        const step3Options = ['step-3-1-1', 'step-3-2-1', 'step-3-1-2', 'step-3-1-3']
         const completedStep3 = step3Options.filter(step => completedSteps.includes(step))
-        return completedStep3.length > 0 ? completedStep3[completedStep3.length - 1] : 'step-3-1-1'
+        if (completedStep3.length > 0) {
+          return completedStep3[completedStep3.length - 1]
+        }
+        // 根据Rod Installed状态决定起始步骤
+        const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
+        return hasRodInstalled ? 'step-3-1-1' : 'step-3-2-1'
       case 'step-4':
         // 返回已完成的最后一个step-4子步骤，或第一个step-4步骤
         const step4Options = ['step-4-1', 'step-4-2']
@@ -226,20 +231,28 @@ export default function MeasurementTool() {
 
   // 将小数转换为小数格式的函数，应用自定义四舍五入规则
   const convertToDecimal = (decimal: number): string => {
+    // 处理负数或零的情况
+    if (decimal <= 0) {
+      return '0'
+    }
+
     const wholeNumber = Math.floor(decimal)
     const fractionalPart = decimal - wholeNumber
 
     // 应用自定义四舍五入规则
     let adjustedFractionalPart: number
-    if (fractionalPart >= 0.1 && fractionalPart <= 0.3) {
+    if (fractionalPart < 0.1) {
+      // 小于0.1的值，四舍五入到0
+      adjustedFractionalPart = 0.0
+    } else if (fractionalPart >= 0.1 && fractionalPart <= 0.3) {
+      // 0.1-0.3 之间的值，四舍五入到0
       adjustedFractionalPart = 0.0
     } else if (fractionalPart > 0.3 && fractionalPart <= 0.7) {
+      // 0.3-0.7 之间的值，四舍五入到0.5
       adjustedFractionalPart = 0.5
-    } else if (fractionalPart > 0.7) {
-      adjustedFractionalPart = 1.0
     } else {
-      // 对于小于0.1的值，保持为0
-      adjustedFractionalPart = fractionalPart < 0.1 ? 0.0 : fractionalPart
+      // 大于0.7的值，四舍五入到1.0
+      adjustedFractionalPart = 1.0
     }
 
     // 如果调整后的小数部分是1.0，则进位到整数部分
@@ -260,10 +273,14 @@ export default function MeasurementTool() {
   const calculateRecommendedSize = (): { width: string; height: string } => {
     // 判断是否已安装窗帘杆
     const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
+    console.log('计算推荐尺寸 - hasRodInstalled:', hasRodInstalled)
+    console.log('计算推荐尺寸 - selectedOptions:', selectedOptions)
+    console.log('计算推荐尺寸 - inputValues:', inputValues)
 
     let width = 0
     let height = 0
 
+    // 计算宽度
     if (hasRodInstalled) {
       // 已安装杆的情况：直接使用杆长度
       width = inputValues['rod-width-top'] || 0
@@ -275,31 +292,45 @@ export default function MeasurementTool() {
       width = windowWidth + leftExtension + rightExtension
     }
 
-    // 计算高度
-    const windowTopToFloorHeight = inputValues['top-to-floor-height'] || 0
+    // 计算高度 - 第一步：计算杆到地面的距离
+    let rodToFloorHeight = 0
 
-    // 如果已安装杆，rod-extension-above-frame 为0（因为杆已经安装，不需要考虑安装位置）
-    const rodExtensionAboveFrame = hasRodInstalled ? 0 : inputValues['rod-extension-above-frame'] || 0
+    if (hasRodInstalled) {
+      // 已安装杆的情况：直接使用杆到地面的高度
+      rodToFloorHeight = inputValues['rod-top-to-floor-height'] || 0
+      console.log('已安装杆 - rodToFloorHeight:', rodToFloorHeight)
+    } else {
+      // 未安装杆的情况：窗户顶部到地面的高度 + 杆在窗框上方的延伸
+      const windowTopToFloorHeight = inputValues['top-to-floor-height'] || 0
+      const rodExtensionAboveFrame = inputValues['rod-extension-above-frame'] || 0
+      rodToFloorHeight = windowTopToFloorHeight + rodExtensionAboveFrame
+      console.log('未安装杆 - windowTopToFloorHeight:', windowTopToFloorHeight)
+      console.log('未安装杆 - rodExtensionAboveFrame:', rodExtensionAboveFrame)
+      console.log('未安装杆 - rodToFloorHeight:', rodToFloorHeight)
+    }
 
-    // 第一步：计算杆到地面的距离
-    // 杆到地面的高度 = 窗户顶部到地面的高度 + 杆在窗框上方的延伸
-    const rodToFloorHeight = windowTopToFloorHeight + rodExtensionAboveFrame
-
-    // 第二步：根据帘头样式调整起始高度
+    // 计算高度 - 第二步：根据帘头样式调整起始高度
     const headerStyle = selectedOptions['step-1']
+    console.log('帘头样式 - headerStyle:', headerStyle)
     let curtainHeight = rodToFloorHeight
 
     if (headerStyle === 'pleated') {
       // 褶皱样式：从杆到地面的距离减去1英寸用于环的半径
       curtainHeight = rodToFloorHeight - 1
+      console.log('褶皱样式 - curtainHeight:', curtainHeight)
     } else if (headerStyle === 'soft-top') {
+      // 软顶样式：Rod Pocket 需要考虑杆的直径和袋口的额外长度
       curtainHeight = rodToFloorHeight + 0.9
+      console.log('软顶样式 - curtainHeight:', curtainHeight)
     } else if (headerStyle === 'grommets') {
+      // 扣眼样式：Grommets 安装在窗帘顶部，需要额外长度
       curtainHeight = rodToFloorHeight + 2.8
+      console.log('扣眼样式 - curtainHeight:', curtainHeight)
     }
 
-    // 第三步：根据窗帘长度样式调整最终高度
+    // 计算高度 - 第三步：根据窗帘长度样式调整最终高度
     const lengthStyle = selectedOptions['step-3-1-3']
+    console.log('长度样式 - lengthStyle:', lengthStyle)
     if (lengthStyle === 'length-style-above-floor') {
       // 离地面1英寸
       height = curtainHeight - 1
@@ -313,6 +344,7 @@ export default function MeasurementTool() {
       // 默认情况
       height = curtainHeight
     }
+    console.log('最终高度计算 - height:', height)
 
     // 根据面板类型调整宽度
     const panelType = selectedOptions['step-4-1']
@@ -321,7 +353,7 @@ export default function MeasurementTool() {
       width = width / 2
     }
 
-    // 确保宽度和高度都是正数
+    // 确保宽度和高度都是正数，防止计算错误导致负值
     width = Math.max(width, 0)
     height = Math.max(height, 0)
 
@@ -435,23 +467,18 @@ export default function MeasurementTool() {
       saveCurrentStepInputs()
     }
 
-    // 动态调整跳转目标：如果从step-3-1-1且Rod Installed为Yes，跳过step-3-1-2
+    // 动态调整跳转目标
     let actualJump = jump
-    if (currentStep === 'step-3-1-1') {
-      // 检查是否选择了Rod Installed为Yes
-      const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
-      if (hasRodInstalled && jump === 'step-3-1-2') {
-        actualJump = 'step-3-1-3'
-      }
-    }
 
     // 如果当前步骤是 step-1 且历史记录中有超过一个步骤，说明用户重新选择了第一步
     // 需要清空之前的历史和已完成步骤，重新开始
     if (currentStep === 'step-1' && stepHistory.length > 1) {
+      // 保留step-1的选择
+      const newSelectedOptions = optionId ? { 'step-1': optionId } : {}
       setCompletedSteps([currentStep])
       setStepHistory(['step-1', actualJump])
       setInputValues({}) // 清空所有之前的输入值
-      setSelectedOptions({}) // 清空所有之前的选择
+      setSelectedOptions(newSelectedOptions) // 保留当前步骤的选择
     } else {
       // 记录当前步骤为已完成
       if (!completedSteps.includes(currentStep)) {
@@ -500,7 +527,7 @@ export default function MeasurementTool() {
   return (
     <div className="flex flex-col lg:flex-row" ref={stepWrapRef}>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block w-[35%] bg-white">
+      <div className="hidden lg:block w-[30%] bg-white">
         <div className="flex flex-col h-full justify-center">
           <div className="">
             {steps.map((step, index) => (
@@ -592,7 +619,7 @@ export default function MeasurementTool() {
           {currentStepData && (
             <>
               {getPreviousStep() && (
-                <div className="mb-4">
+                <div className="lg:absolute top-0 left-0">
                   <button
                     onClick={() => {
                       const prevStep = getPreviousStep()!
@@ -615,7 +642,9 @@ export default function MeasurementTool() {
                 </div>
               )}
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
-                <h1 className="text-[30px] font-americana not-md:text-[18px]">{currentStepData.title}</h1>
+                <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
+                  {currentStepData.title}
+                </h1>
                 {currentStepData.subTitle && (
                   <div className="text-[16px] not-md:text-[12px] text-[#333]">{currentStepData.subTitle}</div>
                 )}
@@ -633,10 +662,27 @@ export default function MeasurementTool() {
                           <div className={`option-image ${option.imageClass}`} />
                         </div>
                         <div className="flex-1 md:text-center">
-                          <h3 className="text-[24px] text-[#171717] not-md:text-[15px]">{option.title}</h3>
+                          <h3 className="text-[24px] text-[#171717] not-md:text-[15px] flex items-center">
+                            <div className={`flex-1 ${currentStep === 'step-1' ? 'md:text-left' : ''}`}>
+                              {option.title}
+                            </div>
+                            {option.detailUrl && (
+                              <div className="md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200">
+                                <a
+                                  href={option.detailUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#8b572a] text-[16px] block"
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  Details →
+                                </a>
+                              </div>
+                            )}
+                          </h3>
                           <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
                           <div
-                            className="text-[16px] text-[#171717] not-md:text-[12px]"
+                            className={`text-[16px] text-[#171717] not-md:text-[12px] ${currentStep === 'step-1' ? 'md:text-left' : ''}`}
                             dangerouslySetInnerHTML={{ __html: option.description }}
                           />
                         </div>
