@@ -42,6 +42,8 @@
 /* QR Code */
 .image-qr-code { background-image: url('../assets/code@2x.webp'); }
 
+.image-question { background-image: url('../assets/question.webp'); }
+
 /* 通用图片容器样式 */
 .step-image,
 .option-image,

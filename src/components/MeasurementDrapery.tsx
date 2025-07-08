@@ -417,6 +417,26 @@ export default function MeasurementTool() {
     return 'Standard Panel'
   }
 
+  // 根据step-1选择的类型获取相应的additionalInfo
+  const getAdditionalInfoForCurrentStep = (): string | undefined => {
+    // 只有在 step-3-1-2 步骤时才显示additionalInfo
+    if (currentStep !== 'step-3-1-2') return undefined
+
+    // 只有在输入步骤时才显示additionalInfo
+    if (currentStepData.type !== 'input') return undefined
+
+    // 获取step-1选择的header style
+    const headerStyle = selectedOptions['step-1']
+
+    if (!headerStyle) return currentStepData.additionalInfo
+
+    // 从step-1配置中找到对应选项的additionalInfo
+    const step1Config = CozyologyConfig.measurementConfig['step-1']
+    const selectedOption = step1Config?.options?.find(option => option.id === headerStyle)
+
+    return selectedOption?.additionalInfo || currentStepData.additionalInfo
+  }
+
   const handleContinue = (jump: string, optionId?: string) => {
     // 如果当前步骤是选择类型，记录选择的选项ID
     if (currentStepData.type === 'select' && optionId) {
@@ -435,21 +455,30 @@ export default function MeasurementTool() {
           .map(option => {
             const value = currentStepInputs[option.id]
             const fieldName = option.title || option.label || option.id
+            const showFieldName = currentStepData.options.length > 1
 
             if (!value || value.trim() === '' || isNaN(parseFloat(value))) {
               if (option.max) {
-                return `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
+                return showFieldName
+                  ? `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
+                  : `Please enter a number between ${option.min} and ${option.max}`
               } else {
-                return `${fieldName}: Please enter a number between ${option.min} and above`
+                return showFieldName
+                  ? `${fieldName}: Please enter a number between ${option.min} and above`
+                  : `Please enter a number between ${option.min} and above`
               }
             }
 
             const numValue = parseFloat(value)
             if (numValue < option.min || (option.max && numValue > option.max)) {
               if (option.max) {
-                return `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
+                return showFieldName
+                  ? `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
+                  : `Please enter a number between ${option.min} and ${option.max}`
               } else {
-                return `${fieldName}: Please enter a number between ${option.min} and above`
+                return showFieldName
+                  ? `${fieldName}: Please enter a number between ${option.min} and above`
+                  : `Please enter a number between ${option.min} and above`
               }
             }
 
@@ -618,15 +647,15 @@ export default function MeasurementTool() {
         <div className="md:mx-auto md:py-0 mx-4 pt-5 relative">
           {currentStepData && (
             <>
-              {getPreviousStep() && (
-                <div className="lg:absolute top-0 left-0">
+              <div className="h-[24px] mb-2">
+                {getPreviousStep() && (
                   <button
                     onClick={() => {
                       const prevStep = getPreviousStep()!
                       setCurrentStep(prevStep)
                       restoreInputsForStep(prevStep)
                     }}
-                    className="flex items-center gap-2 cursor-pointer"
+                    className="flex items-center gap-2 cursor-pointer not-md:text-[14px] not-md:text-gray-900"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -639,12 +668,12 @@ export default function MeasurementTool() {
                     </svg>
                     Previous
                   </button>
-                </div>
-              )}
+                )}
+              </div>
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
-                <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
+                {currentStepData.title && <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
                   {currentStepData.title}
-                </h1>
+                </h1>}
                 {currentStepData.subTitle && (
                   <div className="text-[16px] not-md:text-[12px] text-[#333]">{currentStepData.subTitle}</div>
                 )}
@@ -654,10 +683,10 @@ export default function MeasurementTool() {
                   {currentStepData.options.map(option => (
                     <div
                       key={option.id}
-                      className="group md:min-h-[600px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto md:flex-1"
+                      className="group md:min-h-[400px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto md:flex-1"
                       onClick={() => handleContinue(option.jump, option.id)}
                     >
-                      <div className="p-[40px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
+                      <div className="p-[20px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
                         <div className="w-full aspect-square mx-auto relative not-md:w-[50%]">
                           <div className={`option-image ${option.imageClass}`} />
                         </div>
@@ -706,20 +735,18 @@ export default function MeasurementTool() {
                     <div className="md:hidden not-md:w-[50%] text-[12px] flex flex-col justify-between gap-[10px]">
                       <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
                       <div>
-                        {currentStepData.additionalInfo && (
+                        {getAdditionalInfoForCurrentStep() && (
                           <div className="relative">
                             <button
                               onClick={() => setShowTooltip(!showTooltip)}
-                              className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+                              className="w-5 h-5 image-question cursor-pointer"
                               type="button"
-                            >
-                              ?
-                            </button>
+                            ></button>
                             {showTooltip && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
-                                <div className="absolute bottom-6 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
-                                  <div className="text-sm text-gray-700">{currentStepData.additionalInfo}</div>
+                                <div className="absolute bottom-8 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                  <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
                                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
                                 </div>
                               </>
@@ -733,20 +760,18 @@ export default function MeasurementTool() {
                     <div className="flex-1 not-md:hidden text-[16px] flex flex-col justify-between gap-[10px]">
                       <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
                       <div>
-                        {currentStepData.additionalInfo && (
+                        {getAdditionalInfoForCurrentStep() && (
                           <div className="relative">
                             <button
                               onClick={() => setShowTooltip(!showTooltip)}
-                              className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+                              className="w-5 h-5 image-question cursor-pointer"
                               type="button"
-                            >
-                              ?
-                            </button>
+                            ></button>
                             {showTooltip && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
-                                <div className="absolute bottom-6 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
-                                  <div className="text-sm text-gray-700">{currentStepData.additionalInfo}</div>
+                                <div className="absolute bottom-8 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                  <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
                                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
                                 </div>
                               </>
@@ -795,49 +820,51 @@ export default function MeasurementTool() {
 
               {currentStepData.type === 'finished' && (
                 <>
-                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] px-[30px] xl:px-[120px]">
-                    <div className="text-[20px] font-medium text-black not-md:text-[12px]">
-                      Your recommended drapery size is&nbsp;
-                    </div>
-                    <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                    <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
-                      {(() => {
-                        const { width, height } = calculateRecommendedSize()
-                        return `${width}" W × ${height}" L`
-                      })()}
-                    </div>
-                    <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                    <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: CozyologyConfig.resultTexts?.orderInstructions || '',
-                        }}
-                      />
-                    </div>
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
-                        }}
-                      />
+                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[120px]">
+                    <div className="flex flex-col items-center px-[30px]">
+                      <div className="text-[20px] font-medium text-black not-md:text-[12px]">
+                        Your recommended drapery size is&nbsp;
+                      </div>
+                      <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
+                      <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
+                        {(() => {
+                          const { width, height } = calculateRecommendedSize()
+                          return `${width}" W × ${height}" L`
+                        })()}
+                      </div>
+                      <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
+                      <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: CozyologyConfig.resultTexts?.orderInstructions || '',
+                          }}
+                        />
+                      </div>
+                      <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
+                          }}
+                        />
+                      </div>
                     </div>
 
                     <div className="mt-[50px] flex w-full text-center">
-                      <div className="flex-1 flex flex-col items-center">
+                      <div className="flex flex-col items-center flex-1 px-4">
                         <div className="text-[16px] text-[#999] font-americana mb-[24px]">Header</div>
                         <div className="text-[16px] font-americana">{getHeaderStyleDescription()}</div>
                       </div>
-                      <div className="flex-1 flex flex-col items-center border-l border-[#DDD]">
+                      <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
                         <div className="text-[16px] text-[#999] font-americana mb-[24px]">Bottom</div>
                         <div className="text-[16px] font-americana ">{getLengthStyleDescription()}</div>
                       </div>
-                      <div className="flex-1 flex flex-col items-center border-l border-[#DDD]">
+                      <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
                         <div className="text-[16px] text-[#999] font-americana mb-[24px]">Panel Type</div>
                         <div className="text-[16px] font-americana">{getPanelTypeDescription()}</div>
                       </div>
                     </div>
 
-                    <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full">
+                    <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full px-[30px]">
                       <button
                         onClick={handleShopNow}
                         className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"

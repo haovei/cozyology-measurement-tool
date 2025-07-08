@@ -540,7 +540,7 @@ export default function MeasurementTool() {
           {currentStepData && (
             <>
               {getPreviousStep() && (
-                <div className="lg:absolute top-0 left-0">
+                <div className="mb-0">
                   <button
                     onClick={() => {
                       const prevStep = getPreviousStep()!
