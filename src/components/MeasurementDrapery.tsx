@@ -679,11 +679,11 @@ export default function MeasurementTool() {
                 )}
               </div>
               {currentStepData.type === 'select' && (
-                <div className="flex flex-col md:flex-row gap-6 justify-between items-stretch">
+                <div className="flex flex-col md:flex-row gap-6 justify-around items-stretch">
                   {currentStepData.options.map(option => (
                     <div
                       key={option.id}
-                      className="group md:min-h-[400px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto md:flex-1"
+                      className="group max-w-[400px] md:min-h-[400px] transition-all duration-200 hover:bg-[#F5F5F5] flex flex-col relative cursor-pointer not-md:bg-[#F5F5F5] not-md:w-full not-md:h-auto md:flex-1"
                       onClick={() => handleContinue(option.jump, option.id)}
                     >
                       <div className="p-[20px] pb-[70px] flex-1 flex flex-col gap-5 not-md:gap-[14px] not-md:flex-row not-md:p-4">
