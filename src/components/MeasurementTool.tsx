@@ -449,8 +449,8 @@ export default function MeasurementTool() {
     <div className="flex flex-col lg:flex-row" ref={stepWrapRef}>
       {/* Desktop Sidebar */}
       <div className="hidden lg:block w-[35%] bg-white">
-        <div className="flex flex-col h-full justify-center">
-          <div className="">
+        <div className="flex flex-col h-full">
+          <div className="mt-[80px]">
             {steps.map((step, index) => (
               <div key={step.id} className="flex">
                 <div className="flex flex-col items-center mr-4 w-[30px]">
@@ -539,15 +539,15 @@ export default function MeasurementTool() {
         <div className="md:mx-auto md:py-0 mx-4 pt-5 relative">
           {currentStepData && (
             <>
-              {getPreviousStep() && (
-                <div className="h-[24px] mb-2">
+              <div className="h-[24px] mb-2">
+                {getPreviousStep() && (
                   <button
                     onClick={() => {
                       const prevStep = getPreviousStep()!
                       setCurrentStep(prevStep)
                       restoreInputsForStep(prevStep)
                     }}
-                    className="flex items-center gap-2 cursor-pointer"
+                    className="flex items-center gap-2 cursor-pointer not-md:text-[14px] not-md:text-gray-900"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -560,10 +560,12 @@ export default function MeasurementTool() {
                     </svg>
                     Previous
                   </button>
-                </div>
-              )}
+                )}
+              </div>
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
-                <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">{currentStepData.title}</h1>
+                <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
+                  {currentStepData.title}
+                </h1>
                 {currentStepData.subTitle && (
                   <div className="text-[16px] not-md:text-[12px] text-[#333]">{currentStepData.subTitle}</div>
                 )}

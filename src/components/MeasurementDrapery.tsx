@@ -557,8 +557,8 @@ export default function MeasurementTool() {
     <div className="flex flex-col lg:flex-row" ref={stepWrapRef}>
       {/* Desktop Sidebar */}
       <div className="hidden lg:block w-[30%] bg-white">
-        <div className="flex flex-col h-full justify-center">
-          <div className="">
+        <div className="flex flex-col h-full">
+          <div className="mt-[80px]">
             {steps.map((step, index) => (
               <div key={step.id} className="flex">
                 <div className="flex flex-col items-center mr-4 w-[30px]">
@@ -745,7 +745,7 @@ export default function MeasurementTool() {
                             {showTooltip && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
-                                <div className="absolute bottom-8 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
                                   <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
                                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
                                 </div>
@@ -770,7 +770,7 @@ export default function MeasurementTool() {
                             {showTooltip && (
                               <>
                                 <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
-                                <div className="absolute bottom-8 left-2.5 transform -translate-x-1/2 z-20 w-64 p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
                                   <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
                                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
                                 </div>
