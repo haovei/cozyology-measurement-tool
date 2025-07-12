@@ -397,7 +397,7 @@ export default function MeasurementTool() {
       return 'Pleated'
     }
     if (headerStyle === 'grommets') {
-      return 'Grommets'
+      return 'Grommet'
     }
 
     return 'Standard'
