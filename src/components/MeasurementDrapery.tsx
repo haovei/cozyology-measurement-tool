@@ -419,8 +419,8 @@ export default function MeasurementTool() {
 
   // 根据step-1选择的类型获取相应的additionalInfo
   const getAdditionalInfoForCurrentStep = (): string | undefined => {
-    // 只有在 step-3-1-2 步骤时才显示additionalInfo
-    if (currentStep !== 'step-3-1-2') return undefined
+    // 只有在 step-3-1-1 或 step-3-1-2 步骤时才显示additionalInfo
+    if (currentStep !== 'step-3-1-1' && currentStep !== 'step-3-1-2') return undefined
 
     // 只有在输入步骤时才显示additionalInfo
     if (currentStepData.type !== 'input') return undefined
@@ -671,9 +671,11 @@ export default function MeasurementTool() {
                 )}
               </div>
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
-                {currentStepData.title && <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
-                  {currentStepData.title}
-                </h1>}
+                {currentStepData.title && (
+                  <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
+                    {currentStepData.title}
+                  </h1>
+                )}
                 {currentStepData.subTitle && (
                   <div className="text-[16px] not-md:text-[12px] text-[#333]">{currentStepData.subTitle}</div>
                 )}
@@ -734,51 +736,47 @@ export default function MeasurementTool() {
                     </div>
                     <div className="md:hidden not-md:w-[50%] text-[12px] flex flex-col justify-between gap-[10px]">
                       <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
-                      <div>
-                        {getAdditionalInfoForCurrentStep() && (
-                          <div className="relative">
-                            <button
-                              onClick={() => setShowTooltip(!showTooltip)}
-                              className="w-5 h-5 image-question cursor-pointer"
-                              type="button"
-                            ></button>
-                            {showTooltip && (
-                              <>
-                                <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
-                                <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
-                                  <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
-                                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                      {getAdditionalInfoForCurrentStep() && (
+                        <div className="relative">
+                          <button
+                            onClick={() => setShowTooltip(!showTooltip)}
+                            className="w-5 h-5 image-question cursor-pointer"
+                            type="button"
+                          ></button>
+                          {showTooltip && (
+                            <>
+                              <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
+                              <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
+                                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex-1 flex flex-col gap-[10px] not-md:w-full">
                     <div className="flex-1 not-md:hidden text-[16px] flex flex-col justify-between gap-[10px]">
                       <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
-                      <div>
-                        {getAdditionalInfoForCurrentStep() && (
-                          <div className="relative">
-                            <button
-                              onClick={() => setShowTooltip(!showTooltip)}
-                              className="w-5 h-5 image-question cursor-pointer"
-                              type="button"
-                            ></button>
-                            {showTooltip && (
-                              <>
-                                <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
-                                <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
-                                  <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
-                                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                      {getAdditionalInfoForCurrentStep() && (
+                        <div className="relative">
+                          <button
+                            onClick={() => setShowTooltip(!showTooltip)}
+                            className="w-5 h-5 image-question cursor-pointer"
+                            type="button"
+                          ></button>
+                          {showTooltip && (
+                            <>
+                              <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
+                              <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
+                                <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
+                                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="flex flex-col justify-end gap-[20px] not-md:gap-[15px]">
                       {currentStepData.options.map(option => (
