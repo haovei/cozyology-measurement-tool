@@ -408,13 +408,13 @@ export default function MeasurementTool() {
     const panelType = selectedOptions['step-4-1']
 
     if (panelType === 'single-panels') {
-      return 'Single Panel'
+      return 'Single'
     }
     if (panelType === 'split-panels') {
-      return 'Split Panels'
+      return 'Split'
     }
 
-    return 'Standard Panel'
+    return 'Standard'
   }
 
   // 根据step-1选择的类型获取相应的additionalInfo
@@ -857,7 +857,7 @@ export default function MeasurementTool() {
                         <div className="text-[16px] font-americana ">{getLengthStyleDescription()}</div>
                       </div>
                       <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
-                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Panel Type</div>
+                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Panel</div>
                         <div className="text-[16px] font-americana">{getPanelTypeDescription()}</div>
                       </div>
                     </div>
