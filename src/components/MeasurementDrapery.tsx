@@ -730,7 +730,7 @@ export default function MeasurementTool() {
 
               {currentStepData.type === 'input' && (
                 <div className="flex gap-[75px] md:bg-[#F5F5F5] p-[50px] not-md:p-2 not-md:flex-col not-md:items-center not-md:gap-[15px]">
-                  <div className="w-[45%] mx-auto relative flex items-center gap-[10px] not-md:w-full not-md:bg-[#F5F5F5] not-md:p-2">
+                  <div className="w-[45%] mx-auto relative flex items-stretch gap-[10px] not-md:w-full not-md:bg-[#F5F5F5] not-md:p-2">
                     <div className="w-full not-md:w-[50%]">
                       <div className={`step-image ${currentStepData.imageClass}`} />
                     </div>
