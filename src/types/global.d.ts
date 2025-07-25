@@ -21,6 +21,7 @@ declare global {
         screenshotReminder: string
         mountStyleLabel?: string
         lengthStyleLabel?: string
+        finishedTitle?: string
       }
       contactDetails: string
       contactDetailsMobile: string

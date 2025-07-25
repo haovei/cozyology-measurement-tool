@@ -821,7 +821,7 @@ export default function MeasurementTool() {
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[120px]">
                     <div className="flex flex-col items-center px-[30px]">
                       <div className="text-[20px] font-medium text-black not-md:text-[12px]">
-                        Your recommended drapery size is&nbsp;
+                        {CozyologyConfig.resultTexts?.finishedTitle}
                       </div>
                       <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
                       <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
