@@ -287,6 +287,7 @@
           screenshotReminder:
             'For your records, please <span class="text-[#ba6352]">take a screenshot</span> before proceeding.',
           finishedTitle: 'Your recommended shade size is',
+          finishedTitleOfRippleFold: 'Your recommended Total Coverage Size is',
         },
         contactDetails: `<div class="font-bold text-black">Want to double-check your sizing?</div>
                 <div class="mt-[10px] text-gray-500">
@@ -363,6 +364,16 @@
                 additionalInfo: `Grommet: Measure from the rod to the floor. We automatically add 2.8 inches for the ring's radius.`,
                 jump: 'step-2-0',
               },
+              {
+                id: 'ripple-fold',
+                title: 'Ripple Fold',
+                imageClass: 'image-ripple-fold',
+                alt: 'Ripple Fold',
+                description: 'For a modern, flowing look <br />· Even, wave-like folds <br />· Belt hook system',
+                detailUrl: 'https://cozyologycurtains.com/pages/header#ripplefold',
+                additionalInfo: `The tool will automatically subtract this measurement to ensure the curtain length is correct. Enter 1 1/4". Most tracks use this distance, and our complimentary adjustable hooks allow fine-tuning.`,
+                jump: 'step-2-0-1',
+              },
             ],
           },
           'step-2-0': {
@@ -382,6 +393,28 @@
                 imageClass: 'image-drapery-02-2',
                 description: `I don't have a rod installed yet<br />For more accurate measurement, we recommend you have the rod or track installed`,
                 jump: 'step-2-2-1',
+              },
+            ],
+          },
+          'step-2-0-1': {
+            type: 'select',
+            title: 'Which Hardware Do You Prefer?',
+            options: [
+              {
+                id: 'hardware-Rod',
+                title: 'Rod',
+                imageClass: 'image-drapery-02-6',
+                description: 'Classic look with customizable<br />finishes & finials.',
+                featureLinkContent: 'Explore Evelyn Rod &rarr;',
+                jump: 'step-2-2-1',
+              },
+              {
+                id: 'hardware-Track',
+                title: 'Track',
+                imageClass: 'image-drapery-02-7',
+                description: `Modern, smooth-gliding style —<br />motorized available.`,
+                featureLinkContent: 'Explore Evelyn Rod &rarr;',
+                jump: 'step-2-2-3',
               },
             ],
           },
@@ -436,6 +469,25 @@
                 title: 'B',
                 label: 'Right Side',
                 min: 0,
+                max: 280,
+              },
+            ],
+          },
+          /* 新增步骤 Track Length */
+          'step-2-2-3': {
+            type: 'input',
+            title: 'Track Length?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-drapery-02-8',
+            jump: 'step-3-1-4',
+            description:
+              'Measure from the left wall to the right wall, or across the exact area you’d like your curtains to cover.',
+            options: [
+              {
+                id: 'hardware-track-length',
+                title: '',
+                label: 'Length',
+                min: 15,
                 max: 280,
               },
             ],
@@ -514,6 +566,39 @@ Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain b
                 imageClass: 'image-drapery-03-5',
                 description: 'The Plush Choice<br />Rich and striking, but requires more cleaning',
                 jump: 'step-4-1',
+              },
+            ],
+          },
+          /* 新增步骤 Track top to bottpm length */
+          'step-3-1-4': {
+            type: 'input',
+            title: 'Height from Ceiling to Floor?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-drapery-03-6',
+            jump: 'step-3-2-2',
+            options: [
+              {
+                id: 'track-ceiling-to-floor-height',
+                title: '',
+                label: 'Height',
+                min: 19,
+                max: 280,
+              },
+            ],
+          },
+          /* 新增步骤 Track ring ceil to bottom height */
+          'step-3-2-2': {
+            type: 'input',
+            title: 'Height from Ceiling to Bottom of Track Ring?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-drapery-03-7',
+            jump: 'step-3-1-3',
+            options: [
+              {
+                id: 'track-ring-ceiling-to-bottom-height',
+                title: '',
+                label: 'Height',
+                isTrackSelector: true,
               },
             ],
           },

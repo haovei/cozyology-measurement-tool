@@ -22,6 +22,7 @@ declare global {
         mountStyleLabel?: string
         lengthStyleLabel?: string
         finishedTitle?: string
+        finishedTitleOfRippleFold?: string
       }
       contactDetails: string
       contactDetailsMobile: string

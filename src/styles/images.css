@@ -25,17 +25,23 @@
 .image-soft-top { background-image: url('../assets/drapery-01-1.webp'); }
 .image-pleated { background-image: url('../assets/drapery-01-2.webp'); }
 .image-grommets { background-image: url('../assets/drapery-01-3.webp'); }
+.image-ripple-fold { background-image: url('../assets/drapery-01-4.webp'); } /* 新增分支Ripple Fold第一步选项图片 */
 .image-drapery-02-1 { background-image: url('../assets/drapery-02-1.webp'); }
 .image-drapery-02-2 { background-image: url('../assets/drapery-02-2.webp'); }
 .image-drapery-02-3 { background-image: url('../assets/drapery-02-3.webp'); }
 .image-drapery-02-4 { background-image: url('../assets/drapery-02-4.webp'); }
 .image-drapery-02-5 { background-image: url('../assets/drapery-02-5.webp'); }
+.image-drapery-02-6 { background-image: url('../assets/drapery-02-6.webp'); } /* 新增分支Ripple Fold第二步选项图片 */
+.image-drapery-02-7 { background-image: url('../assets/drapery-02-7.webp'); } /* 新增分支Ripple Fold第二步选项图片 */
+.image-drapery-02-8 { background-image: url('../assets/drapery-02-8.webp'); } /* 新增分支Ripple Fold第二步-Track分支输入卡片图片 */
 .image-drapery-03-1 { background-image: url('../assets/drapery-03-1.webp'); }
 .image-drapery-03-2-1 { background-image: url('../assets/drapery-03-2-1.webp'); }
 .image-drapery-03-2 { background-image: url('../assets/drapery-03-2.webp'); }
 .image-drapery-03-3 { background-image: url('../assets/drapery-03-3.webp'); }
 .image-drapery-03-4 { background-image: url('../assets/drapery-03-4.webp'); }
 .image-drapery-03-5 { background-image: url('../assets/drapery-03-5.webp'); }
+.image-drapery-03-6 { background-image: url('../assets/drapery-03-6.webp'); } /* 新增分支Ripple Fold第三步-Track Height分支输入卡片图片 */
+.image-drapery-03-7 { background-image: url('../assets/drapery-03-7.webp'); } /* 新增分支Ripple Fold第三步-Track Ring Height分支输入卡片图片 */
 .image-drapery-04-1 { background-image: url('../assets/drapery-04-1.webp'); }
 .image-drapery-04-2 { background-image: url('../assets/drapery-04-2.webp'); }
 
