@@ -99,12 +99,20 @@ export default function MeasurementTool() {
         return 'step-1'
       case 'step-2':
         // 返回已完成的最后一个step-2子步骤，或第一个step-2步骤
-        const step2Options = ['step-2-0', 'step-2-1-1', 'step-2-2-1', 'step-2-2-2']
+        const step2Options = [
+          'step-2-0',
+          'step-2-0-0',
+          'step-2-0-1',
+          'step-2-1-1',
+          'step-2-2-1',
+          'step-2-2-2',
+          'step-2-2-3',
+        ]
         const completedStep2 = step2Options.filter(step => completedSteps.includes(step))
         return completedStep2.length > 0 ? completedStep2[completedStep2.length - 1] : 'step-2-0'
       case 'step-3':
         // 返回已完成的最后一个step-3子步骤，或根据Rod Installed状态确定第一个step-3步骤
-        const step3Options = ['step-3-1-1', 'step-3-2-1', 'step-3-1-2', 'step-3-1-3']
+        const step3Options = ['step-3-1-1', 'step-3-2-1', 'step-3-1-2', 'step-3-1-3', 'step-3-1-4', 'step-3-2-2']
         const completedStep3 = step3Options.filter(step => completedSteps.includes(step))
         if (completedStep3.length > 0) {
           return completedStep3[completedStep3.length - 1]
@@ -114,9 +122,12 @@ export default function MeasurementTool() {
         return hasRodInstalled ? 'step-3-1-1' : 'step-3-2-1'
       case 'step-4':
         // 返回已完成的最后一个step-4子步骤，或第一个step-4步骤
+        let defaultStep = 'step-4-1'
+        // ripple-fold 没有 step-4-1这一步
+        if (selectedOptions?.['step-1'] === 'ripple-fold') defaultStep = 'step-4-2'
         const step4Options = ['step-4-1', 'step-4-2']
         const completedStep4 = step4Options.filter(step => completedSteps.includes(step))
-        return completedStep4.length > 0 ? completedStep4[completedStep4.length - 1] : 'step-4-1'
+        return completedStep4.length > 0 ? completedStep4[completedStep4.length - 1] : defaultStep
       default:
         return 'step-1'
     }
@@ -380,14 +391,31 @@ export default function MeasurementTool() {
 
   // 计算新流程中Ripple Fold的结果
   const calculateRippleFoldSize = (): [number, number] => {
-    let w = inputValues['hardware-track-length'] || 0,
+    const hardware = selectedOptions['step-2-0-1']
+    let w = 0,
       h = 0
-    const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
-    const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
-    // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
-    h = ceilingToFloorHeight - ringCeilingToBottomHeight
-    // 根据窗帘长度样式调整最终高度
-    h = calculateByCurtainStyle(h)
+
+    if (hardware === 'hardware-Track') {
+      w = inputValues['hardware-track-length'] || 0
+      const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
+      const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
+      // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
+      h = ceilingToFloorHeight - ringCeilingToBottomHeight
+      // 根据窗帘长度样式调整最终高度
+      h = calculateByCurtainStyle(h)
+    }
+
+    if (hardware === 'hardware-Rod') {
+      const windowWidth = inputValues['norod-window-width'] || 0 // 窗户宽度
+      const extLeftWidth = inputValues['norod-width-left-extension'] || 0 // 左延申宽度
+      const extRightWidth = inputValues['norod-width-right-extension'] || 0 // 右延申宽度
+      const windowHeight = inputValues['top-to-floor-height'] || 0 // 地面到窗户高度
+      const aboveFrameHeight = inputValues['rod-extension-above-frame'] || 0 // 窗户顶部到天花板高度
+      w = windowWidth + extLeftWidth + extRightWidth
+      // 根据窗帘长度样式调整最终高度
+      h = calculateByCurtainStyle(windowHeight + aboveFrameHeight)
+    }
+
     return [w, h]
   }
 
@@ -740,33 +768,35 @@ export default function MeasurementTool() {
                         <div className="w-full aspect-square mx-auto relative not-md:w-[50%]">
                           <div className={`option-image ${option.imageClass}`} />
                         </div>
-                        <div className="flex-1 md:text-center">
-                          <h3 className="text-[24px] text-[#171717] not-md:text-[15px] flex items-center">
-                            <div className={`flex-1 ${currentStep === 'step-1' ? 'md:text-left' : ''}`}>
-                              {option.title}
-                            </div>
-                            {option.detailUrl && (
-                              <div className="md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200">
-                                <a
-                                  href={option.detailUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[#8b572a] text-[16px] block"
-                                  onClick={e => e.stopPropagation()}
-                                >
-                                  Details →
-                                </a>
+                        <div className="flex-1 md:text-center flex flex-col justify-between">
+                          <div>
+                            <h3 className="text-[24px] text-[#171717] not-md:text-[15px] flex items-center">
+                              <div className={`flex-1 ${currentStep === 'step-1' ? 'md:text-left' : ''}`}>
+                                {option.title}
                               </div>
-                            )}
-                          </h3>
-                          <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
-                          <div
-                            className={`text-[16px] text-[#171717] not-md:text-[12px] ${currentStep === 'step-1' ? 'md:text-left' : ''}`}
-                            dangerouslySetInnerHTML={{ __html: option.description }}
-                          />
+                            </h3>
+                            <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
+                            <div
+                              className={`text-[16px] text-[#171717] not-md:text-[12px] ${currentStep === 'step-1' ? 'md:text-left' : ''}`}
+                              dangerouslySetInnerHTML={{ __html: option.description }}
+                            />
+                          </div>
+                          {option.detailUrl && (
+                            <div className="hidden not-md:block">
+                              <a
+                                href={option.detailUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#8b572a] text-[16px] not-md:text-[12px] block"
+                                onClick={e => e.stopPropagation()}
+                              >
+                                Details →
+                              </a>
+                            </div>
+                          )}
                           {option.featureLink && (
                             <a
-                              className={`text-[16px] text-[#8B5729] not-md:text-[12px] md:text-left underline`}
+                              className={`text-[16px] text-[#8B5729] not-md:text-[12px] md:text-center underline`}
                               dangerouslySetInnerHTML={{ __html: option.featureLink.content }}
                               rel="noopener noreferrer"
                               target="_blank"
@@ -781,6 +811,19 @@ export default function MeasurementTool() {
                           CONTINUE
                         </button>
                       </div>
+                      {option.detailUrl && (
+                        <div className="not-md:hidden md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200 text-center w-full absolute -bottom-7">
+                          <a
+                            href={option.detailUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#8b572a] text-[16px] block"
+                            onClick={e => e.stopPropagation()}
+                          >
+                            Details →
+                          </a>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

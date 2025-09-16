@@ -335,16 +335,6 @@
             title: 'Which Drape Header Style Do You Prefer?',
             options: [
               {
-                id: 'soft-top',
-                title: 'SOFT TOP',
-                imageClass: 'image-soft-top',
-                alt: 'Soft Top',
-                description: 'For a soft natural look<br />· Rod Pocket',
-                detailUrl: 'https://cozyologycurtains.com/pages/header#softtop',
-                additionalInfo: `Soft Top: Measure from the rod to the floor. We automatically add 0.9 inches for the rod's diameter.`,
-                jump: 'step-2-0',
-              },
-              {
                 id: 'pleated',
                 title: 'PLEATED',
                 imageClass: 'image-pleated',
@@ -352,6 +342,26 @@
                 description: 'For a luxurious full look<br />· Double pinch pleat <br />· Triple pinch pleat',
                 detailUrl: 'https://cozyologycurtains.com/pages/header#pleat',
                 additionalInfo: `Pleated: Measure from the rod to the floor. We automatically subtract 1 inches for the ring's radius.`,
+                jump: 'step-2-0-0',
+              },
+              {
+                id: 'ripple-fold',
+                title: 'RIPPLE FOLD',
+                imageClass: 'image-ripple-fold',
+                alt: 'RIPPLE FOLD',
+                description: 'For a modern, flowing look <br />· Even, wave-like folds <br />· Belt hook system',
+                detailUrl: 'https://cozyologycurtains.com/pages/header#ripplefold',
+                additionalInfo: `The tool will automatically subtract this measurement to ensure the curtain length is correct. Enter 1 1/4". Most tracks use this distance, and our complimentary adjustable hooks allow fine-tuning.`,
+                jump: 'step-2-0-1',
+              },
+              {
+                id: 'soft-top',
+                title: 'SOFT TOP',
+                imageClass: 'image-soft-top',
+                alt: 'Soft Top',
+                description: 'For a soft natural look<br />· Rod Pocket',
+                detailUrl: 'https://cozyologycurtains.com/pages/header#softtop',
+                additionalInfo: `Soft Top: Measure from the rod to the floor. We automatically add 0.9 inches for the rod's diameter.`,
                 jump: 'step-2-0',
               },
               {
@@ -363,16 +373,6 @@
                 detailUrl: 'https://cozyologycurtains.com/pages/header#grommet',
                 additionalInfo: `Grommet: Measure from the rod to the floor. We automatically add 2.8 inches for the ring's radius.`,
                 jump: 'step-2-0',
-              },
-              {
-                id: 'ripple-fold',
-                title: 'Ripple Fold',
-                imageClass: 'image-ripple-fold',
-                alt: 'Ripple Fold',
-                description: 'For a modern, flowing look <br />· Even, wave-like folds <br />· Belt hook system',
-                detailUrl: 'https://cozyologycurtains.com/pages/header#ripplefold',
-                additionalInfo: `The tool will automatically subtract this measurement to ensure the curtain length is correct. Enter 1 1/4". Most tracks use this distance, and our complimentary adjustable hooks allow fine-tuning.`,
-                jump: 'step-2-0-1',
               },
             ],
           },
@@ -389,6 +389,26 @@
               },
               {
                 id: 'rod-installed-no',
+                title: 'No',
+                imageClass: 'image-drapery-02-2',
+                description: `I don't have a rod installed yet<br />For more accurate measurement, we recommend you have the rod or track installed`,
+                jump: 'step-2-2-1',
+              },
+            ],
+          },
+          'step-2-0-0': {
+            type: 'select',
+            title: 'Drapery Rod or Track Installed?',
+            options: [
+              {
+                id: 'rod-or-track-installed-yes',
+                title: 'Yes',
+                imageClass: 'image-drapery-02-9',
+                description: 'I have a rod / track installed already',
+                jump: 'step-2-1-1',
+              },
+              {
+                id: 'rod-or-track-installed-no',
                 title: 'No',
                 imageClass: 'image-drapery-02-2',
                 description: `I don't have a rod installed yet<br />For more accurate measurement, we recommend you have the rod or track installed`,
@@ -462,6 +482,7 @@
             subTitle: 'For accuracy, please use a steel measuring tape.',
             imageClass: 'image-drapery-02-5',
             jump: 'step-3-2-1',
+            description: '"Extend 6–15" beyond each side for stack space and balance.',
             options: [
               {
                 id: 'norod-width-left-extension',

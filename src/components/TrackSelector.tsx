@@ -9,6 +9,7 @@ enum TRACK_SELECTOR_TYPE {
 enum TRACK_SELECT_COM_VALUE {
   WALLMOUNT = '1.625', // (1 5/8) ->  (1又5/8)
   CEILINGMOUNT = '1',
+  DEFAULT = '',
 }
 
 interface TrackSelectorProps {
@@ -20,21 +21,21 @@ interface TrackSelectorProps {
 }
 
 export default function TrackSelector(props: TrackSelectorProps) {
-  const [selected, setSelected] = useState<TRACK_SELECTOR_TYPE>(TRACK_SELECTOR_TYPE.CT)
+  const [selected, setSelected] = useState<TRACK_SELECTOR_TYPE>()
   const [inputValue, setInputValue] = useState<string>('')
-  const [selectValue, setSelectValue] = useState<TRACK_SELECT_COM_VALUE | null>(null)
+  const [selectValue, setSelectValue] = useState<TRACK_SELECT_COM_VALUE>(TRACK_SELECT_COM_VALUE.DEFAULT)
 
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
 
   React.useEffect(() => {
+    setSelected(TRACK_SELECTOR_TYPE.CT)
     if (!props.value) return
     // 回显逻辑，如果是预设值直接回显到下拉框组件，反之回显到输入框组件
     const isPresetValue =
       props.value == TRACK_SELECT_COM_VALUE.CEILINGMOUNT || props.value == TRACK_SELECT_COM_VALUE.WALLMOUNT
     if (isPresetValue) {
       setSelectValue(props.value as TRACK_SELECT_COM_VALUE)
-      setSelected(TRACK_SELECTOR_TYPE.CT)
     } else {
       setInputValue(props.value)
       setSelected(TRACK_SELECTOR_TYPE.MT)
@@ -45,7 +46,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
   const handleSwitch = (value: TRACK_SELECTOR_TYPE): void => {
     setSelected(value)
     setInputValue('')
-    setSelectValue(null)
+    setSelectValue(TRACK_SELECT_COM_VALUE.DEFAULT)
     props.handleSelectChange('') // 清空当前输入值，让用户重新输入
   }
 
@@ -91,7 +92,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
           <input
             ref={inputRef}
             className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
-            placeholder={`${TRACK_SELECTOR_TYPE.MT}（eg.1 5/8）`}
+            placeholder={`eg.1 5/8`}
             value={inputValue}
             min={props.min}
             max={props.max}
@@ -113,7 +114,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
               onChange={handleSelectChange}
               required
             >
-              <option value="" disabled>
+              <option value={TRACK_SELECT_COM_VALUE.DEFAULT} disabled>
                 {TRACK_SELECTOR_TYPE.CT}
               </option>
               <option value={TRACK_SELECT_COM_VALUE.WALLMOUNT}>Emery | Ripple Fold Track - Wall Mount</option>
