@@ -456,7 +456,6 @@ export default function MeasurementTool() {
       return 'Split'
     }
 
-
     return 'Standard'
   }
 
@@ -481,9 +480,6 @@ export default function MeasurementTool() {
   }
 
   const handleContinue = (jump: string, optionId?: string) => {
-    console.log('handleContinue-----', jump, optionId)
-    console.log('handleContinue currentStepData-----', currentStepData)
-    console.log('handleContinue stepHistory-----', stepHistory)
     // 如果当前步骤是选择类型，记录选择的选项ID
     if (currentStepData.type === 'select' && optionId) {
       setSelectedOptions(prev => ({
@@ -707,7 +703,7 @@ export default function MeasurementTool() {
                       setCurrentStep(prevStep)
                       restoreInputsForStep(prevStep)
                     }}
-                    className="flex items-center gap-2 cursor-pointer not-md:text-[14px] not-md:text-gray-900"
+                    className="flex items-center gap-2 cursor-pointer not-md:text-[14px] not-md:text-gray-900 font-americana"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -893,11 +889,9 @@ export default function MeasurementTool() {
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[120px]">
                     <div className="flex flex-col items-center px-[30px]">
                       <div className="text-[20px] font-medium text-black not-md:text-[12px] font-americana">
-                        {
-                          selectedOptions['step-1'] === 'ripple-fold'
-                            ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
-                            : CozyologyConfig.resultTexts?.finishedTitle
-                        }
+                        {selectedOptions['step-1'] === 'ripple-fold'
+                          ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
+                          : CozyologyConfig.resultTexts?.finishedTitle}
                       </div>
                       <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
                       <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
@@ -905,6 +899,23 @@ export default function MeasurementTool() {
                           const { width, height } = calculateRecommendedSize()
                           return `${width}" W × ${height}" L`
                         })()}
+                      </div>
+                      <div className="md:hidden text-[#999999] text-center">
+                        <div className="text-[16px] font-americana font-bold">
+                          Header: {getHeaderStyleDescription()}
+                        </div>
+                        {selectedOptions['step-1'] === 'ripple-fold' && (
+                          <>
+                            <div className="text-[16px] font-americana font-bold ">Fullness: 2.2x</div>
+                            <div className="text-[16px] font-americana font-bold ">
+                              Hardware: {getHardwareWhenRippleFold()}
+                            </div>
+                          </>
+                        )}
+                        <div className="text-[16px] font-americana font-bold ">
+                          Bottom: {getLengthStyleDescription()}
+                        </div>
+                        <div className="text-[16px] font-americana font-bold">Panel: {getPanelTypeDescription()}</div>
                       </div>
                       <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
                       <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
@@ -923,7 +934,7 @@ export default function MeasurementTool() {
                       </div>
                     </div>
 
-                    <div className="mt-[50px] flex w-full text-center">
+                    <div className="mt-[50px] flex w-full text-center not-md:hidden">
                       <div className="flex flex-col items-center flex-1 px-4">
                         <div className="text-[16px] text-[#999] font-americana mb-[24px]">Header</div>
                         <div className="text-[16px] font-americana">{getHeaderStyleDescription()}</div>
