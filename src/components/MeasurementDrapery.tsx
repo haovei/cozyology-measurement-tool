@@ -764,13 +764,14 @@ export default function MeasurementTool() {
                             className={`text-[16px] text-[#171717] not-md:text-[12px] ${currentStep === 'step-1' ? 'md:text-left' : ''}`}
                             dangerouslySetInnerHTML={{ __html: option.description }}
                           />
-                          {/* TODO: 特色链接，缺少跳转链接 */}
-                          {option.featureLinkContent && (
+                          {option.featureLink && (
                             <a
                               className={`text-[16px] text-[#8B5729] not-md:text-[12px] md:text-left underline`}
-                              dangerouslySetInnerHTML={{ __html: option.featureLinkContent }}
+                              dangerouslySetInnerHTML={{ __html: option.featureLink.content }}
                               rel="noopener noreferrer"
                               target="_blank"
+                              href={option.featureLink.link}
+                              onClick={e => e.stopPropagation()}
                             />
                           )}
                         </div>

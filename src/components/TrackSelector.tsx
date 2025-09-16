@@ -50,11 +50,11 @@ export default function TrackSelector(props: TrackSelectorProps) {
   }
 
   const handleInputChange = () => {
-    if (inputRef.current && props.handleInputChange) {
+    if (inputRef.current) {
       const value = inputRef.current.value || ''
       const sum = parseMixedNumberAndSum(value) // 解析混合数字或带分数格式并求和
       setInputValue(value)
-      props.handleInputChange(sum.toString()) // 将结果传递给父组件
+      props.handleInputChange?.(sum.toString())
     }
   }
 
@@ -62,7 +62,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
     if (selectRef.current) {
       const value = selectRef.current.value || ''
       setSelectValue(value as TRACK_SELECT_COM_VALUE)
-      props.handleSelectChange(value)
+      props.handleSelectChange?.(value)
     }
   }
 
