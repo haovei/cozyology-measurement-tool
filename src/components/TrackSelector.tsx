@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isDecimal, parseMixedNumberAndSum } from '../utils'
+import { mixedNumberRegex, parseMixedNumberAndSum } from '../utils'
 
 enum TRACK_SELECTOR_TYPE {
   CT = 'Cozyology Track',
@@ -7,9 +7,8 @@ enum TRACK_SELECTOR_TYPE {
 }
 
 enum TRACK_SELECT_COM_VALUE {
-  WALLMOUNT = '1.625', // (1 5/8) ->  (1又5/8)
+  WALLMOUNT = '1 5/8', // (1 5/8) ->  (1又5/8)
   CEILINGMOUNT = '1',
-  DEFAULT = '',
 }
 
 interface TrackSelectorProps {
@@ -23,14 +22,17 @@ interface TrackSelectorProps {
 export default function TrackSelector(props: TrackSelectorProps) {
   const [selected, setSelected] = useState<TRACK_SELECTOR_TYPE>()
   const [inputValue, setInputValue] = useState<string>('')
-  const [selectValue, setSelectValue] = useState<TRACK_SELECT_COM_VALUE>(TRACK_SELECT_COM_VALUE.DEFAULT)
+  const [selectValue, setSelectValue] = useState<TRACK_SELECT_COM_VALUE>()
 
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
 
   React.useEffect(() => {
     setSelected(TRACK_SELECTOR_TYPE.CT)
-    if (!props.value) return
+    if (!props.value) {
+      initSelectValue()
+      return
+    }
     // 回显逻辑，如果是预设值直接回显到下拉框组件，反之回显到输入框组件
     const isPresetValue =
       props.value == TRACK_SELECT_COM_VALUE.CEILINGMOUNT || props.value == TRACK_SELECT_COM_VALUE.WALLMOUNT
@@ -45,17 +47,26 @@ export default function TrackSelector(props: TrackSelectorProps) {
   // 切换tab
   const handleSwitch = (value: TRACK_SELECTOR_TYPE): void => {
     setSelected(value)
+    // 如果切换回CT，初始化下拉框的值
+    if (value === TRACK_SELECTOR_TYPE.CT) {
+      return initSelectValue()
+    }
     setInputValue('')
-    setSelectValue(TRACK_SELECT_COM_VALUE.DEFAULT)
     props.handleSelectChange('') // 清空当前输入值，让用户重新输入
+  }
+
+  // 初始化下框的值
+  const initSelectValue = () => {
+    // 默认选中第一个选项值，并将值传回父组件保存
+    setSelectValue(TRACK_SELECT_COM_VALUE.WALLMOUNT)
+    props.handleSelectChange?.(TRACK_SELECT_COM_VALUE.WALLMOUNT)
   }
 
   const handleInputChange = () => {
     if (inputRef.current) {
       const value = inputRef.current.value || ''
-      const sum = parseMixedNumberAndSum(value) // 解析混合数字或带分数格式并求和
       setInputValue(value)
-      props.handleInputChange?.(sum.toString())
+      props.handleInputChange?.(value)
     }
   }
 
@@ -114,9 +125,6 @@ export default function TrackSelector(props: TrackSelectorProps) {
               onChange={handleSelectChange}
               required
             >
-              <option value={TRACK_SELECT_COM_VALUE.DEFAULT} disabled>
-                {TRACK_SELECTOR_TYPE.CT}
-              </option>
               <option value={TRACK_SELECT_COM_VALUE.WALLMOUNT}>Emery | Ripple Fold Track - Wall Mount</option>
               <option value={TRACK_SELECT_COM_VALUE.CEILINGMOUNT}>Emery | Ripple Fold Track - Ceiling Mount</option>
             </select>

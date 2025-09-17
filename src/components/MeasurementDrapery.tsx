@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import TrackSelector from './TrackSelector'
+import { mixNumberOrFractionHandle, convertToMixedNumber } from '../utils'
 
 const CozyologyConfig = window.CozyologyConfig_Drapery
 
@@ -9,7 +10,7 @@ export default function MeasurementTool() {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
-  const [inputValues, setInputValues] = useState<Record<string, number>>({}) // 记录所有输入值
+  const [inputValues, setInputValues] = useState<Record<string, any>>({}) // 记录所有输入值
   const [currentStepInputs, setCurrentStepInputs] = useState<Record<string, string>>({}) // 当前步骤的输入值
   const [inputErrors, setInputErrors] = useState<Record<string, string>>({}) // 输入错误信息
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({}) // 记录每个步骤选择的选项ID
@@ -178,7 +179,9 @@ export default function MeasurementTool() {
     currentStepData.options.forEach(option => {
       const value = currentStepInputs[option.id]
       if (value) {
-        newInputs[option.id] = parseFloat(value)
+        // 非合规数字字符串保留原始值，数字字符串转成浮点数
+        const isInvalidNumber = isNaN(Number(value))
+        newInputs[option.id] = isInvalidNumber ? value : parseFloat(value)
       }
     })
 
@@ -294,6 +297,8 @@ export default function MeasurementTool() {
     if (headerStyle === 'ripple-fold') {
       // Ripple Fold新流程就计算逻辑
       ;[width, height] = calculateRippleFoldSize()
+    } else if (headerStyle === 'pleated') {
+      ;[width, height] = calculatePleatedSize()
     } else {
       // 判断是否已安装窗帘杆
       const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
@@ -362,12 +367,12 @@ export default function MeasurementTool() {
     }
 
     // 确保宽度和高度都是正数，防止计算错误导致负值
-    width = Math.max(width, 0)
-    height = Math.max(height, 0)
+    typeof width === 'number' && (width = Math.max(width, 0))
+    typeof height === 'number' && (height = Math.max(height, 0))
 
     return {
-      width: convertToDecimal(width),
-      height: convertToDecimal(height),
+      width: typeof width === 'number' ? convertToDecimal(width) : width,
+      height: typeof height === 'number' ? convertToDecimal(height) : height,
     }
   }
 
@@ -392,17 +397,35 @@ export default function MeasurementTool() {
   // 计算新流程中Ripple Fold的结果
   const calculateRippleFoldSize = (): [number, number] => {
     const hardware = selectedOptions['step-2-0-1']
-    let w = 0,
-      h = 0
+    let w: any = 0,
+      h: any = 0
 
     if (hardware === 'hardware-Track') {
       w = inputValues['hardware-track-length'] || 0
       const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
       const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
-      // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
-      h = ceilingToFloorHeight - ringCeilingToBottomHeight
-      // 根据窗帘长度样式调整最终高度
-      h = calculateByCurtainStyle(h)
+
+      
+      if (typeof ringCeilingToBottomHeight === 'string') {
+        mixNumberOrFractionHandle(ringCeilingToBottomHeight, ret => {
+          const { type, decimalValue, denominator } = ret
+          if (type === 'mixnumber' || type === 'fraction') {
+            // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数
+            let result = Number(ceilingToFloorHeight) - decimalValue
+            result = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
+            h = convertToMixedNumber(result, denominator) // 转成带分数
+          } else {
+            // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0
+            h = Number(ceilingToFloorHeight)
+            h = calculateByCurtainStyle(h) // 根据窗帘长度样式调整最终高度
+          }
+        })
+      }
+      // 如果是数字，该值已在handleContinue出正常转换，正常计算
+      else if (typeof ringCeilingToBottomHeight === 'number') {
+        // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
+        h = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
+      }
     }
 
     if (hardware === 'hardware-Rod') {
@@ -416,6 +439,16 @@ export default function MeasurementTool() {
       h = calculateByCurtainStyle(windowHeight + aboveFrameHeight)
     }
 
+    return [w, h]
+  }
+
+  // 计算Pleated的结果
+  const calculatePleatedSize = (): [number, number] => {
+    // 前面的计算结果和Ripple Fold Track的取值和计算逻辑一样
+    let [w, h] = calculateRippleFoldSize()
+    // pleated需要选择Panel一片还是两片，单独处理w
+    let isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
+    w = isSplitPanels ? w / 2 : w
     return [w, h]
   }
 

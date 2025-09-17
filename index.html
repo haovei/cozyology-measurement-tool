@@ -405,20 +405,49 @@
                 title: 'Yes',
                 imageClass: 'image-drapery-02-9',
                 description: 'I have a rod / track installed already',
-                jump: 'step-2-1-1',
+                jump: 'step-2-0-2',
               },
               {
                 id: 'rod-or-track-installed-no',
                 title: 'No',
                 imageClass: 'image-drapery-02-2',
                 description: `I don't have a rod installed yet<br />For more accurate measurement, we recommend you have the rod or track installed`,
-                jump: 'step-2-2-1',
+                jump: 'step-2-0-1',
               },
             ],
           },
+          // 2-0-1 和 2-0-2配置相同，仅出口不一样（用于控制前一步选择yes or no的流程），所以永远不会有这两个步骤前后关系的情况
           'step-2-0-1': {
             type: 'select',
             title: 'Which Hardware Do You Prefer?',
+            options: [
+              {
+                id: 'hardware-Rod',
+                title: 'Rod',
+                imageClass: 'image-drapery-02-6',
+                description: 'Classic look with customizable<br />finishes & finials.',
+                featureLink: {
+                  content: 'Explore Evelyn Rod &rarr;',
+                  link: 'https://cozyology.com/collections/evelyn-curtain-rods',
+                },
+                jump: 'step-2-2-1',
+              },
+              {
+                id: 'hardware-Track',
+                title: 'Track',
+                imageClass: 'image-drapery-02-7',
+                description: `Modern, smooth-gliding style —<br />motorized available.`,
+                featureLink: {
+                  content: 'Explore Evelyn Rod &rarr;',
+                  link: 'https://cozyology.com/collections/emery-curtain-track',
+                },
+                jump: 'step-2-2-3',
+              },
+            ],
+          },
+          'step-2-0-2': {
+            type: 'select',
+            title: 'Select Your Hardware?',
             options: [
               {
                 id: 'hardware-Rod',
@@ -502,7 +531,7 @@
           },
           /* 新增步骤 Track Length */
           'step-2-2-3': {
-            type: 'input',
+            type: 'input',      
             title: 'Track Length?',
             subTitle: 'For accuracy, please use a steel measuring tape.',
             imageClass: 'image-drapery-02-8',

@@ -3,8 +3,8 @@
  * @param {String} str 字符串
  * @returns {Object} 返回对象包含以下属性：
  * @returns {Boolean} isFloat - 是否为小数
- * @returns {String} [integer] - 整数部分（若为小数）
- * @returns {String} [decimal] - 完整小数格式如0.5（若为小数）
+ * @returns {String} integer - 整数部分（若为小数）
+ * @returns {String} decimal - 完整小数格式如0.5（若为小数）
  */
 export function isDecimal(str: string): { isFloat: boolean; integer?: string; decimal?: string } {
     const regex = /^(\d*)\.((\d+))$/
@@ -67,4 +67,99 @@ export function parseMixedNumberAndSum(input: string): number {
     }
 
     return sum
+}
+
+interface MixNumberHandleReturnProps {
+    type: 'mixnumber' | 'fraction' | ''
+    whole?: number,
+    numerator?: number
+    denominator?: number
+    decimalValue?: number
+    value?: string
+}
+// 匹配带分数 "1 5/8" 格式
+export const mixedNumberRegex = /^(\d+)\s+(\d+)\/(\d+)$/
+
+// 匹配纯分数 "5/8" 格式
+export const fractionRegex = /^(\d+)\/(\d+)$/
+/**
+ * 带分数处理或分数处理，拆分出对应的整数、分子、分母、和带分数转成小数的结果
+ * 如果不满足带分数和分数直接返回输入值
+ * @param {String} input 输入的（带）分数字符串
+ * @param {Function} handleFn 提供处理函数，参数为当前返回值
+ * @returns {MixNumberHandleReturnProps}
+ */
+export function mixNumberOrFractionHandle(input: string, handleFn?: ((ret: MixNumberHandleReturnProps) => void)): MixNumberHandleReturnProps {
+    let result: MixNumberHandleReturnProps
+
+    // 合规的带分数
+    if (mixedNumberRegex.test(input.trim())) {
+        const match = input.trim().match(mixedNumberRegex)
+        const whole = parseInt(match[1]) // 整数部分
+        const numerator = parseInt(match[2]) // 分数部分-分子
+        const denominator = parseInt(match[3]) // 分数部分-分母
+        const decimalValue = whole + numerator / denominator
+        result = {
+            type: 'mixnumber',
+            whole,
+            numerator,
+            denominator,
+            decimalValue
+        }
+    }
+
+    // 合规的纯分数
+    else if (fractionRegex.test(input.trim())) {
+        const match = input.trim().match(fractionRegex)
+        const numerator = parseInt(match[1])
+        const denominator = parseInt(match[2])
+        const decimalValue = numerator / denominator
+        result = {
+            type: 'fraction',
+            numerator,
+            denominator,
+            decimalValue
+        }
+    }
+
+    else {
+        result = {
+            type: '',
+            value: input
+        }
+    }
+
+    handleFn?.(result)
+
+    return result
+}
+
+/**
+ * 辅助函数：将小数转换为带分数字符串
+ * @param decimal 小数
+ * @param denominator 带分数的分母
+ * @returns 
+ */
+export function convertToMixedNumber(decimal: number, denominator: number): string {
+    if (decimal < 0) return '0'
+
+    const whole = Math.floor(decimal)
+    const fractionalPart = decimal - whole
+
+    if (fractionalPart === 0) {
+        return whole.toString()
+    }
+
+    // 将小数部分转换为分数（以指定分母，常用于英制测量）
+    const numerator = Math.round(fractionalPart * denominator)
+
+    if (numerator === 0) {
+        return whole.toString()
+    } else if (numerator === denominator) {
+        return (whole + 1).toString()
+    } else if (whole === 0) {
+        return `${numerator}/${denominator}`
+    } else {
+        return `${whole} ${numerator}/${denominator}`
+    }
 }
