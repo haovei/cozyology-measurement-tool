@@ -401,7 +401,7 @@ export default function MeasurementTool() {
       h: any = 0
 
     if (hardware === 'hardware-Track') {
-      w = inputValues['hardware-track-length'] || 0
+      w = inputValues['hardware-track-length-1'] || 0
       const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
       const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
 
@@ -440,7 +440,7 @@ export default function MeasurementTool() {
           const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - decimalValue)
           h = convertToMixedNumber(result, denominator) // 转成带分数
         })
-      } 
+      }
       // 根据窗帘长度样式调整最终高度
       else {
         h = calculateByCurtainStyle(windowHeight + aboveFrameHeight)
@@ -452,11 +452,43 @@ export default function MeasurementTool() {
 
   // 计算Pleated的结果
   const calculatePleatedSize = (): [number, number] => {
-    // 前面的计算结果和Ripple Fold Track的取值和计算逻辑一样
-    let [w, h] = calculateRippleFoldSize()
-    // pleated需要选择Panel一片还是两片，单独处理w
-    let isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
-    w = isSplitPanels ? w / 2 : w
+    let w: any = 0,
+      h: any = 0
+
+    // 如果选择的是no
+    if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-no') {
+      // 前面的计算结果和Ripple Fold Track的取值和计算逻辑一样
+      const [_w, _h] = calculateRippleFoldSize()
+      // pleated需要选择Panel一片还是两片，单独处理w
+      const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
+      w = isSplitPanels ? _w / 2 : _w
+      h = _h
+    }
+
+    // 如果选择的是yes
+    else if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-yes') {
+      const hardware = selectedOptions['step-2-0-2']
+
+      if (hardware === 'hardware-Track-2') {
+        const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
+        const _w = inputValues['hardware-track-length-2'] || 0
+        let _h = inputValues['track-ring-bottom-to-floor-height'] || 0
+
+        w = isSplitPanels ? _w / 2 : _w
+
+        // Pleated->Yes->Track 的高度固定加上3/8
+        mixNumberOrFractionHandle('3/8', ({ decimalValue, denominator }) => {
+          _h = Number(_h) + decimalValue
+          _h = calculateByCurtainStyle(_h) // 根据窗帘长度样式调整最终高度
+          h = convertToMixedNumber(_h, denominator) // 转成带分数
+        })
+      }
+
+      if (hardware === 'hardware-Rod-2') {
+        // TODO: 待完善
+      }
+    }
+
     return [w, h]
   }
 
@@ -891,7 +923,7 @@ export default function MeasurementTool() {
                             <>
                               <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
                               <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
-                                <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
+                                <div className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: getAdditionalInfoForCurrentStep() }}></div>
                                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
                               </div>
                             </>
@@ -914,7 +946,10 @@ export default function MeasurementTool() {
                             <>
                               <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
                               <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
-                                <div className="text-sm text-gray-700">{getAdditionalInfoForCurrentStep()}</div>
+                                <div
+                                  className="text-sm text-gray-700"
+                                  dangerouslySetInnerHTML={{ __html: getAdditionalInfoForCurrentStep() }}
+                                ></div>
                                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
                               </div>
                             </>

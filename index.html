@@ -450,7 +450,7 @@
             title: 'Select Your Hardware?',
             options: [
               {
-                id: 'hardware-Rod',
+                id: 'hardware-Rod-2',
                 title: 'Rod',
                 imageClass: 'image-drapery-02-6',
                 description: 'Classic look with customizable<br />finishes & finials.',
@@ -458,10 +458,10 @@
                   content: 'Explore Evelyn Rod &rarr;',
                   link: 'https://cozyology.com/collections/evelyn-curtain-rods',
                 },
-                jump: 'step-2-2-1',
+                jump: 'step-2-1-1',
               },
               {
-                id: 'hardware-Track',
+                id: 'hardware-Track-2',
                 title: 'Track',
                 imageClass: 'image-drapery-02-7',
                 description: `Modern, smooth-gliding style —<br />motorized available.`,
@@ -469,7 +469,7 @@
                   content: 'Explore Evelyn Rod &rarr;',
                   link: 'https://cozyology.com/collections/emery-curtain-track',
                 },
-                jump: 'step-2-2-3',
+                jump: 'step-2-2-4',
               },
             ],
           },
@@ -531,7 +531,7 @@
           },
           /* 新增步骤 Track Length */
           'step-2-2-3': {
-            type: 'input',      
+            type: 'input',
             title: 'Track Length?',
             subTitle: 'For accuracy, please use a steel measuring tape.',
             imageClass: 'image-drapery-02-8',
@@ -540,7 +540,23 @@
               'Measure from the left wall to the right wall, or across the exact area you’d like your curtains to cover.',
             options: [
               {
-                id: 'hardware-track-length',
+                id: 'hardware-track-length-1',
+                title: '',
+                label: 'Length',
+                min: 15,
+                max: 280,
+              },
+            ],
+          },
+          'step-2-2-4': {
+            type: 'input',
+            title: 'Track Length?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-drapery-02-10',
+            jump: 'step-3-1-5',
+            options: [
+              {
+                id: 'hardware-track-length-2',
                 title: '',
                 label: 'Length',
                 min: 15,
@@ -642,6 +658,24 @@ Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain b
               },
             ],
           },
+          'step-3-1-5': {
+            type: 'input',
+            title: 'Height from Bottom of Track Ring to Floor?',
+            subTitle: 'For accuracy, please use a steel measuring tape.',
+            imageClass: 'image-drapery-03-8',
+            jump: 'step-3-1-3',
+            additionalInfo: `Pleated: we automatically add 3/8"(≈1 cm). This is the small space between the top of the pleat hook and the very top of the curtain header - it will cover your track ring, which is why it's included.<br />
+              <br />If you prefer the curtain to cover the track itself, it's generally not recommended. For more details, please see this guide(链接到页面) or email us at care@cozyology.com.(链接到mailto)`,
+            options: [
+              {
+                id: 'track-ring-bottom-to-floor-height',
+                title: '',
+                label: 'Height',
+                min: 19,
+                max: 280,
+              },
+            ],
+          },
           /* 新增步骤 Track ring ceil to bottom height */
           'step-3-2-2': {
             type: 'input',
@@ -649,7 +683,8 @@ Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain b
             subTitle: 'For accuracy, please use a steel measuring tape.',
             imageClass: 'image-drapery-03-7',
             jump: 'step-3-1-3',
-            additionalInfo: 'The tool will automatically subtract this measurement to ensure the curtain length is correct. Enter 1 1/4". Most tracks use this distance, and our complimentary adjustable hooks allow fine-tuning.',
+            additionalInfo:
+              'The tool will automatically subtract this measurement to ensure the curtain length is correct. Enter 1 1/4". Most tracks use this distance, and our complimentary adjustable hooks allow fine-tuning.',
             options: [
               {
                 id: 'track-ring-ceiling-to-bottom-height',
@@ -685,13 +720,11 @@ Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain b
         },
         trackSelectorOptions: {
           'ripple-fold': [
-            {label: 'Emery | Ripple Fold Track - Wall Mount', value: '1 5/8'},
-            {label: 'Emery | Ripple Fold Track - Ceiling Mount', value: '1'},
+            { label: 'Emery | Ripple Fold Track - Wall Mount', value: '1 5/8' },
+            { label: 'Emery | Ripple Fold Track - Ceiling Mount', value: '1' },
           ],
-          'pleated': [
-            {label: 'Emery Ripple Fold Track', value: '1 3/8'},
-          ]
-        }
+          pleated: [{ label: 'Emery Ripple Fold Track', value: '1 3/8' }],
+        },
       }
     </script>
   </head>
