@@ -1,4 +1,8 @@
 declare global {
+  interface SelectOptions {
+    label: string
+    value: string
+  }
   interface Window {
     CozyologyConfig: {
       shopNowUrl?: string
@@ -27,8 +31,9 @@ declare global {
       contactDetails: string
       contactDetailsMobile: string
       measurementConfig: any
+      trackSelectorOptions: Record<string, Array<SelectOptions>>
     }
   }
 }
 
-export {}
+export { }

@@ -405,10 +405,8 @@ export default function MeasurementTool() {
       const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
       const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
 
-      
       if (typeof ringCeilingToBottomHeight === 'string') {
-        mixNumberOrFractionHandle(ringCeilingToBottomHeight, ret => {
-          const { type, decimalValue, denominator } = ret
+        mixNumberOrFractionHandle(ringCeilingToBottomHeight, ({ type, decimalValue, denominator }) => {
           if (type === 'mixnumber' || type === 'fraction') {
             // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数
             let result = Number(ceilingToFloorHeight) - decimalValue
@@ -435,8 +433,18 @@ export default function MeasurementTool() {
       const windowHeight = inputValues['top-to-floor-height'] || 0 // 地面到窗户高度
       const aboveFrameHeight = inputValues['rod-extension-above-frame'] || 0 // 窗户顶部到天花板高度
       w = windowWidth + extLeftWidth + extRightWidth
+
+      // 如果是 ripple-fold流程，窗户顶部到天花板高度需要固定减去5/8
+      if (selectedOptions['step-1'] === 'ripple-fold') {
+        mixNumberOrFractionHandle(`5/8`, ({ decimalValue, denominator }) => {
+          const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - decimalValue)
+          h = convertToMixedNumber(result, denominator) // 转成带分数
+        })
+      } 
       // 根据窗帘长度样式调整最终高度
-      h = calculateByCurtainStyle(windowHeight + aboveFrameHeight)
+      else {
+        h = calculateByCurtainStyle(windowHeight + aboveFrameHeight)
+      }
     }
 
     return [w, h]
@@ -522,6 +530,8 @@ export default function MeasurementTool() {
 
   // 根据step-1选择的类型获取相应的additionalInfo
   const getAdditionalInfoForCurrentStep = (): string | undefined => {
+    if (currentStepData.additionalInfo) return currentStepData.additionalInfo
+
     // 只有在 step-3-1-1 或 step-3-1-2 或 step-3-2-2 步骤时才显示additionalInfo
     if (currentStep !== 'step-3-1-1' && currentStep !== 'step-3-1-2' && currentStep !== 'step-3-2-2') return undefined
 
@@ -531,7 +541,7 @@ export default function MeasurementTool() {
     // 获取step-1选择的header style
     const headerStyle = selectedOptions['step-1']
 
-    if (!headerStyle) return currentStepData.additionalInfo
+    // if (!headerStyle) return currentStepData.additionalInfo
 
     // 从step-1配置中找到对应选项的additionalInfo
     const step1Config = CozyologyConfig.measurementConfig['step-1']
@@ -926,6 +936,7 @@ export default function MeasurementTool() {
                               <TrackSelector
                                 key={option.id}
                                 value={currentStepInputs[option.id] || ''}
+                                headerStyle={selectedOptions['step-1']}
                                 handleInputChange={value => handleInputChange(option.id, value)}
                                 handleSelectChange={value => handleInputChange(option.id, value)}
                               />

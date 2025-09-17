@@ -1,31 +1,30 @@
 import React, { useState } from 'react'
-import { mixedNumberRegex, parseMixedNumberAndSum } from '../utils'
 
 enum TRACK_SELECTOR_TYPE {
   CT = 'Cozyology Track',
   MT = 'My Track',
 }
 
-enum TRACK_SELECT_COM_VALUE {
-  WALLMOUNT = '1 5/8', // (1 5/8) ->  (1又5/8)
-  CEILINGMOUNT = '1',
-}
-
 interface TrackSelectorProps {
   value: string
+  headerStyle: string
   min?: number
   max?: number
   handleInputChange?: (value: string) => void
   handleSelectChange?: (value: string) => void
 }
 
+const trackSelectorOptions = window.CozyologyConfig_Drapery.trackSelectorOptions || {}
+
 export default function TrackSelector(props: TrackSelectorProps) {
   const [selected, setSelected] = useState<TRACK_SELECTOR_TYPE>()
   const [inputValue, setInputValue] = useState<string>('')
-  const [selectValue, setSelectValue] = useState<TRACK_SELECT_COM_VALUE>()
+  const [selectValue, setSelectValue] = useState<string>('')
 
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
+
+  const options = (trackSelectorOptions[props.headerStyle] || []).map((option, index) => ({ ...option, key: index }))
 
   React.useEffect(() => {
     setSelected(TRACK_SELECTOR_TYPE.CT)
@@ -33,11 +32,10 @@ export default function TrackSelector(props: TrackSelectorProps) {
       initSelectValue()
       return
     }
-    // 回显逻辑，如果是预设值直接回显到下拉框组件，反之回显到输入框组件
-    const isPresetValue =
-      props.value == TRACK_SELECT_COM_VALUE.CEILINGMOUNT || props.value == TRACK_SELECT_COM_VALUE.WALLMOUNT
+    // 回显逻辑，如果是options某个选项的预设值直接回显到下拉框组件，反之回显到输入框组件
+    const isPresetValue = options.some(option => option.value === props.value)
     if (isPresetValue) {
-      setSelectValue(props.value as TRACK_SELECT_COM_VALUE)
+      setSelectValue(props.value)
     } else {
       setInputValue(props.value)
       setSelected(TRACK_SELECTOR_TYPE.MT)
@@ -58,8 +56,9 @@ export default function TrackSelector(props: TrackSelectorProps) {
   // 初始化下框的值
   const initSelectValue = () => {
     // 默认选中第一个选项值，并将值传回父组件保存
-    setSelectValue(TRACK_SELECT_COM_VALUE.WALLMOUNT)
-    props.handleSelectChange?.(TRACK_SELECT_COM_VALUE.WALLMOUNT)
+    const value = options[0]?.value || ''
+    setSelectValue(value)
+    props.handleSelectChange?.(value)
   }
 
   const handleInputChange = () => {
@@ -73,7 +72,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
   const handleSelectChange = () => {
     if (selectRef.current) {
       const value = selectRef.current.value || ''
-      setSelectValue(value as TRACK_SELECT_COM_VALUE)
+      setSelectValue(value)
       props.handleSelectChange?.(value)
     }
   }
@@ -125,8 +124,11 @@ export default function TrackSelector(props: TrackSelectorProps) {
               onChange={handleSelectChange}
               required
             >
-              <option value={TRACK_SELECT_COM_VALUE.WALLMOUNT}>Emery | Ripple Fold Track - Wall Mount</option>
-              <option value={TRACK_SELECT_COM_VALUE.CEILINGMOUNT}>Emery | Ripple Fold Track - Ceiling Mount</option>
+              {options.map(option => (
+                <option key={option.key} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
         </>
