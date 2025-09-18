@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import TrackSelector from './TrackSelector'
 import { mixNumberOrFractionHandle, convertToMixedNumber } from '../utils'
 
@@ -15,6 +15,10 @@ export default function MeasurementTool() {
   const [inputErrors, setInputErrors] = useState<Record<string, string>>({}) // 输入错误信息
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({}) // 记录每个步骤选择的选项ID
   const [showTooltip, setShowTooltip] = useState(false) // 控制工具提示显示
+
+  const showExtraResultInfos = useMemo(() => {
+    return ['ripple-fold', 'pleated'].includes(selectedOptions['step-1'])
+  }, [selectedOptions])
 
   const getCurrentMainStep = (): string => {
     if (currentStep === 'step-1') return 'step-1'
@@ -455,20 +459,24 @@ export default function MeasurementTool() {
     let w: any = 0,
       h: any = 0
 
-    // 如果选择的是no
+    // 如果选择的是Pleated->No
     if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-no') {
-      // 前面的计算结果和Ripple Fold Track的取值和计算逻辑一样
+      // 前面的流程和Ripple Fold 的流程和计算逻辑一样
       const [_w, _h] = calculateRippleFoldSize()
-      // pleated需要选择Panel一片还是两片，单独处理w
+
+      // RippleFold默认没有选择Panels这一步。Pleated有这一步，需要单独处理
       const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
       w = isSplitPanels ? _w / 2 : _w
-      h = _h
+
+      // 如果选择的是Rod，高度固定减1 即流程Pleated->No->Rod
+      h = selectedOptions['step-2-0-1'] === "hardware-Rod" ? _h - 1 : _h
     }
 
-    // 如果选择的是yes
+    // 如果选择的是Pleated->Yes
     else if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-yes') {
       const hardware = selectedOptions['step-2-0-2']
 
+      // Pleated->Yes->Track
       if (hardware === 'hardware-Track-2') {
         const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
         const _w = inputValues['hardware-track-length-2'] || 0
@@ -484,8 +492,13 @@ export default function MeasurementTool() {
         })
       }
 
+      // Pleated->Yes->Rod
       if (hardware === 'hardware-Rod-2') {
-        // TODO: 待完善
+        const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
+        const _w = inputValues['rod-width-top'] || 0
+        const _h = inputValues['rod-top-to-floor-height'] || 0
+        w = isSplitPanels ? _w / 2 : _w
+        h = calculateByCurtainStyle(_h - 1) // 根据窗帘长度样式调整最终高度
       }
     }
 
@@ -503,7 +516,7 @@ export default function MeasurementTool() {
     const lengthStyle = selectedOptions['step-3-1-3']
 
     if (lengthStyle === 'length-style-above-floor') {
-      return '1" Above Floor'
+      return '1/2" Above Floor'
     }
     if (lengthStyle === 'length-style-breaks-on-floor') {
       return 'Break On The Floor'
@@ -537,8 +550,15 @@ export default function MeasurementTool() {
 
   // Ripple Fold流程下最后一步获取Fullness
   const getHardwareWhenRippleFold = () => {
-    const hardware = selectedOptions['step-2-0-1']
+    let hardware = selectedOptions['step-2-0-1'] // ripple-fold
+
+    if (selectedOptions['step-1'] === 'pleated') {
+      // PS. 这里联合step-2-0-1，是因为Pleated的No分支复用的Ripplefold的逻辑，所以取该step
+      hardware = selectedOptions['step-2-0-2'] || selectedOptions['step-2-0-1']
+    }
+
     if (!hardware) return 'Standard'
+
     return hardware.split('-')?.[1] || ''
   }
 
@@ -551,10 +571,10 @@ export default function MeasurementTool() {
     }
 
     if (panelType === 'single-panels') {
-      return 'Single'
+      return 'Single (Order Qty: 1)'
     }
     if (panelType === 'split-panels') {
-      return 'Split'
+      return 'Split (Order Qty: 2)'
     }
 
     return 'Standard'
@@ -846,13 +866,11 @@ export default function MeasurementTool() {
                         <div className="flex-1 md:text-center flex flex-col justify-between">
                           <div>
                             <h3 className="text-[24px] text-[#171717] not-md:text-[15px] flex items-center">
-                              <div className={`flex-1 ${currentStep === 'step-1' ? 'md:text-left' : ''}`}>
-                                {option.title}
-                              </div>
+                              <div className={`flex-1`}>{option.title}</div>
                             </h3>
-                            <div className="h-[1px] bg-[#DDDDDD] my-5 not-md:my-[10px]"></div>
+                            <div className="h-[1px] bg-[#DDDDDD] my-4 not-md:my-[10px]"></div>
                             <div
-                              className={`text-[16px] text-[#171717] not-md:text-[12px] ${currentStep === 'step-1' ? 'md:text-left' : ''}`}
+                              className={`text-[16px] text-[#171717] not-md:text-[12px]`}
                               dangerouslySetInnerHTML={{ __html: option.description }}
                             />
                           </div>
@@ -871,7 +889,7 @@ export default function MeasurementTool() {
                           )}
                           {option.featureLink && (
                             <a
-                              className={`text-[16px] text-[#8B5729] not-md:text-[12px] md:text-center underline`}
+                              className={`text-[16px] text-[#8B5729] not-md:text-[12px] md:text-center underline md:mt-1`}
                               dangerouslySetInnerHTML={{ __html: option.featureLink.content }}
                               rel="noopener noreferrer"
                               target="_blank"
@@ -923,7 +941,10 @@ export default function MeasurementTool() {
                             <>
                               <div className="fixed inset-0 z-10" onClick={() => setShowTooltip(false)} />
                               <div className="absolute bottom-8 left-[-118px] z-20 w-[256px] p-3 bg-white border border-gray-200 rounded-lg shadow-lg text-left">
-                                <div className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: getAdditionalInfoForCurrentStep() }}></div>
+                                <div
+                                  className="text-sm text-gray-700"
+                                  dangerouslySetInnerHTML={{ __html: getAdditionalInfoForCurrentStep() }}
+                                ></div>
                                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
                               </div>
                             </>
@@ -1009,7 +1030,7 @@ export default function MeasurementTool() {
 
               {currentStepData.type === 'finished' && (
                 <>
-                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[120px]">
+                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
                     <div className="flex flex-col items-center px-[30px]">
                       <div className="text-[20px] font-medium text-black not-md:text-[12px] font-americana">
                         {selectedOptions['step-1'] === 'ripple-fold'
@@ -1027,7 +1048,7 @@ export default function MeasurementTool() {
                         <div className="text-[16px] font-americana font-bold">
                           Header: {getHeaderStyleDescription()}
                         </div>
-                        {selectedOptions['step-1'] === 'ripple-fold' && (
+                        {showExtraResultInfos && (
                           <>
                             <div className="text-[16px] font-americana font-bold ">Fullness: 2.2x</div>
                             <div className="text-[16px] font-americana font-bold ">
@@ -1062,7 +1083,7 @@ export default function MeasurementTool() {
                         <div className="text-[16px] text-[#999] font-americana mb-[24px]">Header</div>
                         <div className="text-[16px] font-americana">{getHeaderStyleDescription()}</div>
                       </div>
-                      {selectedOptions['step-1'] === 'ripple-fold' && (
+                      {showExtraResultInfos && (
                         <>
                           <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
                             <div className="text-[16px] text-[#999] font-americana mb-[24px]">Fullness</div>
