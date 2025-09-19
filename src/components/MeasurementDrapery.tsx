@@ -16,9 +16,17 @@ export default function MeasurementTool() {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({}) // 记录每个步骤选择的选项ID
   const [showTooltip, setShowTooltip] = useState(false) // 控制工具提示显示
 
-  const showExtraResultInfos = useMemo(() => {
-    return ['ripple-fold', 'pleated'].includes(selectedOptions['step-1'])
+  const headerStyle = useMemo(() => {
+    return selectedOptions['step-1']
   }, [selectedOptions])
+
+  // 是否展示额外信息（fullness 和 hardware）
+  const showExtraResultInfos = useMemo(() => {
+    return ['ripple-fold', 'pleated', 'soft-top', 'grommets'].includes(headerStyle)
+  }, [selectedOptions])
+
+  // 默认返回第4-1步骤的结果
+  const isSplitPanels = useMemo(() => selectedOptions['step-4-1'] === 'split-panels', [selectedOptions])
 
   const getCurrentMainStep = (): string => {
     if (currentStep === 'step-1') return 'step-1'
@@ -108,16 +116,26 @@ export default function MeasurementTool() {
           'step-2-0',
           'step-2-0-0',
           'step-2-0-1',
+          'step-2-0-2',
           'step-2-1-1',
           'step-2-2-1',
           'step-2-2-2',
           'step-2-2-3',
+          'step-2-2-4',
         ]
         const completedStep2 = step2Options.filter(step => completedSteps.includes(step))
         return completedStep2.length > 0 ? completedStep2[completedStep2.length - 1] : 'step-2-0'
       case 'step-3':
         // 返回已完成的最后一个step-3子步骤，或根据Rod Installed状态确定第一个step-3步骤
-        const step3Options = ['step-3-1-1', 'step-3-2-1', 'step-3-1-2', 'step-3-1-3', 'step-3-1-4', 'step-3-2-2']
+        const step3Options = [
+          'step-3-1-1',
+          'step-3-2-1',
+          'step-3-1-2',
+          'step-3-1-3',
+          'step-3-1-4',
+          'step-3-1-5',
+          'step-3-2-2',
+        ]
         const completedStep3 = step3Options.filter(step => completedSteps.includes(step))
         if (completedStep3.length > 0) {
           return completedStep3[completedStep3.length - 1]
@@ -293,10 +311,8 @@ export default function MeasurementTool() {
     console.log('结尾selectedOptions---', selectedOptions)
     console.log('结尾inputValues---', inputValues)
 
-    let width = 0
-    let height = 0
-
-    const headerStyle = selectedOptions['step-1']
+    let width: any = 0
+    let height: any = 0
 
     if (headerStyle === 'ripple-fold') {
       // Ripple Fold新流程就计算逻辑
@@ -306,9 +322,6 @@ export default function MeasurementTool() {
     } else {
       // 判断是否已安装窗帘杆
       const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
-      console.log('计算推荐尺寸 - hasRodInstalled:', hasRodInstalled)
-      console.log('计算推荐尺寸 - selectedOptions:', selectedOptions)
-      console.log('计算推荐尺寸 - inputValues:', inputValues)
 
       // 计算宽度
       if (hasRodInstalled) {
@@ -322,55 +335,45 @@ export default function MeasurementTool() {
         width = windowWidth + leftExtension + rightExtension
       }
 
+      // 根据面板类型调整宽度
+      if (isSplitPanels) {
+        // 分割面板：宽度减半
+        width = width / 2
+      }
+
       // 计算高度 - 第一步：计算杆到地面的距离
       let rodToFloorHeight = 0
 
       if (hasRodInstalled) {
         // 已安装杆的情况：直接使用杆到地面的高度
         rodToFloorHeight = inputValues['rod-top-to-floor-height'] || 0
-        console.log('已安装杆 - rodToFloorHeight:', rodToFloorHeight)
       } else {
         // 未安装杆的情况：窗户顶部到地面的高度 + 杆在窗框上方的延伸
         const windowTopToFloorHeight = inputValues['top-to-floor-height'] || 0
         const rodExtensionAboveFrame = inputValues['rod-extension-above-frame'] || 0
         rodToFloorHeight = windowTopToFloorHeight + rodExtensionAboveFrame
-        console.log('未安装杆 - windowTopToFloorHeight:', windowTopToFloorHeight)
-        console.log('未安装杆 - rodExtensionAboveFrame:', rodExtensionAboveFrame)
-        console.log('未安装杆 - rodToFloorHeight:', rodToFloorHeight)
       }
 
       // 计算高度 - 第二步：根据帘头样式调整起始高度
-      console.log('帘头样式 - headerStyle:', headerStyle)
       let curtainHeight = rodToFloorHeight
 
-      if (headerStyle === 'pleated') {
-        // 褶皱样式：从杆到地面的距离减去1英寸用于环的半径
-        curtainHeight = rodToFloorHeight - 1
-        console.log('褶皱样式 - curtainHeight:', curtainHeight)
-      } else if (headerStyle === 'soft-top') {
-        // 软顶样式：Rod Pocket 需要考虑杆的直径和袋口的额外长度
-        curtainHeight = rodToFloorHeight + 0.9
-        console.log('软顶样式 - curtainHeight:', curtainHeight)
-      } else if (headerStyle === 'grommets') {
-        // 扣眼样式：Grommets 安装在窗帘顶部，需要额外长度
-        curtainHeight = rodToFloorHeight + 2.8
-        console.log('扣眼样式 - curtainHeight:', curtainHeight)
+      // SoftTop加0.9变为加7/8，Grommets加2.8变为加2 7/8
+      const mixnumberMap = {
+        'soft-top': '7/8',
+        grommets: '2 7/8',
       }
 
-      // 计算高度 - 第三步：根据窗帘长度样式调整最终高度
-      // 原逻辑已提取到calculateByCurtainStyle方法中，该方法新流程Ripple Fold也需要用到
-      height = calculateByCurtainStyle(curtainHeight)
-      console.log('最终高度计算 - height:', height)
+      // 计算高度并转为带分数
+      mixNumberOrFractionHandle(mixnumberMap[headerStyle], ({ decimalValue, denominator }) => {
+        // 加上对应带分数转换的小数再处理帘头样式高度计算
+        curtainHeight = calculateByCurtainStyle(rodToFloorHeight + decimalValue)
 
-      // 根据面板类型调整宽度
-      const panelType = selectedOptions['step-4-1']
-      if (panelType === 'split-panels') {
-        // 分割面板：宽度减半
-        width = width / 2
-      }
+        // 转换结果为带分数
+        height = convertToMixedNumber(curtainHeight, denominator)
+      })
     }
 
-    // 确保宽度和高度都是正数，防止计算错误导致负值
+    // 确保宽度和高度都是正数，防止计算错误导致负值（类型为number的情况下。因为目前添加了带分数展示类型为string）
     typeof width === 'number' && (width = Math.max(width, 0))
     typeof height === 'number' && (height = Math.max(height, 0))
 
@@ -426,7 +429,8 @@ export default function MeasurementTool() {
       // 如果是数字，该值已在handleContinue出正常转换，正常计算
       else if (typeof ringCeilingToBottomHeight === 'number') {
         // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
-        h = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
+        const result = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
+        h = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
       }
     }
 
@@ -439,7 +443,7 @@ export default function MeasurementTool() {
       w = windowWidth + extLeftWidth + extRightWidth
 
       // 如果是 ripple-fold流程，窗户顶部到天花板高度需要固定减去5/8
-      if (selectedOptions['step-1'] === 'ripple-fold') {
+      if (headerStyle === 'ripple-fold') {
         mixNumberOrFractionHandle(`5/8`, ({ decimalValue, denominator }) => {
           const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - decimalValue)
           h = convertToMixedNumber(result, denominator) // 转成带分数
@@ -465,11 +469,10 @@ export default function MeasurementTool() {
       const [_w, _h] = calculateRippleFoldSize()
 
       // RippleFold默认没有选择Panels这一步。Pleated有这一步，需要单独处理
-      const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
       w = isSplitPanels ? _w / 2 : _w
 
       // 如果选择的是Rod，高度固定减1 即流程Pleated->No->Rod
-      h = selectedOptions['step-2-0-1'] === "hardware-Rod" ? _h - 1 : _h
+      h = selectedOptions['step-2-0-1'] === 'hardware-Rod' ? _h - 1 : _h
     }
 
     // 如果选择的是Pleated->Yes
@@ -478,7 +481,6 @@ export default function MeasurementTool() {
 
       // Pleated->Yes->Track
       if (hardware === 'hardware-Track-2') {
-        const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
         const _w = inputValues['hardware-track-length-2'] || 0
         let _h = inputValues['track-ring-bottom-to-floor-height'] || 0
 
@@ -494,7 +496,6 @@ export default function MeasurementTool() {
 
       // Pleated->Yes->Rod
       if (hardware === 'hardware-Rod-2') {
-        const isSplitPanels = selectedOptions['step-4-1'] === 'split-panels'
         const _w = inputValues['rod-width-top'] || 0
         const _h = inputValues['rod-top-to-floor-height'] || 0
         w = isSplitPanels ? _w / 2 : _w
@@ -530,8 +531,6 @@ export default function MeasurementTool() {
 
   // 获取帘头样式描述
   const getHeaderStyleDescription = (): string => {
-    const headerStyle = selectedOptions['step-1']
-
     if (headerStyle === 'soft-top') {
       return 'Soft Top'
     }
@@ -549,11 +548,17 @@ export default function MeasurementTool() {
   }
 
   // Ripple Fold流程下最后一步获取Fullness
-  const getHardwareWhenRippleFold = () => {
+  const getHardware = () => {
+    // 默认返回Rod
+    if (['soft-top', 'grommets'].includes(headerStyle)) {
+      return 'Rod'
+    }
+
     let hardware = selectedOptions['step-2-0-1'] // ripple-fold
 
-    if (selectedOptions['step-1'] === 'pleated') {
-      // PS. 这里联合step-2-0-1，是因为Pleated的No分支复用的Ripplefold的逻辑，所以取该step
+    // pleated
+    if (headerStyle === 'pleated') {
+      // PS. 这里联合step-2-0-1，是因为Pleated的No分支复用的Ripplefold的逻辑，所以联合取该step
       hardware = selectedOptions['step-2-0-2'] || selectedOptions['step-2-0-1']
     }
 
@@ -589,11 +594,6 @@ export default function MeasurementTool() {
 
     // 只有在输入步骤时才显示additionalInfo
     if (currentStepData.type !== 'input') return undefined
-
-    // 获取step-1选择的header style
-    const headerStyle = selectedOptions['step-1']
-
-    // if (!headerStyle) return currentStepData.additionalInfo
 
     // 从step-1配置中找到对应选项的additionalInfo
     const step1Config = CozyologyConfig.measurementConfig['step-1']
@@ -666,7 +666,7 @@ export default function MeasurementTool() {
 
     // 如果即将到 step-4-1 阶段，因为第一步固定 step-1，并判断第一步是否选择的是ripple-fold，这是新流程Ripple Fold track分支
     // 该分支结尾不需要选择一片or两片（step-4-1），直接跳转最后结算阶段（step-4-2）
-    if (stepHistory.length > 1 && actualJump === 'step-4-1' && selectedOptions['step-1'] === 'ripple-fold') {
+    if (stepHistory.length > 1 && actualJump === 'step-4-1' && headerStyle === 'ripple-fold') {
       actualJump = 'step-4-2'
     }
 
@@ -723,6 +723,16 @@ export default function MeasurementTool() {
   const currentStepData = CozyologyConfig.measurementConfig[currentStep]
 
   const stepWrapRef = useRef<HTMLDivElement>(null)
+
+  // 获取结果fullness
+  const getFullness = (): string => {
+    if (['soft-top', 'grommets'].includes(headerStyle)) {
+      return 'Choose at Order'
+    }
+
+    // ripple-fold & pleated
+    return '2.2x'
+  }
 
   return (
     <div className="flex flex-col lg:flex-row" ref={stepWrapRef}>
@@ -992,7 +1002,7 @@ export default function MeasurementTool() {
                               <TrackSelector
                                 key={option.id}
                                 value={currentStepInputs[option.id] || ''}
-                                headerStyle={selectedOptions['step-1']}
+                                headerStyle={headerStyle}
                                 handleInputChange={value => handleInputChange(option.id, value)}
                                 handleSelectChange={value => handleInputChange(option.id, value)}
                               />
@@ -1033,7 +1043,7 @@ export default function MeasurementTool() {
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
                     <div className="flex flex-col items-center px-[30px]">
                       <div className="text-[20px] font-medium text-black not-md:text-[12px] font-americana">
-                        {selectedOptions['step-1'] === 'ripple-fold'
+                        {headerStyle === 'ripple-fold'
                           ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
                           : CozyologyConfig.resultTexts?.finishedTitle}
                       </div>
@@ -1050,10 +1060,8 @@ export default function MeasurementTool() {
                         </div>
                         {showExtraResultInfos && (
                           <>
-                            <div className="text-[16px] font-americana font-bold ">Fullness: 2.2x</div>
-                            <div className="text-[16px] font-americana font-bold ">
-                              Hardware: {getHardwareWhenRippleFold()}
-                            </div>
+                            <div className="text-[16px] font-americana font-bold ">Fullness: {getFullness()}</div>
+                            <div className="text-[16px] font-americana font-bold ">Hardware: {getHardware()}</div>
                           </>
                         )}
                         <div className="text-[16px] font-americana font-bold ">
@@ -1087,11 +1095,11 @@ export default function MeasurementTool() {
                         <>
                           <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
                             <div className="text-[16px] text-[#999] font-americana mb-[24px]">Fullness</div>
-                            <div className="text-[16px] font-americana">2.2x</div>
+                            <div className="text-[16px] font-americana">{getFullness()}</div>
                           </div>
                           <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
                             <div className="text-[16px] text-[#999] font-americana mb-[24px]">Hardware</div>
-                            <div className="text-[16px] font-americana">{getHardwareWhenRippleFold()}</div>
+                            <div className="text-[16px] font-americana">{getHardware()}</div>
                           </div>
                         </>
                       )}

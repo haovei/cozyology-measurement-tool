@@ -383,7 +383,7 @@
               {
                 id: 'rod-installed-yes',
                 title: 'YES',
-                imageClass: 'image-drapery-02-1',
+                imageClass: 'image-drapery-02-9',
                 description: 'I have a rod installed already',
                 jump: 'step-2-1-1',
               },
@@ -391,7 +391,7 @@
                 id: 'rod-installed-no',
                 title: 'NO',
                 imageClass: 'image-drapery-02-2',
-                description: `I don't have a rod installed yet<br />For more accurate measurement, we recommend you have the rod or track installed`,
+                description: `I don't have a rod installed yet<br /><span style="color: #999">For more accurate measurement, we recommend you have the rod or track installed</span>`,
                 jump: 'step-2-2-1',
               },
             ],
@@ -416,7 +416,6 @@
               },
             ],
           },
-          // 2-0-1 和 2-0-2配置相同，仅出口不一样（用于控制前一步选择yes or no的流程），所以永远不会有这两个步骤前后关系的情况
           'step-2-0-1': {
             type: 'select',
             title: 'Which Hardware Do You Prefer?',
@@ -438,7 +437,7 @@
                 imageClass: 'image-drapery-02-7',
                 description: `Seamless wall-to-wall tracks —<br />ceiling-mounted, motorized option.`,
                 featureLink: {
-                  content: 'Explore Evelyn Track &rarr;',
+                  content: 'Explore Emery Track &rarr;',
                   link: 'https://cozyology.com/collections/emery-curtain-track',
                 },
                 jump: 'step-2-2-3',
@@ -466,7 +465,7 @@
                 imageClass: 'image-drapery-02-7',
                 description: `Modern, smooth-gliding style-motorized option available.`,
                 featureLink: {
-                  content: 'Explore Evelyn Track &rarr;',
+                  content: 'Explore Emery Track &rarr;',
                   link: 'https://cozyology.com/collections/emery-curtain-track',
                 },
                 jump: 'step-2-2-4',
@@ -529,7 +528,6 @@
               },
             ],
           },
-          /* 新增步骤 Track Length */
           'step-2-2-3': {
             type: 'input',
             title: 'Track Length?',
@@ -566,7 +564,7 @@
           },
           'step-3-1-1': {
             type: 'input',
-            title: 'Rod Top to Floor Height?',
+            title: 'Height from Bottom of Rod to Floor?',
             subTitle: 'For accuracy, please use a steel measuring tape.',
             imageClass: 'image-drapery-03-1',
             jump: 'step-3-1-3',
@@ -641,7 +639,6 @@ Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain b
               },
             ],
           },
-          /* 新增步骤 Track top to bottpm length */
           'step-3-1-4': {
             type: 'input',
             title: 'Height from Ceiling to Floor?',
@@ -676,7 +673,6 @@ Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain b
               },
             ],
           },
-          /* 新增步骤 Track ring ceil to bottom height */
           'step-3-2-2': {
             type: 'input',
             title: 'Height from Ceiling to Bottom of Track Ring?',
