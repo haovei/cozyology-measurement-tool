@@ -2,6 +2,7 @@ declare global {
   interface SelectOptions {
     label: string
     value: string
+    link?: string
   }
   interface Window {
     CozyologyConfig: {

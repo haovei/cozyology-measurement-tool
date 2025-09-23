@@ -308,8 +308,8 @@ export default function MeasurementTool() {
 
   // 计算最终的推荐尺寸
   const calculateRecommendedSize = (): { width: string; height: string } => {
-    console.log('结尾selectedOptions---', selectedOptions)
-    console.log('结尾inputValues---', inputValues)
+    // console.log('结尾selectedOptions---', selectedOptions)
+    // console.log('结尾inputValues---', inputValues)
 
     let width: any = 0
     let height: any = 0
@@ -517,7 +517,7 @@ export default function MeasurementTool() {
     const lengthStyle = selectedOptions['step-3-1-3']
 
     if (lengthStyle === 'length-style-above-floor') {
-      return '1/2" Above Floor'
+      return '1" Above Floor'
     }
     if (lengthStyle === 'length-style-breaks-on-floor') {
       return 'Break On The Floor'
@@ -565,6 +565,21 @@ export default function MeasurementTool() {
     if (!hardware) return 'Standard'
 
     return hardware.split('-')?.[1] || ''
+  }
+
+  const renderHardware = () => {
+    if ('track-ring-ceiling-to-bottom-height' in inputValues) {
+      const v = inputValues['track-ring-ceiling-to-bottom-height']
+      const target = (CozyologyConfig.trackSelectorOptions[headerStyle] || []).find(item => item.value === v.toString())
+      if (target) {
+        return (
+          <a href={target.link} target="_blank">
+            {target.label}
+          </a>
+        )
+      }
+    }
+    return getHardware()
   }
 
   // 获取面板类型描述
@@ -899,7 +914,7 @@ export default function MeasurementTool() {
                           )}
                           {option.featureLink && (
                             <a
-                              className={`text-[16px] text-[#8B5729] not-md:text-[12px] md:text-center underline md:mt-1`}
+                              className={`text-[16px] text-[#ba6352] not-md:text-[12px] md:text-center underline md:mt-1`}
                               dangerouslySetInnerHTML={{ __html: option.featureLink.content }}
                               rel="noopener noreferrer"
                               target="_blank"
@@ -992,7 +1007,7 @@ export default function MeasurementTool() {
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
                           {currentStepData.options.length > 1 && (
-                            <div className="w-[80px] not-md:flex not-md:font-bold gap-2">
+                            <div className="w-[80px] not-md:flex gap-2">
                               <div className="text-[18px] not-md:text-[12px]">{option.title}</div>
                               <div className="text-[12px] not-md:text-[12px]">{option.label}</div>
                             </div>
@@ -1069,7 +1084,7 @@ export default function MeasurementTool() {
                         </div>
                         <div className="text-[16px] font-americana font-bold">Panel: {getPanelTypeDescription()}</div>
                       </div>
-                      <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
+                      <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px] mb-0"></div>
                       <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
                         <span
                           dangerouslySetInnerHTML={{
@@ -1077,41 +1092,31 @@ export default function MeasurementTool() {
                           }}
                         />
                       </div>
-                      <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
-                          }}
-                        />
-                      </div>
                     </div>
 
-                    <div className="mt-[50px] flex w-full text-center not-md:hidden">
-                      <div className="flex flex-col items-center flex-1 px-4">
-                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Header</div>
-                        <div className="text-[16px] font-americana">{getHeaderStyleDescription()}</div>
-                      </div>
-                      {showExtraResultInfos && (
-                        <>
-                          <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
-                            <div className="text-[16px] text-[#999] font-americana mb-[24px]">Fullness</div>
-                            <div className="text-[16px] font-americana">{getFullness()}</div>
-                          </div>
-                          <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
-                            <div className="text-[16px] text-[#999] font-americana mb-[24px]">Hardware</div>
-                            <div className="text-[16px] font-americana">{getHardware()}</div>
-                          </div>
-                        </>
-                      )}
-                      <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
-                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Bottom</div>
-                        <div className="text-[16px] font-americana ">{getLengthStyleDescription()}</div>
-                      </div>
-                      <div className="flex flex-col items-center flex-1 px-4 border-l border-[#DDD]">
-                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">Panel</div>
-                        <div className="text-[16px] font-americana">{getPanelTypeDescription()}</div>
-                      </div>
-                    </div>
+                    <table className="border border-gray-400 border-collapse text-sm not-md:hidden font-americana">
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-400 p-2 w-[270px]">
+                            Header: <span className="font-bold">{getHeaderStyleDescription()}</span>
+                          </td>
+                          <td className="border border-gray-400 p-2 w-[270px]">
+                            Fullness: <span className="font-bold">{getFullness()}</span>
+                          </td>
+                          <td className="border border-gray-400 p-2 w-[270px]" rowSpan={2}>
+                            Hardware: <span className="font-bold">{renderHardware()}</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="border border-gray-400 p-2 w-[270px]">
+                            Bottom: <span className="font-bold">{getLengthStyleDescription()}</span>
+                          </td>
+                          <td className="border border-gray-400 p-2 w-[270px]">
+                            Panel: <span className="font-bold">{getPanelTypeDescription()}</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
 
                     <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full px-[30px]">
                       <button
@@ -1126,6 +1131,14 @@ export default function MeasurementTool() {
                       >
                         CALCULATE AGAIN
                       </button>
+                    </div>
+
+                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
+                        }}
+                      />
                     </div>
                   </div>
 

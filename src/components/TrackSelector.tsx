@@ -29,7 +29,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
   React.useEffect(() => {
     setSelected(TRACK_SELECTOR_TYPE.CT)
     if (!props.value) {
-      initSelectValue()
+      // initSelectValue()
       return
     }
     // 回显逻辑，如果是options某个选项的预设值直接回显到下拉框组件，反之回显到输入框组件
@@ -44,11 +44,9 @@ export default function TrackSelector(props: TrackSelectorProps) {
 
   // 切换tab
   const handleSwitch = (value: TRACK_SELECTOR_TYPE): void => {
+    if (value === selected) return
     setSelected(value)
-    // 如果切换回CT，初始化下拉框的值
-    if (value === TRACK_SELECTOR_TYPE.CT) {
-      return initSelectValue()
-    }
+    setSelectValue('')
     setInputValue('')
     props.handleSelectChange('') // 清空当前输入值，让用户重新输入
   }
@@ -77,6 +75,12 @@ export default function TrackSelector(props: TrackSelectorProps) {
     }
   }
 
+  const viewTheTrack = (): void => {
+    const link = options.find(item => item.value === selectValue)?.link
+    if (!link) return
+    window.open(link)
+  }
+
   return (
     <div>
       <div className="border border-[#A9A9A9] p-[5px] flex">
@@ -98,24 +102,31 @@ export default function TrackSelector(props: TrackSelectorProps) {
         </div>
       </div>
       {selected === TRACK_SELECTOR_TYPE.MT ? (
-        <div className={`flex items-center gap-2 border h-[42px] bg-white mt-5`}>
-          <input
-            ref={inputRef}
-            className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
-            placeholder={`eg.1 5/8`}
-            value={inputValue}
-            min={props.min}
-            max={props.max}
-            onChange={handleInputChange}
-            required
-          />
-          <div className="h-[25px] leading-[25px] px-[20px] border-l text-[12px]">Inches</div>
-        </div>
+        <>
+          <div className={`flex items-center gap-2 border h-[42px] bg-white mt-5`}>
+            <input
+              ref={inputRef}
+              className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
+              placeholder={`eg.1 5/8`}
+              value={inputValue}
+              min={props.min}
+              max={props.max}
+              onChange={handleInputChange}
+              required
+            />
+            <div className="h-[25px] leading-[25px] px-[20px] border-l text-[12px]">Inches</div>
+          </div>
+          <div className="mt-4">
+            <span className="opacity-0" onClick={viewTheTrack}>
+              View the Track
+            </span>
+          </div>
+        </>
       ) : (
         <>
-          <div className="md:hidden mt-[15px] text-[#171717] font-bold">choose</div>
-          <div className={`border h-[42px] bg-white md:mt-5`}>
+          <div className={`border h-[42px] bg-white mt-5`}>
             <select
+              name="12"
               ref={selectRef}
               className={`w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px] ${
                 props.value === '' ? 'text-gray-400' : 'text-black'
@@ -124,12 +135,23 @@ export default function TrackSelector(props: TrackSelectorProps) {
               onChange={handleSelectChange}
               required
             >
+              <option key="default" value="" disabled>
+                --
+              </option>
               {options.map(option => (
                 <option key={option.key} value={option.value}>
                   {option.label}
                 </option>
               ))}
             </select>
+          </div>
+          <div className="mt-4">
+            <span
+              className={`text-[#ba6352] underline cursor-pointer text-sm ${selectValue ? 'opacity-100' : 'opacity-0'}`}
+              onClick={viewTheTrack}
+            >
+              View the Track
+            </span>
           </div>
         </>
       )}
