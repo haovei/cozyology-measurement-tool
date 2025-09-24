@@ -14,7 +14,7 @@ interface TrackSelectorProps {
   handleSelectChange?: (value: string) => void
 }
 
-const trackSelectorOptions = window.CozyologyConfig_Drapery.trackSelectorOptions || {}
+const trackSelectorOptions = window.CozyologyConfig_Drapery?.trackSelectorOptions || {}
 
 export default function TrackSelector(props: TrackSelectorProps) {
   const [selected, setSelected] = useState<TRACK_SELECTOR_TYPE>()
@@ -24,7 +24,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
 
-  const options = (trackSelectorOptions[props.headerStyle] || []).map((option, index) => ({ ...option, key: index }))
+  const options = (trackSelectorOptions?.[props.headerStyle] || []).map((option, index) => ({ ...option, key: index }))
 
   React.useEffect(() => {
     setSelected(TRACK_SELECTOR_TYPE.CT)

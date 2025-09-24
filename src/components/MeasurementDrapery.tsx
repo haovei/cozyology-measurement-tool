@@ -570,7 +570,7 @@ export default function MeasurementTool() {
   const renderHardware = () => {
     if ('track-ring-ceiling-to-bottom-height' in inputValues) {
       const v = inputValues['track-ring-ceiling-to-bottom-height']
-      const target = (CozyologyConfig.trackSelectorOptions[headerStyle] || []).find(item => item.value === v.toString())
+      const target = (CozyologyConfig?.trackSelectorOptions?.[headerStyle] || []).find(item => item.value === v.toString())
       if (target) {
         return (
           <a href={target.link} target="_blank">
