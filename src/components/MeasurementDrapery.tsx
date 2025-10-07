@@ -378,9 +378,18 @@ export default function MeasurementTool() {
     typeof height === 'number' && (height = Math.max(height, 0))
 
     return {
-      width: typeof width === 'number' ? convertToDecimal(width) : width,
-      height: typeof height === 'number' ? convertToDecimal(height) : height,
+      width: typeof width === 'number' ? decimalToMixedNumber(convertToDecimal(width)) : width,
+      height: typeof height === 'number' ? decimalToMixedNumber(convertToDecimal(height)) : height,
     }
+  }
+
+  const decimalToMixedNumber = (num: number | string) => {
+    const numToStr = String(num)
+    if (numToStr.endsWith('.5')) {
+      const index = numToStr.indexOf('.5')
+      return numToStr.slice(0, index) + ' 1/2'
+    }
+    return num
   }
 
   // 提取出来的原calculateRecommendedSize方法中的第三步，根据窗帘长度样式调整高度
@@ -570,7 +579,9 @@ export default function MeasurementTool() {
   const renderHardware = () => {
     if ('track-ring-ceiling-to-bottom-height' in inputValues) {
       const v = inputValues['track-ring-ceiling-to-bottom-height']
-      const target = (CozyologyConfig?.trackSelectorOptions?.[headerStyle] || []).find(item => item.value === v.toString())
+      const target = (CozyologyConfig?.trackSelectorOptions?.[headerStyle] || []).find(
+        item => item.value === v.toString()
+      )
       if (target) {
         return (
           <a href={target.link} target="_blank">
