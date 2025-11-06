@@ -412,7 +412,11 @@ export default function MeasurementTool() {
 
   // 计算新流程中Ripple Fold的结果
   const calculateRippleFoldSize = (): [number, number] => {
-    const hardware = selectedOptions['step-2-0-1']
+    /**
+     * 这里hardware在step-2-0-1没值是默认取’hardware-Track‘,满足了第一步选择ripple-fold直接跳转step-2-2-3的新逻辑
+     * 之前逻辑ripple-fold需要先跳转'step-2-0-1'选择Rod or Track，现在逻辑选择ripple-fold变更为直接跳转到 (step-2-0-1选择Track的下一步) 即：step-2-2-3
+     */
+    const hardware = selectedOptions['step-2-0-1'] || 'hardware-Track'
     let w: any = 0,
       h: any = 0
 
@@ -480,8 +484,8 @@ export default function MeasurementTool() {
       // RippleFold默认没有选择Panels这一步。Pleated有这一步，需要单独处理
       w = isSplitPanels ? _w / 2 : _w
 
-      // 如果选择的是Rod，高度固定减1 即流程Pleated->No->Rod
-      h = selectedOptions['step-2-0-1'] === 'hardware-Rod' ? _h - 1 : _h
+      // 如果选择的是Rod，高度固定（减1  旧逻辑）（减0  新逻辑） 即流程Pleated->No->Rod
+      h = selectedOptions['step-2-0-1'] === 'hardware-Rod' ? _h - 0 : _h
     }
 
     // 如果选择的是Pleated->Yes
@@ -508,7 +512,7 @@ export default function MeasurementTool() {
         const _w = inputValues['rod-width-top'] || 0
         const _h = inputValues['rod-top-to-floor-height'] || 0
         w = isSplitPanels ? _w / 2 : _w
-        h = calculateByCurtainStyle(_h - 1) // 根据窗帘长度样式调整最终高度
+        h = calculateByCurtainStyle(_h - 0) // 根据窗帘长度样式调整最终高度，高度固定（减1  旧逻辑）（减0  新逻辑）
       }
     }
 
@@ -616,7 +620,8 @@ export default function MeasurementTool() {
     if (currentStepData.additionalInfo) return currentStepData.additionalInfo
 
     // 只有在 step-3-1-1 或 step-3-1-2 或 step-3-2-2 步骤时才显示additionalInfo
-    if (currentStep !== 'step-3-1-1' && currentStep !== 'step-3-1-2' && currentStep !== 'step-3-2-2') return undefined
+    // if (currentStep !== 'step-3-1-1' && currentStep !== 'step-3-1-2' && currentStep !== 'step-3-2-2') return undefined
+    if (currentStep !== 'step-3-2-2') return undefined
 
     // 只有在输入步骤时才显示additionalInfo
     if (currentStepData.type !== 'input') return undefined
@@ -1087,7 +1092,7 @@ export default function MeasurementTool() {
                         {showExtraResultInfos && (
                           <>
                             <div className="text-[16px] font-americana font-bold ">Fullness: {getFullness()}</div>
-                            <div className="text-[16px] font-americana font-bold ">Hardware: {getHardware()}</div>
+                            <div className="text-[16px] font-americana font-bold ">Hardware: {renderHardware()}</div>
                           </>
                         )}
                         <div className="text-[16px] font-americana font-bold ">
