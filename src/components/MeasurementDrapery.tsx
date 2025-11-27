@@ -2,7 +2,8 @@
 
 import { useRef, useState, useMemo } from 'react'
 import TrackSelector from './TrackSelector'
-import { mixNumberOrFractionHandle, convertToMixedNumber } from '../utils'
+import { mixNumberOrFractionHandle, convertToMixedNumber, fractionOperation } from '../utils'
+import { TRACK_SELECTOR_TYPE } from './TrackSelector'
 
 const CozyologyConfig = window.CozyologyConfig_Drapery
 
@@ -15,6 +16,7 @@ export default function MeasurementTool() {
   const [inputErrors, setInputErrors] = useState<Record<string, string>>({}) // 输入错误信息
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({}) // 记录每个步骤选择的选项ID
   const [showTooltip, setShowTooltip] = useState(false) // 控制工具提示显示
+  const [selectorTabKey, setSelectorTabKey] = useState<TRACK_SELECTOR_TYPE>()
 
   const headerStyle = useMemo(() => {
     return selectedOptions['step-1']
@@ -221,6 +223,11 @@ export default function MeasurementTool() {
     validateSingleInput(optionId, value)
   }
 
+  // 处理tab切换
+  const handleTabSwitch = (option, value: TRACK_SELECTOR_TYPE) => {
+    setSelectorTabKey(value)
+  }
+
   // 验证单个输入字段
   const validateSingleInput = (optionId: string, value: string) => {
     const option = currentStepData.options.find(opt => opt.id === optionId)
@@ -267,7 +274,7 @@ export default function MeasurementTool() {
   }
 
   // 将小数转换为小数格式的函数，应用自定义四舍五入规则
-  const convertToDecimal = (decimal: number): string => {
+  const convertToDecimal = (decimal: number, returnStr: boolean = true): string | number => {
     // 处理负数或零的情况
     if (decimal <= 0) {
       return '0'
@@ -281,35 +288,33 @@ export default function MeasurementTool() {
     if (fractionalPart < 0.1) {
       // 小于0.1的值，四舍五入到0
       adjustedFractionalPart = 0.0
-    } else if (fractionalPart >= 0.1 && fractionalPart <= 0.3) {
+    } else if (fractionalPart >= 0.1 && fractionalPart < 0.25) {
       // 0.1-0.3 之间的值，四舍五入到0
       adjustedFractionalPart = 0.0
-    } else if (fractionalPart > 0.3 && fractionalPart <= 0.7) {
+    } else if (fractionalPart >= 0.25 && fractionalPart < 0.75) {
       // 0.3-0.7 之间的值，四舍五入到0.5
       adjustedFractionalPart = 0.5
     } else {
       // 大于0.7的值，四舍五入到1.0
       adjustedFractionalPart = 1.0
     }
-
+    let res = wholeNumber // 默认赋值为adjustedFractionalPart===0的情况
     // 如果调整后的小数部分是1.0，则进位到整数部分
     if (adjustedFractionalPart >= 1.0) {
-      return (wholeNumber + 1).toString()
+      res += 1
     }
-
-    // 如果调整后的小数部分是0，则只返回整数部分
-    if (adjustedFractionalPart === 0) {
-      return wholeNumber.toString()
+    // 如果调整后的小数部分是0.5，则加上0.5
+    if (adjustedFractionalPart === 0.5) {
+      res += 0.5
     }
-
-    // 返回小数格式
-    return (wholeNumber + adjustedFractionalPart).toString()
+    return returnStr ? res.toString() : res
   }
 
   // 计算最终的推荐尺寸
   const calculateRecommendedSize = (): { width: string; height: string } => {
-    // console.log('结尾selectedOptions---', selectedOptions)
-    // console.log('结尾inputValues---', inputValues)
+    console.log('结尾selectedOptions---', selectedOptions)
+    console.log('结尾inputValues---', inputValues)
+    console.log('结尾selectorTabKey---', selectorTabKey)
 
     let width: any = 0
     let height: any = 0
@@ -355,22 +360,29 @@ export default function MeasurementTool() {
       }
 
       // 计算高度 - 第二步：根据帘头样式调整起始高度
-      let curtainHeight = rodToFloorHeight
+      // let curtainHeight = rodToFloorHeight
 
       // SoftTop加0.9变为加7/8，Grommets加2.8变为加2 7/8
-      const mixnumberMap = {
-        'soft-top': '7/8',
-        grommets: '2 7/8',
+      // const mixnumberMap = {
+      //   'soft-top': '7/8',
+      //   grommets: '2 7/8',
+      // }
+
+      // // 计算高度并转为带分数
+      // mixNumberOrFractionHandle(mixnumberMap[headerStyle], ({ decimalValue, denominator }) => {
+      //   // 加上对应带分数转换的小数再处理帘头样式高度计算
+      //   curtainHeight = calculateByCurtainStyle(rodToFloorHeight + decimalValue)
+
+      //   // 转换结果为带分数
+      //   const { wholePart, fracPart } = convertToMixedNumber(curtainHeight, denominator)
+      //   height = `${wholePart} ${fracPart}`
+      // })
+
+      const extraNumberMap = {
+        'soft-top': 0.9,
+        grommets: 2.9,
       }
-
-      // 计算高度并转为带分数
-      mixNumberOrFractionHandle(mixnumberMap[headerStyle], ({ decimalValue, denominator }) => {
-        // 加上对应带分数转换的小数再处理帘头样式高度计算
-        curtainHeight = calculateByCurtainStyle(rodToFloorHeight + decimalValue)
-
-        // 转换结果为带分数
-        height = convertToMixedNumber(curtainHeight, denominator)
-      })
+      height = calculateByCurtainStyle(rodToFloorHeight + extraNumberMap[headerStyle])
     }
 
     // 确保宽度和高度都是正数，防止计算错误导致负值（类型为number的情况下。因为目前添加了带分数展示类型为string）
@@ -413,7 +425,8 @@ export default function MeasurementTool() {
   // 计算新流程中Ripple Fold的结果
   const calculateRippleFoldSize = (): [number, number] => {
     /**
-     * 这里hardware在step-2-0-1没值是默认取’hardware-Track‘,满足了第一步选择ripple-fold直接跳转step-2-2-3的新逻辑
+     * 这里hardware在step-2-0-1没值是默认取’hardware-Track‘,既满足了第一步选择ripple-fold直接跳转step-2-2-3(step-2-0-1没有值)的新逻辑
+     * 又不影响pleated本身走step-2-0-1的逻辑
      * 之前逻辑ripple-fold需要先跳转'step-2-0-1'选择Rod or Track，现在逻辑选择ripple-fold变更为直接跳转到 (step-2-0-1选择Track的下一步) 即：step-2-2-3
      */
     const hardware = selectedOptions['step-2-0-1'] || 'hardware-Track'
@@ -425,24 +438,38 @@ export default function MeasurementTool() {
       const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
       const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
 
+      /* 2025/11/12 新增逻辑：用户选择pleat/ripple-fold -> track时，如果选择的是MyTrack，需要默认加上1/4 */
+      const isMyTrack = selectorTabKey === TRACK_SELECTOR_TYPE.MT
+
+      /* 分别判断string（分数和带分数）和number类型 */
       if (typeof ringCeilingToBottomHeight === 'string') {
         mixNumberOrFractionHandle(ringCeilingToBottomHeight, ({ type, decimalValue, denominator }) => {
           if (type === 'mixnumber' || type === 'fraction') {
-            // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数
+            // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数，isMyTrack需要加上1/4
             let result = Number(ceilingToFloorHeight) - decimalValue
             result = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
-            h = convertToMixedNumber(result, denominator) // 转成带分数
+            // #region 新逻辑，将result(type:小数)加1/4变成加0.25,再按自定义四舍五入，保证最终结果为整数或者代1/2分数
+            h = convertToDecimal(result + (isMyTrack ? 0.25 : 0), false)
+            // #endregion
+
+            // #region 旧逻辑，将result(type:小数)拆分成带分数，分数部分加1/4，再计算最终结果
+            // let { wholePart, fracPart } = convertToMixedNumber(result, denominator) // 拆分成整数部分和带分数分数
+            // if (isMyTrack) fracPart = fractionOperation('1/4', fracPart, '+') // 默认加上1/4
+            // 分数为1/1时，整数部分加1，分数部分不要了
+            // h = fracPart == '1/1' ? `${(Number(wholePart) + 1).toString()}` : `${wholePart} ${fracPart}`
+            // #endregion
           } else {
-            // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0
-            h = Number(ceilingToFloorHeight)
-            h = calculateByCurtainStyle(h) // 根据窗帘长度样式调整最终高度
+            // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0，再根据是否时MyTrack默认加上0.25
+            h = calculateByCurtainStyle(Number(ceilingToFloorHeight) + (isMyTrack ? 0.25 : 0))
           }
         })
       }
       // 如果是数字，该值已在handleContinue出正常转换，正常计算
       else if (typeof ringCeilingToBottomHeight === 'number') {
         // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
-        const result = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
+        let result = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
+        // 根据选择的是否是MyTrack，默认加上1/4 (0.25)
+        result += isMyTrack ? 0.25 : 0
         h = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
       }
     }
@@ -457,10 +484,18 @@ export default function MeasurementTool() {
 
       // 如果是 ripple-fold流程，窗户顶部到天花板高度需要固定减去5/8
       if (headerStyle === 'ripple-fold') {
-        mixNumberOrFractionHandle(`5/8`, ({ decimalValue, denominator }) => {
-          const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - decimalValue)
-          h = convertToMixedNumber(result, denominator) // 转成带分数
-        })
+        // #region 新逻辑，加5/8变成减去0.625，再自定义四舍五入，保证最后结果为整数或带1/2的带分数
+        const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - 0.625)
+        h = convertToDecimal(result, false)
+        // #endregion
+
+        // #region 旧逻辑，高度需要减去5/8，并将结果转成以8为同分母的带分数
+        // mixNumberOrFractionHandle(`5/8`, ({ decimalValue, denominator }) => {
+        //   const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - decimalValue)
+        //   const { wholePart, fracPart } = convertToMixedNumber(result, denominator) // 转成带分数
+        //   h = `${wholePart} ${fracPart}`
+        // })
+        // #endregion
       }
       // 根据窗帘长度样式调整最终高度
       else {
@@ -484,8 +519,8 @@ export default function MeasurementTool() {
       // RippleFold默认没有选择Panels这一步。Pleated有这一步，需要单独处理
       w = isSplitPanels ? _w / 2 : _w
 
-      // 如果选择的是Rod，高度固定（减1  旧逻辑）（减0  新逻辑） 即流程Pleated->No->Rod
-      h = selectedOptions['step-2-0-1'] === 'hardware-Rod' ? _h - 0 : _h
+      // 如果选择的是Rod，高度固定减1 即流程Pleated->No->Rod
+      h = selectedOptions['step-2-0-1'] === 'hardware-Rod' ? _h - 1 : _h
     }
 
     // 如果选择的是Pleated->Yes
@@ -499,20 +534,41 @@ export default function MeasurementTool() {
 
         w = isSplitPanels ? _w / 2 : _w
 
-        // Pleated->Yes->Track 的高度固定加上3/8
-        mixNumberOrFractionHandle('3/8', ({ decimalValue, denominator }) => {
-          _h = Number(_h) + decimalValue
-          _h = calculateByCurtainStyle(_h) // 根据窗帘长度样式调整最终高度
-          h = convertToMixedNumber(_h, denominator) // 转成带分数
-        })
+        // Pleated->Yes->Track
+        // #region 新逻辑：将_h(type:小数)的高度固定加上0.25，自定义四舍五入，保证最终结果为整数或带1/2的带分数
+        _h = calculateByCurtainStyle(Number(_h) + 0.25)
+        h = convertToDecimal(_h, false)
+        //#endregion
+
+        // #region 旧逻辑，将_h(type:小数)的高度固定加上1/4，拆分成整数和小数部分返回
+        // mixNumberOrFractionHandle('1/4', ({ decimalValue, denominator }) => {
+        //   _h = Number(_h) + decimalValue
+        //   _h = calculateByCurtainStyle(_h) // 根据窗帘长度样式调整最终高度
+        //   const { wholePart, fracPart } = convertToMixedNumber(_h, denominator) // 转成带分数
+        //   h = `${wholePart} ${fracPart}`
+        // })
+        // #endregion
       }
 
       // Pleated->Yes->Rod
       if (hardware === 'hardware-Rod-2') {
         const _w = inputValues['rod-width-top'] || 0
-        const _h = inputValues['rod-top-to-floor-height'] || 0
+        let _h = inputValues['rod-top-to-floor-height'] || 0
         w = isSplitPanels ? _w / 2 : _w
-        h = calculateByCurtainStyle(_h - 0) // 根据窗帘长度样式调整最终高度，高度固定（减1  旧逻辑）（减0  新逻辑）
+        // Pleated->Yes->Track
+        // #region 新逻辑：将_h(type:小数)的高度固定加上0.25，自定义四舍五入，保证最终结果为整数或带1/2的带分数
+        _h = calculateByCurtainStyle(Number(_h) + 0.25)
+        h = convertToDecimal(_h, false)
+        // #endregion
+
+        // #region 旧逻辑，将_h(type:小数)的高度固定加上1/4，拆分成整数和小数部分返回
+        // mixNumberOrFractionHandle('1/4', ({ decimalValue, denominator }) => {
+        //   _h = Number(_h) + decimalValue
+        //   _h = calculateByCurtainStyle(_h) // 根据窗帘长度样式调整最终高度
+        //   const { wholePart, fracPart } = convertToMixedNumber(_h, denominator) // 转成带分数
+        //   h = `${wholePart} ${fracPart}`
+        // })
+        // #endregion
       }
     }
 
@@ -617,9 +673,13 @@ export default function MeasurementTool() {
 
   // 根据step-1选择的类型获取相应的additionalInfo
   const getAdditionalInfoForCurrentStep = (): string | undefined => {
-    if (currentStepData.additionalInfo) return currentStepData.additionalInfo
+    // != 仅判断null和undefined
+    if (currentStepData.additionalInfo != undefined) {
+      if (currentStep === 'step-3-2-2' && headerStyle === 'ripple-fold') return
+      return currentStepData.additionalInfo
+    }
 
-    // 只有在 step-3-1-1 或 step-3-1-2 或 step-3-2-2 步骤时才显示additionalInfo
+    // 只有在step-3-2-2 步骤时才显示additionalInfo
     // if (currentStep !== 'step-3-1-1' && currentStep !== 'step-3-1-2' && currentStep !== 'step-3-2-2') return undefined
     if (currentStep !== 'step-3-2-2') return undefined
 
@@ -757,11 +817,11 @@ export default function MeasurementTool() {
 
   // 获取结果fullness
   const getFullness = (): string => {
-    if (['soft-top', 'grommets'].includes(headerStyle)) {
-      return 'Choose at Order'
+    if (headerStyle === 'soft-top') {
+      return '3x'
     }
 
-    // ripple-fold & pleated
+    // ripple-fold & pleated & grommets
     return '2.2x'
   }
 
@@ -867,7 +927,7 @@ export default function MeasurementTool() {
                       setCurrentStep(prevStep)
                       restoreInputsForStep(prevStep)
                     }}
-                    className="flex items-center gap-2 cursor-pointer not-md:text-[14px] not-md:text-gray-900 font-americana"
+                    className="flex items-center gap-2 cursor-pointer not-md:text-[14px] not-md:text-gray-900 font-americana_bt"
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
@@ -884,7 +944,7 @@ export default function MeasurementTool() {
               </div>
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
                 {currentStepData.title && (
-                  <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
+                  <h1 className="text-[30px] font-americana_bt not-md:text-[18px] lg:min-h-[45px]">
                     {currentStepData.title}
                   </h1>
                 )}
@@ -907,7 +967,7 @@ export default function MeasurementTool() {
                         <div className="flex-1 md:text-center flex flex-col justify-between">
                           <div>
                             <h3 className="text-[24px] text-[#171717] not-md:text-[15px] flex items-center">
-                              <div className={`flex-1`}>{option.title}</div>
+                              <div className="flex-1">{option.title}</div>
                             </h3>
                             <div className="h-[1px] bg-[#DDDDDD] my-4 not-md:my-[10px]"></div>
                             <div
@@ -921,7 +981,7 @@ export default function MeasurementTool() {
                                 href={option.detailUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[#8b572a] text-[16px] not-md:text-[12px] block"
+                                className="text-[#8b572a] text-[16px] not-md:text-[12px] block font-americana_bt"
                                 onClick={e => e.stopPropagation()}
                               >
                                 Details →
@@ -970,7 +1030,15 @@ export default function MeasurementTool() {
                       <div className={`step-image ${currentStepData.imageClass}`} />
                     </div>
                     <div className="md:hidden not-md:w-[50%] text-[12px] flex flex-col justify-between gap-[10px]">
-                      <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
+                      {currentStep === 'step-3-2-2' ? (
+                        /* step-3-2-2是pleated和ripple-fold都会经过的一个步骤，即headerStyle只会等于pleated或ripple */
+                        <div
+                          className="whitespace-pre-wrap"
+                          dangerouslySetInnerHTML={{ __html: currentStepData.description?.[headerStyle] || '' }}
+                        ></div>
+                      ) : (
+                        <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
+                      )}
                       {getAdditionalInfoForCurrentStep() && (
                         <div className="relative">
                           <button
@@ -996,7 +1064,15 @@ export default function MeasurementTool() {
                   </div>
                   <div className="flex-1 flex flex-col gap-[10px] not-md:w-full">
                     <div className="flex-1 not-md:hidden text-[16px] flex flex-col justify-between gap-[10px]">
-                      <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
+                      {currentStep === 'step-3-2-2' ? (
+                        /* step-3-2-2是pleated和ripple-fold都会经过的一个步骤，即headerStyle只会等于pleated或ripple */
+                        <div
+                          className="whitespace-pre-wrap"
+                          dangerouslySetInnerHTML={{ __html: currentStepData.description?.[headerStyle] || '' }}
+                        ></div>
+                      ) : (
+                        <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
+                      )}
                       {getAdditionalInfoForCurrentStep() && (
                         <div className="relative">
                           <button
@@ -1034,8 +1110,10 @@ export default function MeasurementTool() {
                                 key={option.id}
                                 value={currentStepInputs[option.id] || ''}
                                 headerStyle={headerStyle}
+                                initialTabKey={selectorTabKey}
                                 handleInputChange={value => handleInputChange(option.id, value)}
                                 handleSelectChange={value => handleInputChange(option.id, value)}
+                                handleTabSwitch={value => handleTabSwitch(option, value)}
                               />
                             </div>
                           ) : (
@@ -1073,32 +1151,47 @@ export default function MeasurementTool() {
                 <>
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
                     <div className="flex flex-col items-center px-[30px]">
-                      <div className="text-[20px] font-medium text-black not-md:text-[12px] font-americana">
+                      <div className="text-[20px] font-medium text-black not-md:text-[12px] font-americana_bt">
                         {headerStyle === 'ripple-fold'
                           ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
                           : CozyologyConfig.resultTexts?.finishedTitle}
                       </div>
                       <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                      <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
+                      <div className="text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
                         {(() => {
                           const { width, height } = calculateRecommendedSize()
-                          return `${width}" W × ${height}" L`
+                          return (
+                            <>
+                              {/* web */}
+                              <div className="not-md:hidden text-6xl">
+                                {width}" W * {height}" L
+                              </div>
+                              {/* mobile */}
+                              <div className='text-center md:hidden'>
+                                <div>{width}" W</div>
+                                <div className='text-lg text-[#999999] leading-1'>×</div>
+                                <div>{height}" L</div>
+                              </div>
+                            </>
+                          )
                         })()}
                       </div>
                       <div className="md:hidden text-[#999999] text-center">
-                        <div className="text-[16px] font-americana font-bold">
+                        <div className="text-[12px] font-americana_bt font-bold">
                           Header: {getHeaderStyleDescription()}
                         </div>
                         {showExtraResultInfos && (
                           <>
-                            <div className="text-[16px] font-americana font-bold ">Fullness: {getFullness()}</div>
-                            <div className="text-[16px] font-americana font-bold ">Hardware: {renderHardware()}</div>
+                            <div className="text-[12px] font-americana_bt font-bold ">Fullness: {getFullness()}</div>
+                            <div className="text-[12px] font-americana_bt font-bold ">Hardware: {renderHardware()}</div>
                           </>
                         )}
-                        <div className="text-[16px] font-americana font-bold ">
+                        <div className="text-[12px] font-americana_bt font-bold ">
                           Bottom: {getLengthStyleDescription()}
                         </div>
-                        <div className="text-[16px] font-americana font-bold">Panel: {getPanelTypeDescription()}</div>
+                        <div className="text-[12px] font-americana_bt font-bold">
+                          Panel: {getPanelTypeDescription()}
+                        </div>
                       </div>
                       <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px] mb-0"></div>
                       <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
@@ -1110,7 +1203,7 @@ export default function MeasurementTool() {
                       </div>
                     </div>
 
-                    <table className="border border-gray-400 border-collapse text-sm not-md:hidden font-americana">
+                    <table className="border border-gray-400 border-collapse text-sm not-md:hidden font-americana_bt">
                       <tbody>
                         <tr>
                           <td className="border border-gray-400 p-2 w-[270px]">
@@ -1149,7 +1242,7 @@ export default function MeasurementTool() {
                       </button>
                     </div>
 
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
+                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0] font-americana_bt">
                       <span
                         dangerouslySetInnerHTML={{
                           __html: CozyologyConfig.resultTexts?.screenshotReminder || '',

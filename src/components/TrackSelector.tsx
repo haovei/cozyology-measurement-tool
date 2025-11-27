@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-enum TRACK_SELECTOR_TYPE {
+export enum TRACK_SELECTOR_TYPE {
   CT = 'Cozyology Track',
   MT = 'My Track',
 }
@@ -8,18 +8,21 @@ enum TRACK_SELECTOR_TYPE {
 interface TrackSelectorProps {
   value: string
   headerStyle: string
+  initialTabKey?: TRACK_SELECTOR_TYPE
   min?: number
   max?: number
   handleInputChange?: (value: string) => void
   handleSelectChange?: (value: string) => void
+  handleTabSwitch?: (value: TRACK_SELECTOR_TYPE) => void
 }
 
 const trackSelectorOptions = window.CozyologyConfig_Drapery?.trackSelectorOptions || {}
 
 export default function TrackSelector(props: TrackSelectorProps) {
   const [selected, setSelected] = useState<TRACK_SELECTOR_TYPE>()
-  const [inputValue, setInputValue] = useState<string>('')
-  const [selectValue, setSelectValue] = useState<string>('')
+  const [inputValue, setInputValue] = useState('')
+  const [selectValue, setSelectValue] = useState('')
+  const [showTip, setShowTip] = useState(false)
 
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
@@ -27,19 +30,27 @@ export default function TrackSelector(props: TrackSelectorProps) {
   const options = (trackSelectorOptions?.[props.headerStyle] || []).map((option, index) => ({ ...option, key: index }))
 
   React.useEffect(() => {
-    setSelected(TRACK_SELECTOR_TYPE.CT)
-    if (!props.value) {
-      // initSelectValue()
-      return
-    }
-    // 回显逻辑，如果是options某个选项的预设值直接回显到下拉框组件，反之回显到输入框组件
-    const isPresetValue = options.some(option => option.value === props.value)
-    if (isPresetValue) {
-      setSelectValue(props.value)
+    const initTabKey = props.initialTabKey ?? TRACK_SELECTOR_TYPE.CT
+    setSelected(initTabKey)
+    props.handleTabSwitch?.(initTabKey) // 切换到对应的tab
+    if (!props.value) return // 没有值不回显
+    if (initTabKey === TRACK_SELECTOR_TYPE.CT) {
+      setSelectValue(props.value) // 设置下拉框的值
     } else {
-      setInputValue(props.value)
-      setSelected(TRACK_SELECTOR_TYPE.MT)
+      setInputValue(props.value) // 设置输入框的值
     }
+
+    // setSelected(TRACK_SELECTOR_TYPE.CT)
+    // props.handleTabSwitch?.(TRACK_SELECTOR_TYPE.CT)
+    // if (!props.value) return
+    // // 回显逻辑，如果是options某个选项的预设值直接回显到下拉框组件，反之回显到输入框组件
+    // const isPresetValue = options.some(option => option.value === props.value)
+    // if (isPresetValue) {
+    //   setSelectValue(props.value)
+    // } else {
+    //   setInputValue(props.value)
+    //   setSelected(TRACK_SELECTOR_TYPE.MT)
+    // }
   }, [])
 
   // 切换tab
@@ -48,7 +59,9 @@ export default function TrackSelector(props: TrackSelectorProps) {
     setSelected(value)
     setSelectValue('')
     setInputValue('')
+    setShowTip(false)
     props.handleSelectChange('') // 清空当前输入值，让用户重新输入
+    props.handleTabSwitch(value)
   }
 
   // 初始化下框的值
@@ -70,6 +83,8 @@ export default function TrackSelector(props: TrackSelectorProps) {
   const handleSelectChange = () => {
     if (selectRef.current) {
       const value = selectRef.current.value || ''
+      const label = selectRef.current.options[selectRef.current.selectedIndex]?.text || ''
+      setShowTip(label.includes('Wall Mount'))
       setSelectValue(value)
       props.handleSelectChange?.(value)
     }
@@ -145,6 +160,18 @@ export default function TrackSelector(props: TrackSelectorProps) {
               ))}
             </select>
           </div>
+          {showTip && (
+            <div className="mt-4">
+              <span className={`text-sm`}>
+                For wall mount, this tool assumes the track is installed right below the ceiling. If you prefer a
+                wall-mounted setup that sits lower, please contact us at{' '}
+                <a href="mailto:consult@cozyology.com" target="_blank" className="text-[#ba6352] underline">
+                  consult@cozyology.com
+                </a>{' '}
+                for guidance.
+              </span>
+            </div>
+          )}
           <div className="mt-4">
             <span
               className={`text-[#ba6352] underline cursor-pointer text-sm ${selectValue ? 'opacity-100' : 'opacity-0'}`}

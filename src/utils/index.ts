@@ -140,26 +140,149 @@ export function mixNumberOrFractionHandle(input: string, handleFn?: ((ret: MixNu
  * @param denominator 带分数的分母
  * @returns 
  */
-export function convertToMixedNumber(decimal: number, denominator: number): string {
-    if (decimal < 0) return '0'
+// export function convertToMixedNumber(decimal: number, denominator: number ): string {
+//     if (decimal < 0) return '0'
+
+//     const whole = Math.floor(decimal)
+//     const fractionalPart = decimal - whole
+
+//     if (fractionalPart === 0) {
+//         return whole.toString()
+//     }
+
+//     // 将小数部分转换为分数（以指定分母，常用于英制测量）
+//     const numerator = Math.round(fractionalPart * denominator)
+
+//     if (numerator === 0) {
+//         return whole.toString()
+//     } else if (numerator === denominator) {
+//         return (whole + 1).toString()
+//     } else if (whole === 0) {
+//         return `${numerator}/${denominator}`
+//     } else {
+//         return `${whole} ${numerator}/${denominator}`
+//     }
+// }
+
+export function convertToMixedNumber(decimal: number, denominator: number): { wholePart: string, fracPart: string } {
+    if (decimal < 0) return { wholePart: '', fracPart: '' }
 
     const whole = Math.floor(decimal)
     const fractionalPart = decimal - whole
 
-    if (fractionalPart === 0) {
-        return whole.toString()
-    }
+    if (fractionalPart == 0) return { wholePart: whole.toString(), fracPart: '' }
 
     // 将小数部分转换为分数（以指定分母，常用于英制测量）
     const numerator = Math.round(fractionalPart * denominator)
 
-    if (numerator === 0) {
-        return whole.toString()
-    } else if (numerator === denominator) {
-        return (whole + 1).toString()
-    } else if (whole === 0) {
-        return `${numerator}/${denominator}`
-    } else {
-        return `${whole} ${numerator}/${denominator}`
+    if (numerator == 0) return { wholePart: whole.toString(), fracPart: '' }
+
+    if (numerator == denominator) return { wholePart: (whole + 1).toString(), fracPart: '' }
+
+    return { wholePart: whole.toString(), fracPart: `${numerator}/${denominator}` }
+}
+
+
+/**
+ * 辅助函数，解析出分数的分子和分母
+ * @param fraction 
+ * @returns 
+ */
+export function parseFraction(fraction: string) {
+    // 验证输入格式（仅允许数字、/，且分子分母为非负整数）
+    const regex = /^(\d+)(\/(\d+))?$/;
+    const match = fraction.match(regex);
+    if (!match) {
+        return {
+            isValid: false,
+            message: '无效分数格式'
+        }
     }
+    const numerator = BigInt(match[1]); // 分子（BigInt避免大数溢出）
+    const denominator = match[3] ? BigInt(match[3]) : BigInt(1); // 分母默认1（整数情况）
+
+    if (denominator === 0n) {
+        return {
+            isValid: false,
+            message: '分母不能为0'
+        }
+    }
+    return { isValid: true, numerator, denominator };
+}
+
+/**
+ * 计算最大公约数，欧几里得算法
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export function gcd(a, b) {
+    a = a < 0n ? -a : a; // 取绝对值
+    b = b < 0n ? -b : b;
+    while (b !== 0n) [a, b] = [b, a % b];
+    return a;
+};
+
+/**
+ * 约分分数，返回最简分数
+ * @param num 
+ * @param den 
+ * @returns 
+ */
+export function reduceFraction(num, den) {
+    if (num === 0n) return [0n, 1n]; // 分子为0时，分母固定为1
+    const commonDivisor = gcd(num, den);
+    let reducedNum = num / commonDivisor;
+    let reducedDen = den / commonDivisor;
+
+    // 确保分母为正（负号移到分子）
+    if (reducedDen < 0n) {
+        reducedNum = -reducedNum;
+        reducedDen = -reducedDen;
+    }
+    return [reducedNum, reducedDen];
+};
+
+export function fractionOperation(frac1, frac2, operation) {
+    // 解析两个分数
+    const parsed1 = parseFraction(frac1);
+    if (!parsed1.isValid) throw new Error(parsed1.message);
+    const n1 = parsed1.numerator!;
+    const d1 = parsed1.denominator!;
+    const parsed2 = parseFraction(frac2);
+    if (!parsed2.isValid) throw new Error(parsed2.message);
+    const n2 = parsed2.numerator!;
+    const d2 = parsed2.denominator!;
+
+    let resultNum, resultDen;
+
+    switch (operation) {
+        case "+":
+            // 加法：n1/d1 + n2/d2 = (n1*d2 + n2*d1)/(d1*d2)
+            resultNum = n1 * d2 + n2 * d1;
+            resultDen = d1 * d2;
+            break;
+        case "-":
+            // 减法：n1/d1 - n2/d2 = (n1*d2 - n2*d1)/(d1*d2)
+            resultNum = n1 * d2 - n2 * d1;
+            resultDen = d1 * d2;
+            break;
+        case "*":
+            // 乘法：(n1*d2) * (n2*d1) → 直接 n1*n2 / d1*d2
+            resultNum = n1 * n2;
+            resultDen = d1 * d2;
+            break;
+        case "/":
+            // 除法：(n1/d1) / (n2/d2) = (n1*d2)/(d1*n2)，需判断n2是否为0
+            if (n2 === 0n) throw new Error("除数不能为0");
+            resultNum = n1 * d2;
+            resultDen = d1 * n2;
+            break;
+        default:
+            throw new Error(`不支持的运算符：${operation}（仅支持 +、-、*、/）`);
+    }
+
+    // 步骤5：约分结果并转为字符串
+    const [reducedNum, reducedDen] = reduceFraction(resultNum, resultDen);
+    return `${reducedNum}/${reducedDen}`;
 }

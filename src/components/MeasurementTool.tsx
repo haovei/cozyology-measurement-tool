@@ -563,7 +563,7 @@ export default function MeasurementTool() {
                 )}
               </div>
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
-                <h1 className="text-[30px] font-americana not-md:text-[18px] lg:min-h-[45px]">
+                <h1 className="text-[30px] font-americana_bt not-md:text-[18px] lg:min-h-[45px]">
                   {currentStepData.title}
                 </h1>
                 {currentStepData.subTitle && (
@@ -656,7 +656,7 @@ export default function MeasurementTool() {
                       Your recommended shade size is&nbsp;
                     </div>
                     <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                    <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana">
+                    <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
                       {(() => {
                         const { width, height } = calculateRecommendedSize()
                         return `${width}"W × ${height}"L`
@@ -680,12 +680,12 @@ export default function MeasurementTool() {
 
                     <div className="mt-[50px] flex w-full text-center">
                       <div className="flex-1 flex flex-col items-center">
-                        <div className="text-[16px] text-[#999] font-americana mb-[24px]">MOUNT STYLE</div>
-                        <div className="text-[16px] font-americana">{getMountTypeDescription()}</div>
+                        <div className="text-[16px] text-[#999] font-americana_bt mb-[24px]">MOUNT STYLE</div>
+                        <div className="text-[16px] font-americana_bt">{getMountTypeDescription()}</div>
                       </div>
                       <div className="flex-1 flex flex-col items-center border-l border-[#DDD]">
-                        <div className="text-[16px] text-[#999] font-americana  mb-[24px]">LENGTH STYLE</div>
-                        <div className="text-[16px] font-americana">{getLengthStyleDescription()}</div>
+                        <div className="text-[16px] text-[#999] font-americana_bt  mb-[24px]">LENGTH STYLE</div>
+                        <div className="text-[16px] font-americana_bt">{getLengthStyleDescription()}</div>
                       </div>
                     </div>
 
