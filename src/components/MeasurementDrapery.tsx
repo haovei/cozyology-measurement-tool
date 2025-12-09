@@ -535,8 +535,8 @@ export default function MeasurementTool() {
         w = isSplitPanels ? _w / 2 : _w
 
         // Pleated->Yes->Track
-        // #region 新逻辑：将_h(type:小数)的高度固定加上0.25，自定义四舍五入，保证最终结果为整数或带1/2的带分数
-        _h = calculateByCurtainStyle(Number(_h) + 0.25)
+        // #region 新逻辑：将_h(type:小数)自定义四舍五入，保证最终结果为整数或带1/2的带分数
+        _h = calculateByCurtainStyle(Number(_h))
         h = convertToDecimal(_h, false)
         //#endregion
 
@@ -556,8 +556,8 @@ export default function MeasurementTool() {
         let _h = inputValues['rod-top-to-floor-height'] || 0
         w = isSplitPanels ? _w / 2 : _w
         // Pleated->Yes->Track
-        // #region 新逻辑：将_h(type:小数)的高度固定加上0.25，自定义四舍五入，保证最终结果为整数或带1/2的带分数
-        _h = calculateByCurtainStyle(Number(_h) + 0.25)
+        // #region 新逻辑：将_h(type:小数)自定义四舍五入，保证最终结果为整数或带1/2的带分数
+        _h = calculateByCurtainStyle(Number(_h))
         h = convertToDecimal(_h, false)
         // #endregion
 
@@ -1151,7 +1151,7 @@ export default function MeasurementTool() {
                 <>
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
                     <div className="flex flex-col items-center px-[30px]">
-                      <div className="text-[20px] font-medium text-black not-md:text-[12px] font-americana_bt">
+                      <div className="text-[20px] text-black not-md:text-[12px] font-americana_bt">
                         {headerStyle === 'ripple-fold'
                           ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
                           : CozyologyConfig.resultTexts?.finishedTitle}
@@ -1203,7 +1203,7 @@ export default function MeasurementTool() {
                       </div>
                     </div>
 
-                    <table className="border border-gray-400 border-collapse text-sm not-md:hidden font-americana_bt">
+                    <table className="border border-gray-400 border-collapse text-sm not-md:hidden">
                       <tbody>
                         <tr>
                           <td className="border border-gray-400 p-2 w-[270px]">
