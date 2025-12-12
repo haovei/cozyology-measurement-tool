@@ -434,12 +434,13 @@ export default function MeasurementTool() {
       h: any = 0
 
     if (hardware === 'hardware-Track') {
-      w = inputValues['hardware-track-length-1'] || 0
+      const _w = inputValues['hardware-track-length-1'] || 0
+      w = isSplitPanels ? _w / 2 : _w
       const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
       const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
 
       /* 2025/11/12 新增逻辑：用户选择pleat/ripple-fold -> track时，如果选择的是MyTrack，需要默认加上1/4 */
-      const isMyTrack = selectorTabKey === TRACK_SELECTOR_TYPE.MT
+      // const isMyTrack = selectorTabKey === TRACK_SELECTOR_TYPE.MT
 
       /* 分别判断string（分数和带分数）和number类型 */
       if (typeof ringCeilingToBottomHeight === 'string') {
@@ -448,8 +449,8 @@ export default function MeasurementTool() {
             // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数，isMyTrack需要加上1/4
             let result = Number(ceilingToFloorHeight) - decimalValue
             result = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
-            // #region 新逻辑，将result(type:小数)加1/4变成加0.25,再按自定义四舍五入，保证最终结果为整数或者代1/2分数
-            h = convertToDecimal(result + (isMyTrack ? 0.25 : 0), false)
+            // #region 新逻辑，将result(type:小数)按自定义四舍五入，保证最终结果为整数或者代1/2分数
+            h = convertToDecimal(result, false)
             // #endregion
 
             // #region 旧逻辑，将result(type:小数)拆分成带分数，分数部分加1/4，再计算最终结果
@@ -459,8 +460,8 @@ export default function MeasurementTool() {
             // h = fracPart == '1/1' ? `${(Number(wholePart) + 1).toString()}` : `${wholePart} ${fracPart}`
             // #endregion
           } else {
-            // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0，再根据是否时MyTrack默认加上0.25
-            h = calculateByCurtainStyle(Number(ceilingToFloorHeight) + (isMyTrack ? 0.25 : 0))
+            // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0
+            h = calculateByCurtainStyle(Number(ceilingToFloorHeight))
           }
         })
       }
@@ -468,8 +469,6 @@ export default function MeasurementTool() {
       else if (typeof ringCeilingToBottomHeight === 'number') {
         // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
         let result = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
-        // 根据选择的是否是MyTrack，默认加上1/4 (0.25)
-        result += isMyTrack ? 0.25 : 0
         h = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
       }
     }
@@ -517,7 +516,7 @@ export default function MeasurementTool() {
       const [_w, _h] = calculateRippleFoldSize()
 
       // RippleFold默认没有选择Panels这一步。Pleated有这一步，需要单独处理
-      w = isSplitPanels ? _w / 2 : _w
+      w = _w
 
       // 如果选择的是Rod，高度固定减1 即流程Pleated->No->Rod
       h = selectedOptions['step-2-0-1'] === 'hardware-Rod' ? _h - 1 : _h
@@ -757,9 +756,9 @@ export default function MeasurementTool() {
 
     // 如果即将到 step-4-1 阶段，因为第一步固定 step-1，并判断第一步是否选择的是ripple-fold，这是新流程Ripple Fold track分支
     // 该分支结尾不需要选择一片or两片（step-4-1），直接跳转最后结算阶段（step-4-2）
-    if (stepHistory.length > 1 && actualJump === 'step-4-1' && headerStyle === 'ripple-fold') {
-      actualJump = 'step-4-2'
-    }
+    // if (stepHistory.length > 1 && actualJump === 'step-4-1' && headerStyle === 'ripple-fold') {
+    //   actualJump = 'step-4-2'
+    // }
 
     // 如果当前步骤是 step-1 且历史记录中有超过一个步骤，说明用户重新选择了第一步
     // 需要清空之前的历史和已完成步骤，重新开始
@@ -1167,9 +1166,9 @@ export default function MeasurementTool() {
                                 {width}" W * {height}" L
                               </div>
                               {/* mobile */}
-                              <div className='text-center md:hidden'>
+                              <div className="text-center md:hidden">
                                 <div>{width}" W</div>
-                                <div className='text-lg text-[#999999] leading-1'>×</div>
+                                <div className="text-lg text-[#999999] leading-1">×</div>
                                 <div>{height}" L</div>
                               </div>
                             </>
