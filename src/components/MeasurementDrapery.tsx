@@ -655,16 +655,15 @@ export default function MeasurementTool() {
   // 获取面板类型描述
   const getPanelTypeDescription = (): string => {
     const panelType = selectedOptions['step-4-1']
+    if (!panelType) return 'Standard'
 
-    if (selectedOptions?.['step-1'] === 'ripple-fold') {
-      return 'Choose at Order'
-    }
+    const isRippleFold = selectedOptions?.['step-1'] === 'ripple-fold'
 
     if (panelType === 'single-panels') {
-      return 'Single (Order Qty: 1)'
+      return isRippleFold ? 'Single' : 'Single (Order Qty: 1)'
     }
     if (panelType === 'split-panels') {
-      return 'Split (Order Qty: 2)'
+      return isRippleFold ? 'Split' : 'Split (Order Qty: 2)'
     }
 
     return 'Standard'
