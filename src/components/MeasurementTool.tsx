@@ -225,22 +225,24 @@ export default function MeasurementTool() {
     const wholeNumber = Math.floor(decimal)
     const fractionalPart = decimal - wholeNumber
 
-    // 转换为最接近的 1/8 英寸
-    const eighths = Math.round(fractionalPart * 8)
+    const targetInchNum = 8
+
+    // 转换为最接近的 1/targetInchNum 英寸
+    const eighths = Math.round(fractionalPart * targetInchNum)
 
     if (eighths === 0) {
       return wholeNumber.toString()
     }
 
-    if (eighths === 8) {
+    if (eighths === targetInchNum) {
       return (wholeNumber + 1).toString()
     }
 
     // 简化分数
     const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b))
-    const divisor = gcd(eighths, 8)
+    const divisor = gcd(eighths, targetInchNum)
     const numerator = eighths / divisor
-    const denominator = 8 / divisor
+    const denominator = targetInchNum / divisor
 
     if (wholeNumber === 0) {
       return `${numerator}/${denominator}`
