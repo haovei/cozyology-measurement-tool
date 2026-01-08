@@ -27,45 +27,42 @@
           screenshotReminder:
             'For your records, please <span class="text-[#ba6352]">take a screenshot</span> before proceeding.',
         },
-        contactDetails: `<div class="font-bold text-black">Want to double-check your sizing?</div>
+        contactDetails: `<div class="font-bold text-black">Need quick 1-on-1 help?</div>
                 <div class="mt-[10px] text-gray-500">
-                  <div>Send us a quick photo via</div>
                   <div>
-                    <a
-                      href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                    Book a <a
+                      href="https://cozyology.com/products/complimentary-1-on-1-zoom-consultation"
                       class="text-[#ba6352] underline"
                       target="_blank"
                     >
-                      WhatsApp
+                      complimentary Zoom </br> consultation
                     </a>
-                    : (917) 701-2145
-                  </div>
-                  <div>
-                    email&nbsp;
-                    <a href="mailto:care@cozyology.com" class="text-[#ba6352] underline" target="_blank">
-                      Care@Cozyology.com
+                    . Or <a onclick="openEmailPlugin()" class="cursor-pointer text-[#ba6352] underline" target="_blank">
+                     leave us a message
                     </a>
-                    .
                   </div>
-                  <div>and we'll do the rest.</div>
+                  <div> 
+                    — we’ll reply within 24 hours </br>
+                    Email: care@cozyology.com
+                  </div>
                 </div>`,
-        contactDetailsMobile: `<div class="font-bold text-black">Need help with measurements?</div>
-                <div class="font-bold text-black">
-                  Scan the QR code or&nbsp;
-                  <a href="mailto:care@cozyology.com" class="text-[#c16452]" target="_blank">
-                    add us
-                  </a>
-                  &nbsp; on
-                </div>
+        contactDetailsMobile: `<div class="font-bold text-black">Need quick 1-on-1 help?</div>
                 <div class="text-gray-500 mt-[10px]">
-                  <a
-                    href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                  Book a <a
+                    href="https://cozyology.com/products/complimentary-1-on-1-zoom-consultation"
                     class="text-[#ba6352] underline"
                     target="_blank"
                   >
-                    WhatsApp
+                     complimentary Zoom consultation
                   </a>
-                  : (917) 701-2145
+                  . </br>
+                  Or<a
+                    onclick="openEmailPlugin()"
+                    class="text-[#ba6352] underline cursor-pointer"
+                    target="_blank"
+                  >
+                    leave us a message
+                  </a> — we’ll reply within 24 hours Email: care@cozyology.com
                 </div>`,
         measurementConfig: {
           'step-1': {
@@ -289,45 +286,42 @@
           finishedTitle: 'Your recommended Single Panel Order Size is',
           finishedTitleOfRippleFold: 'Your recommended Total Coverage Size is',
         },
-        contactDetails: `<div class="font-bold text-black">Want to double-check your sizing?</div>
+        contactDetails: `<div class="font-bold text-black">Need quick 1-on-1 help?</div>
                 <div class="mt-[10px] text-gray-500">
-                  <div>Send us a quick photo via</div>
                   <div>
-                    <a
-                      href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                    Book a <a
+                      href="https://cozyology.com/products/complimentary-1-on-1-zoom-consultation"
                       class="text-[#ba6352] underline"
                       target="_blank"
                     >
-                      WhatsApp
+                      complimentary Zoom </br> consultation
                     </a>
-                    : (917) 701-2145
-                  </div>
-                  <div>
-                    email&nbsp;
-                    <a href="mailto:care@cozyology.com" class="text-[#ba6352] underline" target="_blank">
-                      Care@Cozyology.com
+                    . Or <a onclick="openEmailPlugin()" class="cursor-pointer text-[#ba6352] underline " target="_blank">
+                     leave us a message
                     </a>
-                    .
                   </div>
-                  <div>and we'll do the rest.</div>
+                  <div> 
+                    — we’ll reply within 24 hours </br>
+                    Email: care@cozyology.com
+                  </div>
                 </div>`,
-        contactDetailsMobile: `<div class="font-bold text-black">Need help with measurements?</div>
-                <div class="font-bold text-black">
-                  Scan the QR code or&nbsp;
-                  <a href="mailto:care@cozyology.com" class="text-[#c16452]" target="_blank">
-                    add us
-                  </a>
-                  &nbsp; on
-                </div>
+        contactDetailsMobile: `<div class="font-bold text-black">Need quick 1-on-1 help?</div>
                 <div class="text-gray-500 mt-[10px]">
-                  <a
-                    href="https://api.whatsapp.com/send/?phone=19177012145&text&type=phone_number&app_absent=0"
+                  Book a <a
+                    href="https://cozyology.com/products/complimentary-1-on-1-zoom-consultation"
                     class="text-[#ba6352] underline"
                     target="_blank"
                   >
-                    WhatsApp
+                     complimentary Zoom consultation
                   </a>
-                  : (917) 701-2145
+                  . </br>
+                  Or<a
+                    onclick="openEmailPlugin()"
+                    class="text-[#ba6352] underline cursor-pointer"
+                    target="_blank"
+                  >
+                    leave us a message
+                  </a> — we’ll reply within 24 hours Email: care@cozyology.com
                 </div>`,
         measurementConfig: {
           'step-1': {
@@ -740,7 +734,19 @@ Ceiling over 10 ft: Keep the rod within 18" above the window frame to maintain b
           pleated: [{ label: 'Emery Ripple Fold Track', value: '1 3/8', link: 'https://cozyology.com/' }],
         },
       }
-    </script>
+   
+    // 唤起Get in Touch弹窗
+    function openEmailPlugin() {
+        const target_btns = document.getElementsByClassName('bcontact-trigger-button bcontact-trigger-button-has-icon')
+        console.log("target_btns===", target_btns);
+        if (target_btns && target_btns.length) {
+            Array.from(target_btns).forEach((btn) => {
+                btn?.click?.()
+            })
+        }
+    }
+
+   </script>
   </head>
   <body>
     <div id="root" class="container mx-auto">
