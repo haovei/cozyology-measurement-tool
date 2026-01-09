@@ -963,7 +963,7 @@ export default function MeasurementTool() {
               </div>
               <div className="text-center mb-7 text-gray-900 not-md:mb-6">
                 {currentStepData.title && (
-                  <h1 className="text-[30px] not-md:text-[18px] lg:min-h-[45px]">
+                  <h1 className="text-[30px] font-americana_bt not-md:text-[18px] lg:min-h-[45px]">
                     {currentStepData.title}
                   </h1>
                 )}
@@ -1000,7 +1000,7 @@ export default function MeasurementTool() {
                                 href={option.detailUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[#8b572a] text-[16px] not-md:text-[12px] block"
+                                className="text-[#8b572a] text-[16px] not-md:text-[12px] block font-americana_bt"
                                 onClick={e => e.stopPropagation()}
                               >
                                 Details →
@@ -1171,13 +1171,13 @@ export default function MeasurementTool() {
                 <div className='md:flex'>
                   <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
                     <div className="flex flex-col items-center px-[30px]">
-                      <div className="text-[20px] text-black not-md:text-[12px]  ">
+                      <div className="text-[20px] text-black not-md:text-[12px]">
                         {headerStyle === 'ripple-fold'
                           ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
                           : CozyologyConfig.resultTexts?.finishedTitle}
                       </div>
                       <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                      <div className="text-black mt-[30px] not-md:my-[0] not-md:text-[35px]  ">
+                      <div className="text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
                         {(() => {
                           const { width, height } = calculateRecommendedSize()
                           return (
@@ -1197,7 +1197,7 @@ export default function MeasurementTool() {
                         })()}
                       </div>
                       <div className="md:hidden text-[#999999] text-center">
-                        <div className="text-[12px]   font-bold">
+                        <div className="text-[12px] font-americana_bt font-bold">
                           Header: {getHeaderStyleDescription()}
                         </div>
                         {showExtraResultInfos && (
@@ -1206,10 +1206,10 @@ export default function MeasurementTool() {
                             <div className="text-[12px]   font-bold ">Hardware: {renderHardware()}</div>
                           </>
                         )}
-                        <div className="text-[12px]   font-bold ">
+                        <div className="text-[12px] font-americana_bt font-bold ">
                           Bottom: {getLengthStyleDescription()}
                         </div>
-                        <div className="text-[12px]   font-bold">
+                        <div className="text-[12px] font-americana_bt font-bold">
                           Panel: {getPanelTypeDescription()}
                         </div>
                       </div>
@@ -1264,7 +1264,7 @@ export default function MeasurementTool() {
                       </button>
                     </div>
 
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]  ">
+                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
                       <span
                         dangerouslySetInnerHTML={{
                           __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
@@ -1414,7 +1414,7 @@ export default function MeasurementTool() {
                               )    
                             }
                           </>
-                        )
+                        ) 
                       }
 
                       {
