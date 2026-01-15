@@ -2,6 +2,7 @@
 
 import { useRef, useState, useMemo } from 'react'
 import TrackSelector from './TrackSelector'
+import SelectedInfos from './SelectedInfos'
 import { mixNumberOrFractionHandle, convertToMixedNumber, fractionOperation } from '../utils'
 import { TRACK_SELECTOR_TYPE } from './TrackSelector'
 
@@ -844,6 +845,87 @@ export default function MeasurementTool() {
     return '2.2x'
   }
 
+  const renderSelectedInfos = () => {
+    const list: { key: string; value: string }[] = []
+
+    if (headerStyle === 'pleated') {
+      if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-yes') {
+        // pleated yes Rod
+        if (selectedOptions['step-2-0-2'] === 'hardware-Rod-2') {
+          list.push(
+            { key: 'Hardware', value: 'Installed Rod' },
+            { key: 'Rod Length', value: `${inputValues['rod-width-top']}"` },
+            { key: 'Ring Eyelet to Floor', value: `${inputValues['rod-top-to-floor-height']}"` }
+          )
+        }
+        // pleated yes Track
+        else if (selectedOptions['step-2-0-2'] === 'hardware-Track-2') {
+          list.push(
+            { key: 'Hardware', value: 'Installed Track' },
+            { key: 'Track Length', value: `${inputValues['hardware-track-length-1']}"` },
+            { key: 'Bottom of Track Gilder to Floor', value: `${inputValues['track-ring-bottom-to-floor-height']}"` }
+          )
+        }
+      } else if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-no') {
+        // pleated no Rod
+        if (selectedOptions['step-2-0-1'] === 'hardware-Rod') {
+          list.push(
+            { key: 'Hardware', value: 'No Rod Installed' },
+            { key: 'Window Width', value: `${inputValues['norod-window-width']}"` },
+            { key: 'Left Side Width', value: `${inputValues['norod-width-left-extension']}"` },
+            { key: 'Right Side Width', value: `${inputValues['norod-width-right-extension']}"` },
+            { key: 'Window Top to Floor Height', value: `${inputValues['top-to-floor-height']}"` },
+            { key: 'Rod Extension Above Frame', value: `${inputValues['rod-extension-above-frame']}"` }
+          )
+        }
+        // pleated no Track
+        else if (selectedOptions['step-2-0-1'] === 'hardware-Track') {
+          list.push(
+            { key: 'Hardware', value: 'No Track Installed' },
+            { key: 'Track Length', value: `${inputValues['hardware-track-length-1']}"` },
+            { key: 'Height from Ceiling to Floor', value: `${inputValues['track-ceiling-to-floor-height']}"` }
+          )
+        }
+      }
+    } else if (headerStyle === 'ripple-fold') {
+      list.push(
+        { key: 'Track Length', value: `${inputValues['hardware-track-length-1']}"` },
+        { key: 'Ceiling to Floor', value: `${inputValues['track-ceiling-to-floor-height']}"` }
+      )
+      if (selectorTabKey === 'My Track') {
+        list.push({
+          key: 'Ceiling to Bottom of Track Gilder',
+          value: `${inputValues['track-ring-ceiling-to-bottom-height']}"`,
+        })
+      }
+    } else if (['soft-top', 'grommets'].includes(headerStyle)) {
+      if (selectedOptions['step-2-0'] === 'rod-installed-yes') {
+        list.push(
+          { key: 'Hardware', value: 'Installed Rod' },
+          { key: 'Rod Length', value: `${inputValues['rod-width-top']}"` },
+          { key: 'Ring Eyelet to Floor', value: `${inputValues['rod-top-to-floor-height']}"` }
+        )
+      } else if (selectedOptions['step-2-0'] === 'rod-installed-no') {
+        list.push(
+          { key: 'Hardware', value: 'No Rod Installed' },
+          { key: 'Window Width', value: `${inputValues['norod-window-width']}"` },
+          { key: 'Left Side Width', value: `${inputValues['norod-width-left-extension']}"` },
+          { key: 'Right Side Width', value: `${inputValues['norod-width-right-extension']}"` },
+          { key: 'Window Top to Floor Height', value: `${inputValues['top-to-floor-height']}"` },
+          { key: 'Rod Extension Above Frame', value: `${inputValues['rod-extension-above-frame']}"` }
+        )
+      }
+    }
+
+    return (
+      <SelectedInfos
+        list={list}
+        getPanelTypeDescription={getPanelTypeDescription}
+        getLengthStyleDescription={getLengthStyleDescription}
+      />
+    )
+  }
+
   return (
     <div className="flex flex-col lg:flex-row" ref={stepWrapRef}>
       {/* Desktop Sidebar */}
@@ -1289,200 +1371,7 @@ export default function MeasurementTool() {
                     </button>
                   </div>
                    {/* 右边 You've selected*/}
-                  <div className='selected-data bg-[#F5F5F5] md:ml-[8px] md:w-[360px] not-md:mt-[20px] not-md:text-[12px] '>
-                    <p className='text-[15px] p-[16px] font-bold'>You've selected</p>
-                    {/* 分割线 */}
-                    <div className='w-full h-[1px] bg-[#DDD]'></div>
-
-                    <div className='p-[16px]'>
-                      {/* 选择pleated  */}
-                      {headerStyle === 'pleated' && (
-                        <>                       
-                          {(selectedOptions['step-2-0-0'] === 'rod-or-track-installed-yes') && (
-                            <>
-                            {/* 有rod */}
-                              {selectedOptions['step-2-0-2'] ==='hardware-Rod-2' && (
-                                <>
-                                  <div className='flex mb-[10px] justify-between items-center '>
-                                    <div className='flex-1 text-[#999999]'>Hardware: </div>
-                                    <div className='flex-1'>Installed Rod</div>
-                                  </div>
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Rod Length: </div>
-                                    <div className='flex-1'>{inputValues['rod-width-top']}"</div>
-                                  </div>
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Ring Eyelet to Floor: </div>
-                                    <div className='flex-1'>{inputValues['rod-top-to-floor-height']}"</div>
-                                  </div>
-                                </>
-                              )}
-                              {/* 有track */}
-                              {selectedOptions['step-2-0-2'] ==='hardware-Track-2' && (
-                                <>
-                                  <div className='flex mb-[10px] justify-between items-center '>
-                                    <div className='flex-1 text-[#999999]'>Hardware: </div>
-                                    <div className='flex-1'>Installed Track</div>
-                                  </div>
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Track Length: </div>
-                                    <div className='flex-1'>{inputValues['hardware-track-length-1']}"</div>
-                                  </div>
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Bottom of Track Gilder to Floor: </div>
-                                    <div className='flex-1'>{inputValues['track-ring-bottom-to-floor-height']}"</div>
-                                  </div>
-                                </>
-                              )}
-                             
-                            </>
-                          )}
-
-                          
-                          {selectedOptions['step-2-0-0'] === 'rod-or-track-installed-no' && (
-                            <>
-                              {/* 无rod */}
-                              {selectedOptions['step-2-0-1'] ==='hardware-Rod' && (
-                                <>
-                                  <div className='flex mb-[10px] justify-between items-center '>
-                                    <div className='flex-1 text-[#999999]'>Hardware: </div>
-                                    <div className='flex-1'>No Rod Installed</div>
-                                  </div>
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Window Width: </div>
-                                    <div className='flex-1'>{inputValues['norod-window-width']}"</div>
-                                  </div> 
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Left Side Width: </div>
-                                    <div className='flex-1'>{inputValues['norod-width-left-extension']}"</div>
-                                  </div>   
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Right Side Width: </div>
-                                    <div className='flex-1'>{inputValues['norod-width-right-extension']}"</div>
-                                  </div>   
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Window Top to Floor Height: </div>
-                                    <div className='flex-1'>{inputValues['top-to-floor-height']}"</div>
-                                  </div>  
-                                  <div className='flex mb-[10px] justify-between items-center'>
-                                    <div className='flex-1 text-[#999999]'>Rod Extension Above Frame: </div>
-                                    <div className='flex-1'>{inputValues['rod-extension-above-frame']}"</div>
-                                  </div>                           
-                                </>
-                              )}
-                              {
-                                // 无track
-                                selectedOptions['step-2-0-1'] ==='hardware-Track' && (
-                                  <>
-                                    <div className='flex mb-[10px] justify-between items-center '>
-                                      <div className='flex-1 text-[#999999]'>Hardware: </div>
-                                      <div className='flex-1'>No Track Installed</div>
-                                    </div>
-                                    <div className='flex mb-[10px] justify-between items-center'>
-                                      <div className='flex-1 text-[#999999]'>Track Length: </div>
-                                      <div className='flex-1'>{inputValues['hardware-track-length-1']}"</div>
-                                    </div>
-                                    <div className='flex mb-[10px] justify-between items-center'>
-                                      <div className='flex-1 text-[#999999]'>Height from Ceiling to Floor: </div>
-                                      <div className='flex-1'>{inputValues['track-ceiling-to-floor-height']}"</div>
-                                    </div>
-                                  </>
-                                )
-                              }
-                            </>
-                          )}
-                        </>
-                      )}
-                      {/*     ○ 选择ripple fold */}
-                      {
-                        headerStyle === 'ripple-fold' && (
-                          <>
-                            <div className='flex mb-[10px] justify-between items-center'>
-                              <div className='flex-1 text-[#999999]'>Track Length: </div>
-                              <div className='flex-1'>{inputValues['hardware-track-length-1']}"</div>
-                            </div>
-                            <div className='flex mb-[10px] justify-between items-center'>
-                              <div className='flex-1 text-[#999999]'>Ceiling to Floor: </div>
-                              <div className='flex-1'>{inputValues['track-ceiling-to-floor-height']}"</div>
-                            </div> 
-                            {
-                              selectorTabKey==='My Track' &&(
-                              <div className='flex mb-[10px] justify-between items-center'>
-                                <div className='flex-1 text-[#999999]'>Ceiling to Bottom of Track Gilder: </div>
-                                <div className='flex-1'>{inputValues['track-ring-ceiling-to-bottom-height']}"</div>
-                              </div>  
-                              )    
-                            }
-                          </>
-                        ) 
-                      }
-
-                      {
-                        ['soft-top', 'grommets'].includes(headerStyle)  && (
-                          <>                      
-
-                          {selectedOptions['step-2-0'] === 'rod-installed-yes' && (
-                            <>
-                              <div className='flex mb-[10px] justify-between items-center '>
-                                <div className='flex-1 text-[#999999]'>Hardware: </div>
-                                <div className='flex-1'>Installed Rod</div>
-                              </div>
-                              <div className='flex mb-[10px] justify-between items-center'>
-                                <div className='flex-1 text-[#999999]'>Rod Length: </div>
-                                <div className='flex-1'>{inputValues['rod-width-top']}"</div>
-                              </div>
-                              <div className='flex mb-[10px] justify-between items-center'>
-                                <div className='flex-1 text-[#999999]'>Ring Eyelet to Floor: </div>
-                                <div className='flex-1'>{inputValues['rod-top-to-floor-height']}"</div>
-                              </div>
-                             
-                            </>
-                          )}
-                          {selectedOptions['step-2-0'] === 'rod-installed-no' && (
-                              <>
-                                <div className='flex mb-[10px] justify-between items-center '>
-                                  <div className='flex-1 text-[#999999]'>Hardware: </div>
-                                  <div className='flex-1'>No Rod Installed</div>
-                                </div>
-                                <div className='flex mb-[10px] justify-between items-center'>
-                                  <div className='flex-1 text-[#999999]'>Window Width: </div>
-                                  <div className='flex-1'>{inputValues['norod-window-width']}"</div>
-                                </div> 
-                                <div className='flex mb-[10px] justify-between items-center'>
-                                  <div className='flex-1 text-[#999999]'>Left Side Width: </div>
-                                  <div className='flex-1'>{inputValues['norod-width-left-extension']}"</div>
-                                </div>   
-                                <div className='flex mb-[10px] justify-between items-center'>
-                                  <div className='flex-1 text-[#999999]'>Right Side Width: </div>
-                                  <div className='flex-1'>{inputValues['norod-width-right-extension']}"</div>
-                                </div>   
-                                <div className='flex mb-[10px] justify-between items-center'>
-                                  <div className='flex-1 text-[#999999]'>Window Top to Floor Height: </div>
-                                  <div className='flex-1'>{inputValues['top-to-floor-height']}"</div>
-                                </div>  
-                                <div className='flex mb-[10px] justify-between items-center'>
-                                  <div className='flex-1 text-[#999999]'>Rod Extension Above Frame: </div>
-                                  <div className='flex-1'>{inputValues['rod-extension-above-frame']}"</div>
-                                </div>                             
-                              </>
-                            )}
-                          </>
-                        )
-                      }
-                   
-                      <div className='flex mb-[10px] justify-between items-center'>
-                        <div className='flex-1 text-[#999999]'>Length Style: </div>
-                        <div className='flex-1'>{getLengthStyleDescription()}</div>
-                      </div>
-                      <div className='flex mb-[10px] justify-between items-center'>
-                        <div className='flex-1 text-[#999999]'>Panel: </div>
-                        <div className='flex-1'>{getPanelTypeDescription()}</div>
-                      </div>    
-                      <div  onClick={handleShopNow} className='text-[#ba6352] underline not-md:hidden mt-[80px]'>
-                        Continue shopping
-                      </div>
-                    </div>
-                  </div>
+                  {renderSelectedInfos()}
                 </div>
                 </>
               )}

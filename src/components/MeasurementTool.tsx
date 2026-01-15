@@ -256,6 +256,9 @@ export default function MeasurementTool() {
     // 判断是内装还是外装
     const isInsideMount = completedSteps.some(step => step.includes('step-2-1'))
 
+    console.log("结果页面completedSteps=======", completedSteps);
+    console.log("结果页面inputValues=======", inputValues);
+
     let width = 0
     let height = 0
 
