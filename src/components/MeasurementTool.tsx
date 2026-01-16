@@ -473,11 +473,11 @@ export default function MeasurementTool() {
   const renderSelectedInfos = () => {
     const list: { key: string; value: string }[] = []
     list.push(
-      { key: 'Window Width', value: `${inputValues['outside-window-width']}` },
-      { key: 'Left Side Width', value: `${inputValues['outside-width-left-extension']}` },
-      { key: 'Right Side Width', value: `${inputValues['outside-width-right-extension']}` },
-      { key: 'Window Height', value: `${inputValues['outside-window-height']}` },
-      { key: 'Shade Above Window', value: `${inputValues['outside-height-above-extension']}` }
+      { key: 'Window Width', value: `${inputValues['outside-window-width']}"` },
+      { key: 'Left Side Width', value: `${inputValues['outside-width-left-extension']}"` },
+      { key: 'Right Side Width', value: `${inputValues['outside-width-right-extension']}"` },
+      { key: 'Window Height', value: `${inputValues['outside-window-height']}"` },
+      { key: 'Shade Above Window', value: `${inputValues['outside-height-above-extension']}"` }
     )
     return <SelectedInfos list={list} />
   }
@@ -681,14 +681,14 @@ export default function MeasurementTool() {
                       Your recommended shade size is&nbsp;
                     </div>
                     <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                    <div className="text-[60px] text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
+                    <div className="text-[60px] text-black mt-[20px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
                       {(() => {
                         const { width, height } = calculateRecommendedSize()
                         return `${width}"W × ${height}"L`
                       })()}
                     </div>
                     <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                    <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
+                    <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px] md:w-[670px]">
                       <span
                         dangerouslySetInnerHTML={{
                           __html: CozyologyConfig.resultTexts?.orderInstructions || '',
@@ -696,14 +696,15 @@ export default function MeasurementTool() {
                       />
                     </div>
 
-                    <table className="border border-gray-400 border-collapse text-sm mt-[50px] not-md:hidden">
+                    {/* web展示 */}
+                    <table className="border border-gray-400 border-collapse text-sm mt-[42px] not-md:hidden">
                       <tbody>
                         <tr>
-                          <td className="border border-gray-400 p-2 w-[270px]">
-                            MOUNT STYLE: <span className="font-bold">{getMountTypeDescription()}</span>
+                          <td className="border border-gray-400 p-2 w-[320px]">
+                            Mount Style: <span className="font-bold">{getMountTypeDescription()}</span>
                           </td>
-                          <td className="border border-gray-400 p-2 w-[270px]">
-                            LENGTH STYLE: <span className="font-bold">{getLengthStyleDescription()}</span>
+                          <td className="border border-gray-400 p-2 w-[320px]">
+                            Length Style: <span className="font-bold">{getLengthStyleDescription()}</span>
                           </td>
                         </tr>
                         {getMountTypeDescription() === 'Inside Mount' && (
@@ -719,6 +720,7 @@ export default function MeasurementTool() {
                       </tbody>
                     </table>
 
+                    {/* mobile展示 */}
                     <div className="md:hidden text-[#999999] text-center not-md:mt-[20px]">
                       <div className="text-[12px] font-americana_bt font-bold">
                         MOUNT STYLE: {getMountTypeDescription()}
@@ -738,15 +740,7 @@ export default function MeasurementTool() {
                       )}
                     </div>
 
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px] not-md:px-[20px]">
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
-                        }}
-                      />
-                    </div>
-
-                    <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full">
+                    <div className="not-md:hidden mt-[42px] flex gap-[30px] w-[640px]">
                       <button
                         onClick={handleShopNow}
                         className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
@@ -759,6 +753,14 @@ export default function MeasurementTool() {
                       >
                         CALCULATE AGAIN
                       </button>
+                    </div>
+
+                    <div className="mt-[18px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px] not-md:px-[20px]">
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
+                        }}
+                      />
                     </div>
                   </div>
 

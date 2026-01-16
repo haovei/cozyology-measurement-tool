@@ -1255,7 +1255,7 @@ export default function MeasurementTool() {
                             : CozyologyConfig.resultTexts?.finishedTitle}
                         </div>
                         <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                        <div className="text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
+                        <div className="text-black mt-[28px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
                           {(() => {
                             const { width, height } = calculateRecommendedSize()
                             return (
@@ -1301,7 +1301,7 @@ export default function MeasurementTool() {
                         </div>
                       </div>
 
-                      <table className="border border-gray-400 border-collapse text-sm not-md:hidden">
+                      <table className="border border-gray-400 border-collapse text-sm not-md:hidden mt-[42px]">
                         <tbody>
                           <tr>
                             <td className="border border-gray-400 p-2 w-[270px]">
@@ -1327,7 +1327,7 @@ export default function MeasurementTool() {
                         </tbody>
                       </table>
 
-                      <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full px-[30px]">
+                      <div className="not-md:hidden mt-[42px] flex gap-[30px] w-full px-[30px]">
                         <button
                           onClick={handleShopNow}
                           className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
@@ -1342,7 +1342,7 @@ export default function MeasurementTool() {
                         </button>
                       </div>
 
-                      <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
+                      <div className="mt-[42px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
                         <span
                           dangerouslySetInnerHTML={{
                             __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
