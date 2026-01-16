@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 interface SelectedInfosListItem {
   key: string
   value: string
@@ -5,13 +7,12 @@ interface SelectedInfosListItem {
 
 interface SelectedInfosProps {
   list: SelectedInfosListItem[]
-  getPanelTypeDescription: () => string
-  getLengthStyleDescription: () => string
+  children?: ReactNode
 }
 
 const CozyologyConfig = window.CozyologyConfig_Drapery
 
-const SelectedInfos = ({ list, getPanelTypeDescription, getLengthStyleDescription }: SelectedInfosProps) => {
+const SelectedInfos = ({ list, children }: SelectedInfosProps) => {
   const handleShopNow = () => {
     window.open(CozyologyConfig.shopNowUrl, '_blank')
   }
@@ -31,14 +32,7 @@ const SelectedInfos = ({ list, getPanelTypeDescription, getLengthStyleDescriptio
           ))}
         </>
 
-        <div className="flex mb-[10px] justify-between items-center">
-          <div className="flex-1 text-[#999999]">Length Style: </div>
-          <div className="flex-1">{getLengthStyleDescription()}</div>
-        </div>
-        <div className="flex mb-[10px] justify-between items-center">
-          <div className="flex-1 text-[#999999]">Panel: </div>
-          <div className="flex-1">{getPanelTypeDescription()}</div>
-        </div>
+        {children}
         <div onClick={handleShopNow} className="text-[#ba6352] underline not-md:hidden mt-[80px] cursor-pointer w-fit">
           Continue shopping
         </div>

@@ -920,9 +920,18 @@ export default function MeasurementTool() {
     return (
       <SelectedInfos
         list={list}
-        getPanelTypeDescription={getPanelTypeDescription}
-        getLengthStyleDescription={getLengthStyleDescription}
-      />
+      >
+        <>
+          <div className="flex mb-[10px] justify-between items-center">
+            <div className="flex-1 text-[#999999]">Length Style: </div>
+            <div className="flex-1">{getLengthStyleDescription?.()}</div>
+          </div>
+          <div className="flex mb-[10px] justify-between items-center">
+            <div className="flex-1 text-[#999999]">Panel: </div>
+            <div className="flex-1">{getPanelTypeDescription?.()}</div>
+          </div>
+        </>
+      </SelectedInfos>
     )
   }
 
@@ -1250,129 +1259,129 @@ export default function MeasurementTool() {
 
               {currentStepData.type === 'finished' && (
                 <>
-                <div className='md:flex'>
-                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
-                    <div className="flex flex-col items-center px-[30px]">
-                      <div className="text-[20px] text-black not-md:text-[12px]">
-                        {headerStyle === 'ripple-fold'
-                          ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
-                          : CozyologyConfig.resultTexts?.finishedTitle}
-                      </div>
-                      <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
-                      <div className="text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
-                        {(() => {
-                          const { width, height } = calculateRecommendedSize()
-                          return (
+                  <div className="md:flex">
+                    <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
+                      <div className="flex flex-col items-center px-[30px]">
+                        <div className="text-[20px] text-black not-md:text-[12px]">
+                          {headerStyle === 'ripple-fold'
+                            ? CozyologyConfig.resultTexts?.finishedTitleOfRippleFold
+                            : CozyologyConfig.resultTexts?.finishedTitle}
+                        </div>
+                        <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px]"></div>
+                        <div className="text-black mt-[30px] not-md:my-[0] not-md:text-[35px] font-americana_bt">
+                          {(() => {
+                            const { width, height } = calculateRecommendedSize()
+                            return (
+                              <>
+                                {/* web */}
+                                <div className="not-md:hidden text-6xl">
+                                  {width}" W * {height}" L
+                                </div>
+                                {/* mobile */}
+                                <div className="text-center md:hidden">
+                                  <div>{width}" W</div>
+                                  <div className="text-lg text-[#999999] leading-1">×</div>
+                                  <div>{height}" L</div>
+                                </div>
+                              </>
+                            )
+                          })()}
+                        </div>
+                        <div className="md:hidden text-[#999999] text-center">
+                          <div className="text-[12px] font-americana_bt font-bold">
+                            Header: {getHeaderStyleDescription()}
+                          </div>
+                          {showExtraResultInfos && (
                             <>
-                              {/* web */}
-                              <div className="not-md:hidden text-6xl">
-                                {width}" W * {height}" L
-                              </div>
-                              {/* mobile */}
-                              <div className="text-center md:hidden">
-                                <div>{width}" W</div>
-                                <div className="text-lg text-[#999999] leading-1">×</div>
-                                <div>{height}" L</div>
-                              </div>
+                              <div className="text-[12px]   font-bold ">Fullness: {getFullness()}</div>
+                              <div className="text-[12px]   font-bold ">Hardware: {renderHardware()}</div>
                             </>
-                          )
-                        })()}
-                      </div>
-                      <div className="md:hidden text-[#999999] text-center">
-                        <div className="text-[12px] font-americana_bt font-bold">
-                          Header: {getHeaderStyleDescription()}
+                          )}
+                          <div className="text-[12px] font-americana_bt font-bold ">
+                            Bottom: {getLengthStyleDescription()}
+                          </div>
+                          <div className="text-[12px] font-americana_bt font-bold">
+                            Panel: {getPanelTypeDescription()}
+                          </div>
                         </div>
-                        {showExtraResultInfos && (
-                          <>
-                            <div className="text-[12px]   font-bold ">Fullness: {getFullness()}</div>
-                            <div className="text-[12px]   font-bold ">Hardware: {renderHardware()}</div>
-                          </>
-                        )}
-                        <div className="text-[12px] font-americana_bt font-bold ">
-                          Bottom: {getLengthStyleDescription()}
-                        </div>
-                        <div className="text-[12px] font-americana_bt font-bold">
-                          Panel: {getPanelTypeDescription()}
+                        <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px] mb-0"></div>
+                        <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: CozyologyConfig.resultTexts?.orderInstructions || '',
+                            }}
+                          />
                         </div>
                       </div>
-                      <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px] mb-0"></div>
-                      <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">
+
+                      <table className="border border-gray-400 border-collapse text-sm not-md:hidden">
+                        <tbody>
+                          <tr>
+                            <td className="border border-gray-400 p-2 w-[270px]">
+                              Header: <span className="font-bold">{getHeaderStyleDescription()}</span>
+                            </td>
+                            <td className="border border-gray-400 p-2 w-[270px]">
+                              Fullness: <span className="font-bold">{getFullness()}</span>
+                            </td>
+                            {/* <td className="border border-gray-400 p-2 w-[270px]" rowSpan={2}>
+                            Hardware: <span className="font-bold">{renderHardware()}</span>
+                          </td> */}
+                          </tr>
+                          <tr>
+                            <td className="border border-gray-400 p-2 w-[270px]">
+                              Quantity: <span className="font-bold">{getQuantity()}</span>
+                              {/* Bottom: <span className="font-bold">{getLengthStyleDescription()}</span> */}
+                            </td>
+                            <td className="border border-gray-400 p-2 w-[270px]">
+                              Hardware: <span className="font-bold">{renderHardware()}</span>
+                              {/* Panel: <span className="font-bold">{getPanelTypeDescription()}</span> */}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full px-[30px]">
+                        <button
+                          onClick={handleShopNow}
+                          className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                        >
+                          SHOP NOW
+                        </button>
+                        <button
+                          onClick={handleCalculateAgain}
+                          className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 border cursor-pointer"
+                        >
+                          CALCULATE AGAIN
+                        </button>
+                      </div>
+
+                      <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
                         <span
                           dangerouslySetInnerHTML={{
-                            __html: CozyologyConfig.resultTexts?.orderInstructions || '',
+                            __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
                           }}
                         />
                       </div>
                     </div>
 
-                    <table className="border border-gray-400 border-collapse text-sm not-md:hidden">
-                      <tbody>
-                        <tr>
-                          <td className="border border-gray-400 p-2 w-[270px]">
-                            Header: <span className="font-bold">{getHeaderStyleDescription()}</span>
-                          </td>
-                          <td className="border border-gray-400 p-2 w-[270px]">
-                            Fullness: <span className="font-bold">{getFullness()}</span>
-                          </td>
-                          {/* <td className="border border-gray-400 p-2 w-[270px]" rowSpan={2}>
-                            Hardware: <span className="font-bold">{renderHardware()}</span>
-                          </td> */}
-                        </tr>
-                        <tr>
-                          <td className="border border-gray-400 p-2 w-[270px]">
-                            Quantity: <span className="font-bold">{getQuantity()}</span>
-                            {/* Bottom: <span className="font-bold">{getLengthStyleDescription()}</span> */}
-                          </td>
-                          <td className="border border-gray-400 p-2 w-[270px]">
-                            Hardware: <span className="font-bold">{renderHardware()}</span>
-                            {/* Panel: <span className="font-bold">{getPanelTypeDescription()}</span> */}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                    <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full px-[30px]">
+                    <div className="md:hidden mt-[20px] flex gap-[15px]">
                       <button
                         onClick={handleShopNow}
-                        className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 bg-black text-white cursor-pointer"
+                        className="flex-1 h-[40px] text-[12px] font-medium transition-all duration-200 bg-black text-white cursor-pointer"
                       >
                         SHOP NOW
                       </button>
                       <button
                         onClick={handleCalculateAgain}
-                        className="flex-1 h-[60px] text-lg font-medium transition-all duration-200 border cursor-pointer"
+                        className="flex-1 h-[40px] text-[12px] font-medium transition-all duration-200 border cursor-pointer"
                       >
                         CALCULATE AGAIN
                       </button>
                     </div>
 
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
-                        }}
-                      />
-                    </div>
+                    {/* 右边 You've selected*/}
+                    {renderSelectedInfos()}
                   </div>
-                 
-
-                  <div className="md:hidden mt-[20px] flex gap-[15px]">
-                    <button
-                      onClick={handleShopNow}
-                      className="flex-1 h-[40px] text-[12px] font-medium transition-all duration-200 bg-black text-white cursor-pointer"
-                    >
-                      SHOP NOW
-                    </button>
-                    <button
-                      onClick={handleCalculateAgain}
-                      className="flex-1 h-[40px] text-[12px] font-medium transition-all duration-200 border cursor-pointer"
-                    >
-                      CALCULATE AGAIN
-                    </button>
-                  </div>
-                   {/* 右边 You've selected*/}
-                  {renderSelectedInfos()}
-                </div>
                 </>
               )}
             </>

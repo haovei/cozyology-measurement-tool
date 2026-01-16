@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import SelectedInfos from './SelectedInfos'
 
 const CozyologyConfig = window.CozyologyConfig
 
@@ -256,8 +257,8 @@ export default function MeasurementTool() {
     // 判断是内装还是外装
     const isInsideMount = completedSteps.some(step => step.includes('step-2-1'))
 
-    console.log("结果页面completedSteps=======", completedSteps);
-    console.log("结果页面inputValues=======", inputValues);
+    console.log('结果页面completedSteps=======', completedSteps)
+    console.log('结果页面inputValues=======', inputValues)
 
     let width = 0
     let height = 0
@@ -449,6 +450,36 @@ export default function MeasurementTool() {
   const currentStepData = CozyologyConfig.measurementConfig[currentStep]
 
   const stepWrapRef = useRef<HTMLDivElement>(null)
+
+  // width取最小，height取最大
+  const calculateExtremeValue = (demension: 'width' | 'height') => {
+    if (demension === 'width') {
+      const widthValues = [
+        inputValues['inside-width-top'],
+        inputValues['inside-width-middle'],
+        inputValues['inside-width-bottom'],
+      ].filter(v => v !== undefined)
+      return widthValues.length > 0 ? Math.min(...widthValues) : '-'
+    }
+    const heightValues = [
+      inputValues['inside-height-left'],
+      inputValues['inside-height-middle'],
+      inputValues['inside-height-right'],
+    ].filter(v => v !== undefined)
+    return heightValues.length > 0 ? Math.max(...heightValues) : '-'
+  }
+
+  const renderSelectedInfos = () => {
+    const list: { key: string; value: string }[] = []
+    list.push(
+      { key: 'Window Width', value: `${inputValues['outside-window-width']}` },
+      { key: 'Left Side Width', value: `${inputValues['outside-width-left-extension']}` },
+      { key: 'Right Side Width', value: `${inputValues['outside-width-right-extension']}` },
+      { key: 'Window Height', value: `${inputValues['outside-window-height']}` },
+      { key: 'Shade Above Window', value: `${inputValues['outside-height-above-extension']}` }
+    )
+    return <SelectedInfos list={list} />
+  }
 
   return (
     <div className="flex flex-col lg:flex-row" ref={stepWrapRef}>
@@ -655,8 +686,8 @@ export default function MeasurementTool() {
               )}
 
               {currentStepData.type === 'finished' && (
-                <>
-                  <div className="flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] px-[30px] xl:px-[120px]">
+                <div className="md:flex">
+                  <div className="flex-1 flex flex-col items-center bg-[#F5F5F5] py-[70px] not-md:py-[25px] xl:px-[60px]">
                     <div className="text-[20px] font-medium text-black not-md:text-[12px]">
                       Your recommended shade size is&nbsp;
                     </div>
@@ -675,23 +706,55 @@ export default function MeasurementTool() {
                         }}
                       />
                     </div>
-                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px]">
+
+                    <table className="border border-gray-400 border-collapse text-sm mt-[50px] not-md:hidden">
+                      <tbody>
+                        <tr>
+                          <td className="border border-gray-400 p-2 w-[270px]">
+                            MOUNT STYLE: <span className="font-bold">{getMountTypeDescription()}</span>
+                          </td>
+                          <td className="border border-gray-400 p-2 w-[270px]">
+                            LENGTH STYLE: <span className="font-bold">{getLengthStyleDescription()}</span>
+                          </td>
+                        </tr>
+                        {getMountTypeDescription() === 'Inside Mount' && (
+                          <tr>
+                            <td className="border border-gray-400 p-2 w-[270px]">
+                              Window Width: <span className="font-bold">{calculateExtremeValue('width')}</span>
+                            </td>
+                            <td className="border border-gray-400 p-2 w-[270px]">
+                              Window Height: <span className="font-bold">{calculateExtremeValue('height')}</span>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+
+                    <div className="md:hidden text-[#999999] text-center not-md:mt-[20px]">
+                      <div className="text-[12px] font-americana_bt font-bold">
+                        MOUNT STYLE: {getMountTypeDescription()}
+                      </div>
+                      <div className="text-[12px] font-americana_bt font-bold">
+                        LENGTH STYLE: {getLengthStyleDescription()}
+                      </div>
+                      {getMountTypeDescription() === 'Inside Mount' && (
+                        <>
+                          <div className="text-[12px] font-americana_bt font-bold">
+                            Window Width: {calculateExtremeValue('width')}
+                          </div>
+                          <div className="text-[12px] font-americana_bt font-bold">
+                            Window Height: {calculateExtremeValue('height')}
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="mt-[50px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[20px] not-md:px-[20px]">
                       <span
                         dangerouslySetInnerHTML={{
                           __html: CozyologyConfig.resultTexts?.screenshotReminder || '',
                         }}
                       />
-                    </div>
-
-                    <div className="mt-[50px] flex w-full text-center">
-                      <div className="flex-1 flex flex-col items-center">
-                        <div className="text-[16px] text-[#999] font-americana_bt mb-[24px]">MOUNT STYLE</div>
-                        <div className="text-[16px] font-americana_bt">{getMountTypeDescription()}</div>
-                      </div>
-                      <div className="flex-1 flex flex-col items-center border-l border-[#DDD]">
-                        <div className="text-[16px] text-[#999] font-americana_bt  mb-[24px]">LENGTH STYLE</div>
-                        <div className="text-[16px] font-americana_bt">{getLengthStyleDescription()}</div>
-                      </div>
                     </div>
 
                     <div className="not-md:hidden mt-[50px] flex gap-[30px] w-full">
@@ -724,7 +787,10 @@ export default function MeasurementTool() {
                       CALCULATE AGAIN
                     </button>
                   </div>
-                </>
+
+                  {/* 右边 You've selected*/}
+                  {getMountTypeDescription() === 'Outside Mount' && renderSelectedInfos()}
+                </div>
               )}
             </>
           )}
