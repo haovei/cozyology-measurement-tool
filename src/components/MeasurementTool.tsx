@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import SelectedInfos from './SelectedInfos'
+import ContactQrcode from './ContactQrcode'
 
 const CozyologyConfig = window.CozyologyConfig
 
@@ -519,19 +520,7 @@ export default function MeasurementTool() {
           </div>
 
           {/* QR Code Section */}
-          <div className="mt-30">
-            <div className="flex items-center gap-[20px]">
-              <div className="w-[130px] h-[130px] rounded flex-shrink-0">
-                <div className="qr-code-image image-qr-code" />
-              </div>
-              <div
-                className="text-[14px]"
-                dangerouslySetInnerHTML={{
-                  __html: CozyologyConfig.contactDetails,
-                }}
-              ></div>
-            </div>
-          </div>
+          <ContactQrcode client="web" type="shade" />
         </div>
       </div>
 
@@ -796,19 +785,7 @@ export default function MeasurementTool() {
           )}
 
           {/* Mobile QR Code Section */}
-          <div className="lg:hidden mt-8 p-4 bg-[#F6F2EF] rounded-lg">
-            <div className="flex items-center justify-between">
-              <div
-                className="flex-1 text-[12px]"
-                dangerouslySetInnerHTML={{
-                  __html: CozyologyConfig.contactDetailsMobile,
-                }}
-              ></div>
-              <div className="w-[65px] h-[65px] flex-shrink-0">
-                <div className="qr-code-image image-qr-code" />
-              </div>
-            </div>
-          </div>
+          <ContactQrcode client="mobile" type="shade" />
         </div>
       </div>
     </div>

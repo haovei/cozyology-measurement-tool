@@ -16,6 +16,7 @@ declare global {
       }
       contactDetails: string
       contactDetailsMobile: string
+      contactBookNowUrl?: string
       measurementConfig: any
     }
     CozyologyConfig_Drapery: {
@@ -31,6 +32,7 @@ declare global {
       }
       contactDetails: string
       contactDetailsMobile: string
+      contactBookNowUrl?: string
       measurementConfig: any
       trackSelectorOptions: Record<string, Array<SelectOptions>>
     }
