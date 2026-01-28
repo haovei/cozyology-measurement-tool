@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactNode } from 'react'
 
 interface SelectedInfosListItem {
   key: string
@@ -24,12 +24,14 @@ const SelectedInfos = ({ list, children }: SelectedInfosProps) => {
 
       <div className="p-[16px] text-sm">
         <>
-          {list.map(item => (
-            <div className="flex mb-[10px] justify-between items-center" key={item.key}>
-              <div className="flex-1 text-[#999999]">{item.key}: </div>
-              <div className="flex-1">{item.value}</div>
-            </div>
-          ))}
+          {list.map(item =>
+            item.value ? (
+              <div className="flex mb-[10px] justify-between items-center" key={item.key}>
+                <div className="flex-1 text-[#999999]">{item.key}: </div>
+                <div className="flex-1">{item.value}</div>
+              </div>
+            ) : null
+          )}
         </>
 
         {children}

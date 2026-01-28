@@ -1,3 +1,5 @@
+import { SelectOptionProp, SelectOptionPropReturns } from "@/types/global";
+
 /**
  * 判断字符串是否为小数，并返回相关信息
  * @param {String} str 字符串
@@ -286,3 +288,10 @@ export function fractionOperation(frac1, frac2, operation) {
     const [reducedNum, reducedDen] = reduceFraction(resultNum, resultDen);
     return `${reducedNum}/${reducedDen}`;
 }
+
+/**
+ * 给下拉options添加key为index的值
+ * @param arr 
+ * @returns 
+ */
+export const generateOptionKey = (arr: Array<SelectOptionProp>): Array<SelectOptionPropReturns> => arr.map((item: SelectOptionProp, index: number) => ({ ...item, key: index + 1 }))

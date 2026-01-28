@@ -1,8 +1,10 @@
+import { SelectOptionPropReturns } from '@/types/global'
+import { generateOptionKey } from '../utils'
 import React, { useState } from 'react'
 
 export enum TRACK_SELECTOR_TYPE {
-  CT = 'Cozyology Track',
-  MT = 'My Track',
+  CT = 'Cozyology Hardware',
+  MT = 'My Hardware',
 }
 
 interface TrackSelectorProps {
@@ -11,6 +13,7 @@ interface TrackSelectorProps {
   initialTabKey?: TRACK_SELECTOR_TYPE
   min?: number
   max?: number
+  selectedOptions?: any
   handleInputChange?: (value: string) => void
   handleSelectChange?: (value: string) => void
   handleTabSwitch?: (value: TRACK_SELECTOR_TYPE) => void
@@ -23,11 +26,41 @@ export default function TrackSelector(props: TrackSelectorProps) {
   const [inputValue, setInputValue] = useState('')
   const [selectValue, setSelectValue] = useState('')
   const [showTip, setShowTip] = useState(false)
+  const [options, setOptions] = useState<Array<SelectOptionPropReturns>>([])
 
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
 
-  const options = (trackSelectorOptions?.[props.headerStyle] || []).map((option, index) => ({ ...option, key: index }))
+  console.log('--------trackSelector--------', props.selectedOptions)
+
+  // const options = (trackSelectorOptions?.[props.headerStyle] || []).map((option, index) => ({ ...option, key: index }))
+
+  const showMyTip = React.useMemo(() => {
+    return selected === TRACK_SELECTOR_TYPE.MT
+  }, [selected])
+
+  const initOptions = () => {
+    let opts = []
+    const optMap = trackSelectorOptions?.[props.headerStyle]
+
+    // pleated
+    if (props.headerStyle === 'pleated' && optMap) {
+      const mountType = props.selectedOptions['step-2-2-7'] || ''
+      if (mountType === 'hardware-ceiling-mount') {
+        opts = generateOptionKey(optMap['ceiling'] || [])
+      } else if (mountType === 'hardware-wall-mount') {
+        opts = generateOptionKey(optMap['wall'] || [])
+      }
+    }
+
+    // others...
+
+    setOptions(opts)
+  }
+
+  React.useEffect(() => {
+    initOptions()
+  }, [])
 
   React.useEffect(() => {
     const initTabKey = props.initialTabKey ?? TRACK_SELECTOR_TYPE.CT
@@ -131,11 +164,17 @@ export default function TrackSelector(props: TrackSelectorProps) {
             />
             <div className="h-[25px] leading-[25px] px-[20px] border-l text-[12px]">Inches</div>
           </div>
-          <div className="mt-4">
+          {showMyTip && (
+            <div className="mt-4">
+              <span className={`text-sm`}>If using your own hardware, it's best to measure after install.</span>
+            </div>
+          )}
+          {/* 下面的View the Track Dom主要解决之前两个tab切换带来的元素重排缺陷 */}
+          {/* <div className="mt-4">
             <span className="opacity-0" onClick={viewTheTrack}>
               View the Track
             </span>
-          </div>
+          </div> */}
         </>
       ) : (
         <>
@@ -154,13 +193,13 @@ export default function TrackSelector(props: TrackSelectorProps) {
                 --
               </option>
               {options.map(option => (
-                <option key={option.key} value={option.value}>
+                <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
             </select>
           </div>
-          {showTip && (
+          {/* {showTip && (
             <div className="mt-4">
               <span className={`text-sm`}>
                 For wall mount, this tool assumes the track is installed right below the ceiling. If you prefer a
@@ -171,7 +210,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
                 for guidance.
               </span>
             </div>
-          )}
+          )} */}
           <div className="mt-4">
             <span
               className={`text-[#ba6352] underline cursor-pointer text-sm ${selectValue ? 'opacity-100' : 'opacity-0'}`}

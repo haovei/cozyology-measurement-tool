@@ -6,6 +6,7 @@ import SelectedInfos from './SelectedInfos'
 import { mixNumberOrFractionHandle, convertToMixedNumber, fractionOperation } from '../utils'
 import { TRACK_SELECTOR_TYPE } from './TrackSelector'
 import ContactQrcode from './ContactQrcode'
+import TrackSelectorSingle from './TrackSelectorSingle'
 
 const CozyologyConfig = window.CozyologyConfig_Drapery
 
@@ -323,7 +324,7 @@ export default function MeasurementTool() {
 
     if (headerStyle === 'ripple-fold') {
       // Ripple Fold新流程就计算逻辑
-      ;[width, height] = calculateRippleFoldSize()
+      ;[width, height] = calculateRippleFoldSizeNew()
     } else if (headerStyle === 'pleated') {
       ;[width, height] = calculatePleatedSize()
     } else {
@@ -333,12 +334,12 @@ export default function MeasurementTool() {
       // 计算宽度
       if (hasRodInstalled) {
         // 已安装杆的情况：直接使用杆长度
-        width = inputValues['rod-width-top'] || 0
+        width = inputValues['rod-width-top-2'] || 0
       } else {
         // 未安装杆的情况：窗户宽度 + 左右延伸
-        const windowWidth = inputValues['norod-window-width'] || 0
-        const leftExtension = inputValues['norod-width-left-extension'] || 0
-        const rightExtension = inputValues['norod-width-right-extension'] || 0
+        const windowWidth = inputValues['norod-window-width-2'] || 0
+        const leftExtension = inputValues['norod-width-left-extension-2'] || 0
+        const rightExtension = inputValues['norod-width-right-extension-2'] || 0
         width = windowWidth + leftExtension + rightExtension
       }
 
@@ -353,36 +354,17 @@ export default function MeasurementTool() {
 
       if (hasRodInstalled) {
         // 已安装杆的情况：直接使用杆到地面的高度
-        rodToFloorHeight = inputValues['rod-top-to-floor-height'] || 0
+        rodToFloorHeight = inputValues['rod-top-to-floor-height-2'] || 0
       } else {
         // 未安装杆的情况：窗户顶部到地面的高度 + 杆在窗框上方的延伸
-        const windowTopToFloorHeight = inputValues['top-to-floor-height'] || 0
-        const rodExtensionAboveFrame = inputValues['rod-extension-above-frame'] || 0
+        const windowTopToFloorHeight = inputValues['top-to-floor-height-2'] || 0
+        const rodExtensionAboveFrame = inputValues['rod-extension-above-frame-3'] || 0
         rodToFloorHeight = windowTopToFloorHeight + rodExtensionAboveFrame
       }
 
-      // 计算高度 - 第二步：根据帘头样式调整起始高度
-      // let curtainHeight = rodToFloorHeight
-
-      // SoftTop加0.9变为加7/8，Grommets加2.8变为加2 7/8
-      // const mixnumberMap = {
-      //   'soft-top': '7/8',
-      //   grommets: '2 7/8',
-      // }
-
-      // // 计算高度并转为带分数
-      // mixNumberOrFractionHandle(mixnumberMap[headerStyle], ({ decimalValue, denominator }) => {
-      //   // 加上对应带分数转换的小数再处理帘头样式高度计算
-      //   curtainHeight = calculateByCurtainStyle(rodToFloorHeight + decimalValue)
-
-      //   // 转换结果为带分数
-      //   const { wholePart, fracPart } = convertToMixedNumber(curtainHeight, denominator)
-      //   height = `${wholePart} ${fracPart}`
-      // })
-
       const extraNumberMap = {
-        'soft-top': 0.9,
-        grommets: 2.9,
+        'soft-top': 0.5,
+        grommets: 1,
       }
       height = calculateByCurtainStyle(rodToFloorHeight + extraNumberMap[headerStyle])
     }
@@ -507,21 +489,136 @@ export default function MeasurementTool() {
     return [w, h]
   }
 
+  // 计算ripple-fold结果
+  const calculateRippleFoldSizeNew = (): [number, number] => {
+    let w: any = 0,
+      h: any = 0
+
+    // 计算宽度
+    const width = inputValues['ripplefold-notrack-window-width'] || 0
+    const leftExt = inputValues['ripplefold-notrack-width-left-extension'] || 0
+    const rightExt = inputValues['ripplefold-notrack-width-right-extension'] || 0
+    const _w = width + leftExt + rightExt
+    w = isSplitPanels ? _w / 2 : _w
+
+    // 计算高度
+    const mountType = selectedOptions['step-2-2-10']
+    let height = 0,
+      distance = 0
+    if (mountType === 'ripplefold-hardware-ceiling-mount') {
+      height = inputValues['ripplefold-track-ceiling-to-floor-height'] || 0
+      distance = inputValues['ripplefold-ring-ceiling-to-bottom-height'] || 0
+    } else if (mountType === 'ripplefold-hardware-wall-mount') {
+      height = inputValues['ripplefold-window-top-to-floor-height'] || 0
+      distance = inputValues['ripplefold-how-to-hardware-height'] || 0
+      height = height + (inputValues['ripplefold-extension-above-frame'] || 0)
+    }
+
+    if (typeof distance === 'string') {
+      mixNumberOrFractionHandle(distance, ({ type, decimalValue }) => {
+        console.log('distance', distance, type, decimalValue)
+        if (type === 'mixnumber' || type === 'fraction') {
+          let result = Number(height) - decimalValue
+          result = calculateByCurtainStyle(result)
+          h = convertToDecimal(result, false)
+        } else {
+          h = calculateByCurtainStyle(Number(height))
+        }
+      })
+    } else if (typeof height === 'number') {
+      let result = Number(height) - distance
+      h = calculateByCurtainStyle(result)
+    }
+
+    return [w, h]
+  }
+
   // 计算Pleated的结果
   const calculatePleatedSize = (): [number, number] => {
     let w: any = 0,
       h: any = 0
 
-    // 如果选择的是Pleated->No
+    // Pleated->No
     if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-no') {
-      // 前面的流程和Ripple Fold 的流程和计算逻辑一样
-      const [_w, _h] = calculateRippleFoldSize()
+      // Pleated->No->Track
+      if (selectedOptions['step-2-0-1'] === 'hardware-Track') {
+        const leftExt = inputValues['notrack-width-left-extension'] || 0
+        const rightExt = inputValues['notrack-width-right-extension'] || 0
+        const _w = (inputValues['notrack-window-width'] || 0) + leftExt + rightExt
+        w = isSplitPanels ? _w / 2 : _w
 
-      // RippleFold默认没有选择Panels这一步。Pleated有这一步，需要单独处理
-      w = _w
+        const mountType = selectedOptions['step-2-2-7']
+        // Pleated->No->Track->CeilingMount
+        if (mountType === 'hardware-ceiling-mount') {
+          const coverType = selectedOptions['step-3-1-8']
+          // Pleated->No->Track->CeilingMount->Visible （顶装Visible）
+          const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
+          if (coverType === 'hardware-visible-2') {
+            const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
+            if (typeof ringCeilingToBottomHeight === 'string') {
+              mixNumberOrFractionHandle(ringCeilingToBottomHeight, ({ type, decimalValue, denominator }) => {
+                if (type === 'mixnumber' || type === 'fraction') {
+                  // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数
+                  let result = Number(ceilingToFloorHeight) - decimalValue
+                  result = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
+                  h = convertToDecimal(result, false)
+                } else {
+                  // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0
+                  h = calculateByCurtainStyle(Number(ceilingToFloorHeight))
+                }
+              })
+            }
+            // 如果是数字，该值已在handleContinue处正常转换，正常计算
+            else if (typeof ringCeilingToBottomHeight === 'number') {
+              // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
+              let result = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
+              h = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
+            }
+          } else if (coverType === 'hardware-covered-2') {
+            h = calculateByCurtainStyle(Number(ceilingToFloorHeight))
+          }
+        } else if (mountType === 'hardware-wall-mount') {
+          const coverType = selectedOptions['step-3-1-9']
+          // Pleated->No->Track->WallMount->Visible （顶装Visible）
+          const topToFloorHeight = inputValues['wall-mount-top-to-floor-height'] || 0
+          const extensionAboveFrame = inputValues['rod-extension-above-frame-2'] || 0
+          if (coverType === 'hardware-visible-3') {
+            const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height-2'] || 0
+            if (typeof ringCeilingToBottomHeight === 'string') {
+              mixNumberOrFractionHandle(ringCeilingToBottomHeight, ({ type, decimalValue, denominator }) => {
+                if (type === 'mixnumber' || type === 'fraction') {
+                  // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数
+                  let result = Number(topToFloorHeight + extensionAboveFrame) - decimalValue
+                  result = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
+                  h = convertToDecimal(result, false)
+                } else {
+                  // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0
+                  h = calculateByCurtainStyle(Number(topToFloorHeight + extensionAboveFrame))
+                }
+              })
+            }
+            // 如果是数字，该值已在handleContinue处正常转换，正常计算
+            else if (typeof ringCeilingToBottomHeight === 'number') {
+              // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
+              let result = Number(topToFloorHeight + extensionAboveFrame) - ringCeilingToBottomHeight
+              h = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
+            }
+          } else if (coverType === 'hardware-covered-3') {
+            h = calculateByCurtainStyle(Number(topToFloorHeight + extensionAboveFrame))
+          }
+        }
+      } else if (selectedOptions['step-2-0-1'] === 'hardware-Rod') {
+        // 如果选择的是Rod，高度固定减1 即流程Pleated->No->Rod
+        const leftExt = inputValues['norod-width-left-extension'] || 0
+        const rightExt = inputValues['norod-width-right-extension'] || 0
+        const width = inputValues['norod-window-width'] || 0
+        const _w = leftExt + rightExt + width
+        w = isSplitPanels ? _w / 2 : _w
 
-      // 如果选择的是Rod，高度固定减1 即流程Pleated->No->Rod
-      h = selectedOptions['step-2-0-1'] === 'hardware-Rod' ? _h - 1 : _h
+        const heightExt = inputValues['rod-extension-above-frame'] || '0'
+        const height = inputValues['top-to-floor-height'] || '0'
+        h = heightExt + height - 1
+      }
     }
 
     // 如果选择的是Pleated->Yes
@@ -531,7 +628,13 @@ export default function MeasurementTool() {
       // Pleated->Yes->Track
       if (hardware === 'hardware-Track-2') {
         const _w = inputValues['hardware-track-length-2'] || 0
-        let _h = inputValues['track-ring-bottom-to-floor-height'] || 0
+        let _h = 0
+        if (selectedOptions['step-3-1-7'] === 'hardware-visible') {
+          _h = inputValues['track-bottom-to-floor-height'] || 0
+        }
+        if (selectedOptions['step-3-1-7'] === 'hardware-covered') {
+          _h = inputValues['track-top-to-floor-height'] || 0
+        }
 
         w = isSplitPanels ? _w / 2 : _w
 
@@ -644,19 +747,60 @@ export default function MeasurementTool() {
   }
 
   const renderHardware = () => {
-    if ('track-ring-ceiling-to-bottom-height' in inputValues) {
-      const v = inputValues['track-ring-ceiling-to-bottom-height']
-      const target = (CozyologyConfig?.trackSelectorOptions?.[headerStyle] || []).find(
-        item => item.value === v.toString()
-      )
-      if (target) {
-        return (
-          <a href={target.link} target="_blank">
-            {target.label}
-          </a>
-        )
+    console.log('headerssssssstyle', headerStyle)
+    console.log('headerssssssstyle', headerStyle)
+    if (headerStyle === 'pleated') {
+      if (
+        'track-ring-ceiling-to-bottom-height' in inputValues ||
+        'track-ring-ceiling-to-bottom-height-2' in inputValues
+      ) {
+        const mountType = selectedOptions['step-2-2-7'] || ''
+        const selectorOptionsMap = CozyologyConfig?.trackSelectorOptions?.[headerStyle] || {}
+        let targetOpts = [],
+          v = ''
+        if (mountType === 'hardware-ceiling-mount') {
+          targetOpts = selectorOptionsMap['ceiling']
+          v = inputValues['track-ring-ceiling-to-bottom-height'] || ''
+        } else if (mountType === 'hardware-wall-mount') {
+          targetOpts = selectorOptionsMap['wall']
+          v = inputValues['track-ring-ceiling-to-bottom-height-2'] || ''
+        }
+        const target = (targetOpts || []).find(item => item.value === v.toString())
+        if (target) {
+          return (
+            <a href={target.link} target="_blank">
+              {target.label}
+            </a>
+          )
+        }
+      }
+    } else if (headerStyle === 'ripple-fold') {
+      if (
+        'ripplefold-ring-ceiling-to-bottom-height' in inputValues ||
+        'ripplefold-how-to-hardware-height' in inputValues
+      ) {
+        const mountType = selectedOptions['step-2-2-10'] || ''
+        const selectorOptionsMap = CozyologyConfig?.trackSelectorSingleOptions?.[headerStyle] || {}
+        let targetOpts = [],
+          v = ''
+        if (mountType === 'ripplefold-hardware-ceiling-mount') {
+          targetOpts = selectorOptionsMap['ceiling']
+          v = inputValues['ripplefold-ring-ceiling-to-bottom-height'] || ''
+        } else if (mountType === 'ripplefold-hardware-wall-mount') {
+          targetOpts = selectorOptionsMap['wall']
+          v = inputValues['ripplefold-how-to-hardware-height'] || ''
+        }
+        const target = (targetOpts || []).find(item => item.value === v.toString())
+        if (target) {
+          return (
+            <a href={target.link} target="_blank">
+              {target.label}
+            </a>
+          )
+        }
       }
     }
+
     return getHardware()
   }
 
@@ -687,7 +831,7 @@ export default function MeasurementTool() {
       return '1 panel'
     }
     if (panelType === 'split-panels') {
-      return '2 panel'
+      return '2 panels'
     }
     return 'Standard'
   }
@@ -695,23 +839,24 @@ export default function MeasurementTool() {
   // 根据step-1选择的类型获取相应的additionalInfo
   const getAdditionalInfoForCurrentStep = (): string | undefined => {
     // != 仅判断null和undefined
-    if (currentStepData.additionalInfo != undefined) {
-      if (currentStep === 'step-3-2-2' && headerStyle === 'ripple-fold') return
-      return currentStepData.additionalInfo
-    }
+    // if (currentStepData.additionalInfo != undefined) {
+    //   if (currentStep === 'step-3-2-2' && headerStyle === 'ripple-fold') return
+    //   return currentStepData.additionalInfo
+    // }
 
     // 只有在step-3-2-2 步骤时才显示additionalInfo
     // if (currentStep !== 'step-3-1-1' && currentStep !== 'step-3-1-2' && currentStep !== 'step-3-2-2') return undefined
-    if (currentStep !== 'step-3-2-2') return undefined
+    // if (currentStep !== 'step-3-2-2') return undefined
 
     // 只有在输入步骤时才显示additionalInfo
     if (currentStepData.type !== 'input') return undefined
+    return currentStepData.additionalInfo
 
     // 从step-1配置中找到对应选项的additionalInfo
     const step1Config = CozyologyConfig.measurementConfig['step-1']
     const selectedOption = step1Config?.options?.find(option => option.id === headerStyle)
 
-    return selectedOption?.additionalInfo || currentStepData.additionalInfo
+    return currentStepData.additionalInfo ?? selectedOption?.additionalInfo
   }
 
   const handleContinue = (jump: string, optionId?: string) => {
@@ -838,9 +983,9 @@ export default function MeasurementTool() {
 
   // 获取结果fullness
   const getFullness = (): string => {
-    if (headerStyle === 'soft-top') {
-      return '3x'
-    }
+    // if (headerStyle === 'soft-top') {
+    //   return '3x'
+    // }
 
     // ripple-fold & pleated & grommets
     return '2.2x'
@@ -863,9 +1008,20 @@ export default function MeasurementTool() {
         else if (selectedOptions['step-2-0-2'] === 'hardware-Track-2') {
           list.push(
             { key: 'Hardware', value: 'Installed Track' },
-            { key: 'Track Length', value: `${inputValues['hardware-track-length-1']}"` },
-            { key: 'Bottom of Track Gilder to Floor', value: `${inputValues['track-ring-bottom-to-floor-height']}"` }
+            { key: 'Track Length', value: `${inputValues['hardware-track-length-2']}"` }
           )
+          if (selectedOptions['step-3-1-7'] === 'hardware-visible') {
+            list.push(
+              { key: 'Bottom-of-Hardware to Floor', value: `${inputValues['track-bottom-to-floor-height']}"` },
+              { key: 'Hardware Coverage', value: 'Visible' }
+            )
+          }
+          if (selectedOptions['step-3-1-7'] === 'hardware-covered') {
+            list.push(
+              { key: 'Top-of-Track to Floor', value: `${inputValues['track-top-to-floor-height']}"` },
+              { key: 'Hardware Coverage', value: 'Covered' }
+            )
+          }
         }
       } else if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-no') {
         // pleated no Rod
@@ -881,39 +1037,92 @@ export default function MeasurementTool() {
         }
         // pleated no Track
         else if (selectedOptions['step-2-0-1'] === 'hardware-Track') {
+          const mountType =
+            selectedOptions['step-2-2-7'] === 'hardware-ceiling-mount'
+              ? 'Ceiling Mount'
+              : selectedOptions['step-2-2-7'] === 'hardware-wall-mount'
+                ? 'Wall Mount'
+                : ''
+          const hardware = (step: string, suffix: string) => {
+            return selectedOptions[step] === `hardware-visible-${suffix}`
+              ? 'Visible'
+              : selectedOptions[step] === `hardware-covered-${suffix}`
+                ? 'Covered'
+                : ''
+          }
           list.push(
             { key: 'Hardware', value: 'No Track Installed' },
-            { key: 'Track Length', value: `${inputValues['hardware-track-length-1']}"` },
-            { key: 'Height from Ceiling to Floor', value: `${inputValues['track-ceiling-to-floor-height']}"` }
+            { key: 'Window Width', value: `${inputValues['notrack-window-width']}"` },
+            { key: 'Left Side Width', value: `${inputValues['notrack-width-left-extension']}"` },
+            { key: 'Right Side Width', value: `${inputValues['notrack-width-right-extension']}"` },
+            { key: 'Mount Type', value: `${mountType}` }
           )
+          if (mountType === 'Ceiling Mount') {
+            const trackRingCeilingToFloorHeight = inputValues['track-ring-ceiling-to-bottom-height']
+            list.push(
+              { key: 'Ceiling-to-Floor Height', value: `${inputValues['track-ceiling-to-floor-height']}"` },
+              {
+                key: 'Ceiling to Bottom-of-Hardware Height',
+                // 仅当有值时才显示，Pleated->No->Track->CeilingMount->Visible （顶装Visible）,covered不显示
+                value: trackRingCeilingToFloorHeight ? `${trackRingCeilingToFloorHeight}"` : undefined,
+              },
+              { key: 'Hardware Coverage', value: `${hardware('step-3-1-8', '2')}` }
+            )
+          } else if (mountType === 'Wall Mount') {
+            const trackRingCeilingToFloorHeight = inputValues['track-ring-ceiling-to-bottom-height-2']
+            list.push(
+              { key: 'Top-of-Window to Floor', value: `${inputValues['notrack-window-width']}"` },
+              { key: 'Top-of-Window to Top-of-Hardware', value: `${inputValues['rod-extension-above-frame-2']}"` },
+              {
+                key: 'Hardware Thinckness',
+                // 仅当有值时才显示，Pleated->No->Track->WallMount->Visible （顶装Visible）,covered不显示
+                value: trackRingCeilingToFloorHeight ? `${trackRingCeilingToFloorHeight}"` : undefined,
+              },
+              { key: 'Hardware Coverage', value: `${hardware('step-3-1-9', '3')}` }
+            )
+          }
         }
       }
     } else if (headerStyle === 'ripple-fold') {
+      const mountType =
+        selectedOptions['step-2-2-10'] === 'ripplefold-hardware-ceiling-mount'
+          ? 'Ceiling Mount'
+          : selectedOptions['step-2-2-10'] === 'ripplefold-hardware-wall-mount'
+            ? 'Wall Mount'
+            : '-'
       list.push(
-        { key: 'Track Length', value: `${inputValues['hardware-track-length-1']}"` },
-        { key: 'Ceiling to Floor', value: `${inputValues['track-ceiling-to-floor-height']}"` }
+        { key: 'Window Width', value: `${inputValues['ripplefold-notrack-window-width']}"` },
+        { key: 'Left Side Width', value: `${inputValues['ripplefold-notrack-width-left-extension']}"` },
+        { key: 'Right Side Width', value: `${inputValues['ripplefold-notrack-width-right-extension']}"` },
+        { key: 'Mount Type', value: `${mountType}` }
       )
-      if (selectorTabKey === 'My Track') {
-        list.push({
-          key: 'Ceiling to Bottom of Track Gilder',
-          value: `${inputValues['track-ring-ceiling-to-bottom-height']}"`,
-        })
+      if (mountType === 'Ceiling Mount') {
+        list.push(
+          { key: 'Ceiling-to-Floor Height', value: `${inputValues['ripplefold-track-ceiling-to-floor-height']}"` },
+          { key: 'Hardware to Install', value: `${inputValues['ripplefold-ring-ceiling-to-bottom-height']}"` }
+        )
+      } else if (mountType === 'Wall Mount') {
+        list.push(
+          { key: 'Top-of-Window to Floor', value: `${inputValues['ripplefold-window-top-to-floor-height']}"` },
+          { key: 'Top-of-Window to Top-of-Hardware', value: `${inputValues['ripplefold-extension-above-frame']}"` },
+          { key: 'Hardware to Install', value: `${inputValues['ripplefold-how-to-hardware-height']}"` }
+        )
       }
     } else if (['soft-top', 'grommets'].includes(headerStyle)) {
       if (selectedOptions['step-2-0'] === 'rod-installed-yes') {
         list.push(
-          { key: 'Hardware', value: 'Installed Rod' },
-          { key: 'Rod Length', value: `${inputValues['rod-width-top']}"` },
-          { key: 'Ring Eyelet to Floor', value: `${inputValues['rod-top-to-floor-height']}"` }
+          { key: 'Hardware', value: 'Rod Installed' },
+          { key: 'Rod Length', value: `${inputValues['rod-width-top-2']}"` },
+          { key: 'Ring Eyelet to Floor', value: `${inputValues['rod-top-to-floor-height-2']}"` }
         )
       } else if (selectedOptions['step-2-0'] === 'rod-installed-no') {
         list.push(
           { key: 'Hardware', value: 'No Rod Installed' },
-          { key: 'Window Width', value: `${inputValues['norod-window-width']}"` },
-          { key: 'Left Side Width', value: `${inputValues['norod-width-left-extension']}"` },
-          { key: 'Right Side Width', value: `${inputValues['norod-width-right-extension']}"` },
-          { key: 'Window Top to Floor Height', value: `${inputValues['top-to-floor-height']}"` },
-          { key: 'Rod Extension Above Frame', value: `${inputValues['rod-extension-above-frame']}"` }
+          { key: 'Window Width', value: `${inputValues['norod-window-width-2']}"` },
+          { key: 'Left Side Width', value: `${inputValues['norod-width-left-extension-2']}"` },
+          { key: 'Right Side Width', value: `${inputValues['norod-width-right-extension-2']}"` },
+          { key: 'Top-of-Window to Floor', value: `${inputValues['top-to-floor-height-2']}"` },
+          { key: 'Top-of-Rod to Window', value: `${inputValues['rod-extension-above-frame-3']}"` }
         )
       }
     }
@@ -1127,15 +1336,7 @@ export default function MeasurementTool() {
                       <div className={`step-image ${currentStepData.imageClass}`} />
                     </div>
                     <div className="md:hidden not-md:w-[50%] text-[12px] flex flex-col justify-between gap-[10px]">
-                      {currentStep === 'step-3-2-2' ? (
-                        /* step-3-2-2是pleated和ripple-fold都会经过的一个步骤，即headerStyle只会等于pleated或ripple */
-                        <div
-                          className="whitespace-pre-wrap"
-                          dangerouslySetInnerHTML={{ __html: currentStepData.description?.[headerStyle] || '' }}
-                        ></div>
-                      ) : (
-                        <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
-                      )}
+                      <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
                       {getAdditionalInfoForCurrentStep() && (
                         <div className="relative">
                           <button
@@ -1160,16 +1361,17 @@ export default function MeasurementTool() {
                     </div>
                   </div>
                   <div className="flex-1 flex flex-col gap-[10px] not-md:w-full">
-                    <div className="flex-1 not-md:hidden text-[16px] flex flex-col justify-between gap-[10px]">
-                      {currentStep === 'step-3-2-2' ? (
-                        /* step-3-2-2是pleated和ripple-fold都会经过的一个步骤，即headerStyle只会等于pleated或ripple */
+                    <div className="flex-1 not-md:hidden text-[14px] leading-[18px] text-[#171717] flex flex-col justify-between gap-[10px]">
+                      {/* {currentStep === 'step-3-2-2' ? (
+                        // step-3-2-2是pleated和ripple-fold都会经过的一个步骤，即headerStyle只会等于pleated或ripple
                         <div
                           className="whitespace-pre-wrap"
                           dangerouslySetInnerHTML={{ __html: currentStepData.description?.[headerStyle] || '' }}
                         ></div>
                       ) : (
                         <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
-                      )}
+                      )} */}
+                      <div dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
                       {getAdditionalInfoForCurrentStep() && (
                         <div className="relative">
                           <button
@@ -1208,9 +1410,20 @@ export default function MeasurementTool() {
                                 value={currentStepInputs[option.id] || ''}
                                 headerStyle={headerStyle}
                                 initialTabKey={selectorTabKey}
+                                selectedOptions={selectedOptions}
                                 handleInputChange={value => handleInputChange(option.id, value)}
                                 handleSelectChange={value => handleInputChange(option.id, value)}
                                 handleTabSwitch={value => handleTabSwitch(option, value)}
+                              />
+                            </div>
+                          ) : option.isSingleSelector ? (
+                            <div className="flex-1">
+                              <TrackSelectorSingle
+                                key={option.id}
+                                value={currentStepInputs[option.id] || ''}
+                                headerStyle={headerStyle}
+                                selectedOptions={selectedOptions}
+                                handleSelectChange={value => handleInputChange(option.id, value)}
                               />
                             </div>
                           ) : (
@@ -1280,7 +1493,7 @@ export default function MeasurementTool() {
                           </div>
                           {showExtraResultInfos && (
                             <>
-                              <div className="text-[12px]   font-bold ">Fullness: {getFullness()}</div>
+                              <div className="text-[12px]   font-bold ">Pre-set Built-in Fullness: {getFullness()}</div>
                               <div className="text-[12px]   font-bold ">Hardware: {renderHardware()}</div>
                             </>
                           )}
@@ -1301,6 +1514,16 @@ export default function MeasurementTool() {
                         </div>
                       </div>
 
+                      {CozyologyConfig.resultPageTip && (
+                        <div className="not-md:hidden mt-1 text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: CozyologyConfig.resultPageTip,
+                            }}
+                          />
+                        </div>
+                      )}
+
                       <table className="border border-gray-400 border-collapse text-sm not-md:hidden mt-[42px]">
                         <tbody>
                           <tr>
@@ -1308,7 +1531,7 @@ export default function MeasurementTool() {
                               Header: <span className="font-bold">{getHeaderStyleDescription()}</span>
                             </td>
                             <td className="border border-gray-400 p-2 w-[270px]">
-                              Fullness: <span className="font-bold">{getFullness()}</span>
+                              Pre-set Built-in Fullness: <span className="font-bold">{getFullness()}</span>
                             </td>
                             {/* <td className="border border-gray-400 p-2 w-[270px]" rowSpan={2}>
                             Hardware: <span className="font-bold">{renderHardware()}</span>
@@ -1327,6 +1550,7 @@ export default function MeasurementTool() {
                         </tbody>
                       </table>
 
+                      {/* web operation buttons */}
                       <div className="not-md:hidden mt-[42px] flex gap-[30px] w-full px-[30px]">
                         <button
                           onClick={handleShopNow}
@@ -1351,6 +1575,10 @@ export default function MeasurementTool() {
                       </div>
                     </div>
 
+                    {/* 右边 You've selected*/}
+                    {renderSelectedInfos()}
+
+                    {/* mobile operation buttons */}
                     <div className="md:hidden mt-[20px] flex gap-[15px]">
                       <button
                         onClick={handleShopNow}
@@ -1365,9 +1593,6 @@ export default function MeasurementTool() {
                         CALCULATE AGAIN
                       </button>
                     </div>
-
-                    {/* 右边 You've selected*/}
-                    {renderSelectedInfos()}
                   </div>
                 </>
               )}
