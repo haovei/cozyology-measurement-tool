@@ -154,7 +154,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
           <div className={`flex items-center gap-2 border h-[42px] bg-white mt-5`}>
             <input
               ref={inputRef}
-              className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
+              className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px]"
               placeholder={`eg.1 5/8`}
               value={inputValue}
               min={props.min}
@@ -182,7 +182,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
             <select
               name="12"
               ref={selectRef}
-              className={`w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px] ${
+              className={`w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] ${
                 props.value === '' ? 'text-gray-400' : 'text-black'
               }`}
               value={selectValue}

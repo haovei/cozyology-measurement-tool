@@ -25,11 +25,6 @@ export default function MeasurementTool() {
     return selectedOptions['step-1']
   }, [selectedOptions])
 
-  // 是否展示额外信息（fullness 和 hardware）
-  const showExtraResultInfos = useMemo(() => {
-    return ['ripple-fold', 'pleated', 'soft-top', 'grommets'].includes(headerStyle)
-  }, [selectedOptions])
-
   // 默认返回第4-1步骤的结果
   const isSplitPanels = useMemo(() => selectedOptions['step-4-1'] === 'split-panels', [selectedOptions])
 
@@ -1430,7 +1425,7 @@ export default function MeasurementTool() {
                             <div className="flex-1">
                               <div className={`flex items-center gap-2 border h-[42px] bg-white`}>
                                 <input
-                                  className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
+                                  className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px]"
                                   placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
                                   min={option.min}
                                   max={option.max}
@@ -1491,18 +1486,17 @@ export default function MeasurementTool() {
                           <div className="text-[12px] font-americana_bt font-bold">
                             Header: {getHeaderStyleDescription()}
                           </div>
-                          {showExtraResultInfos && (
-                            <>
-                              <div className="text-[12px]   font-bold ">Pre-set Built-in Fullness: {getFullness()}</div>
-                              <div className="text-[12px]   font-bold ">Hardware: {renderHardware()}</div>
-                            </>
-                          )}
                           <div className="text-[12px] font-americana_bt font-bold ">
+                            Pre-set Built-in Fullness: {getFullness()}
+                          </div>
+                          <div className="text-[12px] font-americana_bt font-bold ">Quantity: {getQuantity()}</div>
+                          <div className="text-[12px] font-americana_bt font-bold ">Hardware: {renderHardware()}</div>
+                          {/* <div className="text-[12px] font-americana_bt font-bold ">
                             Bottom: {getLengthStyleDescription()}
                           </div>
                           <div className="text-[12px] font-americana_bt font-bold">
                             Panel: {getPanelTypeDescription()}
-                          </div>
+                          </div> */}
                         </div>
                         <div className="md:hidden w-full h-[1px] bg-[#DDD] my-[15px] mb-0"></div>
                         <div className="mt-[20px] text-[16px] text-center text-[#999999] not-md:text-[12px]">

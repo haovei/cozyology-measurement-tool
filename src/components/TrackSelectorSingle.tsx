@@ -62,7 +62,7 @@ export default function TrackSelectorSingle(props: TrackSelectorProps) {
         <select
           name="12"
           ref={selectRef}
-          className={`w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px] ${
+          className={`w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] ${
             props.value === '' ? 'text-gray-400' : 'text-black'
           }`}
           value={selectValue}

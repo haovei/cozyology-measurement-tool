@@ -648,7 +648,7 @@ export default function MeasurementTool() {
                           <div className="flex-1">
                             <div className={`flex items-center gap-2 border h-[42px] bg-white`}>
                               <input
-                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px] not-md:text-[14px]"
+                                className="w-full h-[40px] px-4 focus:outline-none focus:border-black text-[16px]"
                                 placeholder={`${option.min}${option.max ? `~${option.max}` : ''}`}
                                 min={option.min}
                                 max={option.max}
