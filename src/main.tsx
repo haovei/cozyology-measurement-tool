@@ -10,8 +10,8 @@ const devRoot = document.getElementById('measurement-tool-app')
 if (devRoot) {
   ReactDOM.createRoot(devRoot).render(
     <React.StrictMode>
-      <MeasurementTool />
-      {/* <MeasurementDrapery /> */}
+      {/* <MeasurementTool /> */}
+      <MeasurementDrapery />
     </React.StrictMode>
   )
 }

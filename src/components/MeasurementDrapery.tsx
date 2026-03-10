@@ -1066,7 +1066,7 @@ export default function MeasurementTool() {
           } else if (mountType === 'Wall Mount') {
             const trackRingCeilingToFloorHeight = inputValues['track-ring-ceiling-to-bottom-height-2']
             list.push(
-              { key: 'Top-of-Window to Floor', value: `${inputValues['notrack-window-width']}"` },
+              { key: 'Top-of-Window to Floor', value: `${inputValues['wall-mount-top-to-floor-height']}"` },
               { key: 'Top-of-Window to Top-of-Hardware', value: `${inputValues['rod-extension-above-frame-2']}"` },
               {
                 key: 'Hardware Thinckness',
