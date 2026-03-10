@@ -263,6 +263,8 @@ export default function MeasurementTool() {
 
     let width = 0
     let height = 0
+    const isInsidePuddles = selectedOptions['step-3-1-2'] === 'inside-length-puddles-on-frame'
+    const isOutsidePuddles = selectedOptions['step-3-2-3'] === 'outside-length-puddles-on-frame'
 
     if (isInsideMount) {
       // 内装计算
@@ -288,7 +290,7 @@ export default function MeasurementTool() {
         height = Math.max(...heightValues)
 
         // 如果选择了 puddles 样式，增加 2 英寸
-        if (completedSteps.some(step => step.includes('puddles'))) {
+        if (isInsidePuddles) {
           height += 2
         }
       }
@@ -306,7 +308,7 @@ export default function MeasurementTool() {
       height = windowHeight + aboveExtension
 
       // 如果选择了 puddles 样式，增加 2 英寸
-      if (completedSteps.some(step => step.includes('puddles'))) {
+      if (isOutsidePuddles) {
         height += 2
       }
     }

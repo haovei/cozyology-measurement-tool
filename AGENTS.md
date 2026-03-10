@@ -13,6 +13,10 @@
 - `src/utils/`: 通用函数入口，适合放与 UI 解耦的纯逻辑。
 - `dist/`: 构建产物目录，只用于发布和预览，不直接手改。
 
+当前 `index.html` 中有两套全局配置，分别对应两个业务组件：
+- `MeasurementTool` 使用 `window.CozyologyConfig`
+- `MeasurementDrapery` 使用 `window.CozyologyConfig_Drapery`
+
 ## Build, Test, and Development Commands
 - `npm run dev`: 启动本地开发服务器，默认监听局域网
 - `npm run build`: 先执行 TypeScript 编译，再执行 Vite 打包
