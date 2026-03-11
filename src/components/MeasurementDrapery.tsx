@@ -929,25 +929,9 @@ export default function MeasurementTool() {
 
   // 根据step-1选择的类型获取相应的additionalInfo
   const getAdditionalInfoForCurrentStep = (): string | undefined => {
-    // != 仅判断null和undefined
-    // if (currentStepData.additionalInfo != undefined) {
-    //   if (currentStep === 'step-3-2-2' && headerStyle === 'ripple-fold') return
-    //   return currentStepData.additionalInfo
-    // }
-
-    // 只有在step-3-2-2 步骤时才显示additionalInfo
-    // if (currentStep !== 'step-3-1-1' && currentStep !== 'step-3-1-2' && currentStep !== 'step-3-2-2') return undefined
-    // if (currentStep !== 'step-3-2-2') return undefined
-
-    // 只有在输入步骤时才显示additionalInfo
     if (currentStepData.type !== 'input') return undefined
+
     return currentStepData.additionalInfo
-
-    // 从step-1配置中找到对应选项的additionalInfo
-    const step1Config = CozyologyConfig.measurementConfig['step-1']
-    const selectedOption = step1Config?.options?.find(option => option.id === headerStyle)
-
-    return currentStepData.additionalInfo ?? selectedOption?.additionalInfo
   }
 
   const handleContinue = (jump: string, optionId?: string) => {
