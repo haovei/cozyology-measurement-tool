@@ -10,7 +10,7 @@ import TrackSelectorSingle from './TrackSelectorSingle'
 
 const CozyologyConfig = window.CozyologyConfig_Drapery
 
-export default function MeasurementTool() {
+export default function MeasurementDrapery() {
   const [currentStep, setCurrentStep] = useState('step-1')
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
   const [stepHistory, setStepHistory] = useState<string[]>(['step-1']) // 记录步骤历史
