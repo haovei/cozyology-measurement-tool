@@ -3,7 +3,7 @@
 import { useRef, useState, useMemo } from 'react'
 import TrackSelector from './TrackSelector'
 import SelectedInfos from './SelectedInfos'
-import { mixNumberOrFractionHandle, convertToMixedNumber, fractionOperation } from '../utils'
+import { mixNumberOrFractionHandle } from '../utils'
 import { TRACK_SELECTOR_TYPE } from './TrackSelector'
 import ContactQrcode from './ContactQrcode'
 import TrackSelectorSingle from './TrackSelectorSingle'
@@ -408,7 +408,6 @@ export default function MeasurementTool() {
   const calculateRecommendedSize = (): { width: string; height: string } => {
     console.log('结尾selectedOptions---', selectedOptions)
     console.log('结尾inputValues---', inputValues)
-    console.log('结尾selectorTabKey---', selectorTabKey)
 
     let width: any = 0
     let height: any = 0
@@ -497,90 +496,7 @@ export default function MeasurementTool() {
     return curtainHeight
   }
 
-  // 计算新流程中Ripple Fold的结果
-  const calculateRippleFoldSize = (): [number, number] => {
-    /**
-     * 这里hardware在step-2-0-1没值是默认取’hardware-Track‘,既满足了第一步选择ripple-fold直接跳转step-2-2-3(step-2-0-1没有值)的新逻辑
-     * 又不影响pleated本身走step-2-0-1的逻辑
-     * 之前逻辑ripple-fold需要先跳转'step-2-0-1'选择Rod or Track，现在逻辑选择ripple-fold变更为直接跳转到 (step-2-0-1选择Track的下一步) 即：step-2-2-3
-     */
-    const hardware = selectedOptions['step-2-0-1'] || 'hardware-Track'
-    let w: any = 0,
-      h: any = 0
-
-    if (hardware === 'hardware-Track') {
-      const _w = inputValues['hardware-track-length-1'] || 0
-      w = isSplitPanels ? _w / 2 : _w
-      const ceilingToFloorHeight = inputValues['track-ceiling-to-floor-height'] || 0
-      const ringCeilingToBottomHeight = inputValues['track-ring-ceiling-to-bottom-height'] || 0
-
-      /* 2025/11/12 新增逻辑：用户选择pleat/ripple-fold -> track时，如果选择的是MyTrack，需要默认加上1/4 */
-      // const isMyTrack = selectorTabKey === TRACK_SELECTOR_TYPE.MT
-
-      /* 分别判断string（分数和带分数）和number类型 */
-      if (typeof ringCeilingToBottomHeight === 'string') {
-        mixNumberOrFractionHandle(ringCeilingToBottomHeight, ({ type, decimalValue, denominator }) => {
-          if (type === 'mixnumber' || type === 'fraction') {
-            // 如果是合规的带分数或分数，h = ceilingToFloorHeight - ringCeilingToBottomHeight 这个带分数，并将结果转成带分数，isMyTrack需要加上1/4
-            let result = Number(ceilingToFloorHeight) - decimalValue
-            result = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
-            // #region 新逻辑，将result(type:小数)按自定义四舍五入，保证最终结果为整数或者代1/2分数
-            h = convertToDecimal(result, false)
-            // #endregion
-
-            // #region 旧逻辑，将result(type:小数)拆分成带分数，分数部分加1/4，再计算最终结果
-            // let { wholePart, fracPart } = convertToMixedNumber(result, denominator) // 拆分成整数部分和带分数分数
-            // if (isMyTrack) fracPart = fractionOperation('1/4', fracPart, '+') // 默认加上1/4
-            // 分数为1/1时，整数部分加1，分数部分不要了
-            // h = fracPart == '1/1' ? `${(Number(wholePart) + 1).toString()}` : `${wholePart} ${fracPart}`
-            // #endregion
-          } else {
-            // 如果不是合规的带分数或分数 h = ceilingToFloorHeight - 0
-            h = calculateByCurtainStyle(Number(ceilingToFloorHeight))
-          }
-        })
-      }
-      // 如果是数字，该值已在handleContinue出正常转换，正常计算
-      else if (typeof ringCeilingToBottomHeight === 'number') {
-        // 高度等于轨道天花板到地板的距离减去天花板到轨道环的高度
-        let result = Number(ceilingToFloorHeight) - ringCeilingToBottomHeight
-        h = calculateByCurtainStyle(result) // 根据窗帘长度样式调整最终高度
-      }
-    }
-
-    if (hardware === 'hardware-Rod') {
-      const windowWidth = inputValues['norod-window-width'] || 0 // 窗户宽度
-      const extLeftWidth = inputValues['norod-width-left-extension'] || 0 // 左延申宽度
-      const extRightWidth = inputValues['norod-width-right-extension'] || 0 // 右延申宽度
-      const windowHeight = inputValues['top-to-floor-height'] || 0 // 地面到窗户高度
-      const aboveFrameHeight = inputValues['rod-extension-above-frame'] || 0 // 窗户顶部到天花板高度
-      w = windowWidth + extLeftWidth + extRightWidth
-
-      // 如果是 ripple-fold流程，窗户顶部到天花板高度需要固定减去5/8
-      if (headerStyle === 'ripple-fold') {
-        // #region 新逻辑，加5/8变成减去0.625，再自定义四舍五入，保证最后结果为整数或带1/2的带分数
-        const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - 0.625)
-        h = convertToDecimal(result, false)
-        // #endregion
-
-        // #region 旧逻辑，高度需要减去5/8，并将结果转成以8为同分母的带分数
-        // mixNumberOrFractionHandle(`5/8`, ({ decimalValue, denominator }) => {
-        //   const result = calculateByCurtainStyle(windowHeight + aboveFrameHeight - decimalValue)
-        //   const { wholePart, fracPart } = convertToMixedNumber(result, denominator) // 转成带分数
-        //   h = `${wholePart} ${fracPart}`
-        // })
-        // #endregion
-      }
-      // 根据窗帘长度样式调整最终高度
-      else {
-        h = calculateByCurtainStyle(windowHeight + aboveFrameHeight)
-      }
-    }
-
-    return [w, h]
-  }
-
-  // 计算ripple-fold结果
+  // 计算当前在用的 Ripple Fold 结果
   const calculateRippleFoldSizeNew = (): [number, number] => {
     let w: any = 0,
       h: any = 0
@@ -729,20 +645,8 @@ export default function MeasurementTool() {
 
         w = isSplitPanels ? _w / 2 : _w
 
-        // Pleated->Yes->Track
-        // #region 新逻辑：将_h(type:小数)自定义四舍五入，保证最终结果为整数或带1/2的带分数
         _h = calculateByCurtainStyle(Number(_h))
         h = convertToDecimal(_h, false)
-        //#endregion
-
-        // #region 旧逻辑，将_h(type:小数)的高度固定加上1/4，拆分成整数和小数部分返回
-        // mixNumberOrFractionHandle('1/4', ({ decimalValue, denominator }) => {
-        //   _h = Number(_h) + decimalValue
-        //   _h = calculateByCurtainStyle(_h) // 根据窗帘长度样式调整最终高度
-        //   const { wholePart, fracPart } = convertToMixedNumber(_h, denominator) // 转成带分数
-        //   h = `${wholePart} ${fracPart}`
-        // })
-        // #endregion
       }
 
       // Pleated->Yes->Rod
@@ -750,20 +654,8 @@ export default function MeasurementTool() {
         const _w = inputValues['rod-width-top'] || 0
         let _h = inputValues['rod-top-to-floor-height'] || 0
         w = isSplitPanels ? _w / 2 : _w
-        // Pleated->Yes->Track
-        // #region 新逻辑：将_h(type:小数)自定义四舍五入，保证最终结果为整数或带1/2的带分数
         _h = calculateByCurtainStyle(Number(_h))
         h = convertToDecimal(_h, false)
-        // #endregion
-
-        // #region 旧逻辑，将_h(type:小数)的高度固定加上1/4，拆分成整数和小数部分返回
-        // mixNumberOrFractionHandle('1/4', ({ decimalValue, denominator }) => {
-        //   _h = Number(_h) + decimalValue
-        //   _h = calculateByCurtainStyle(_h) // 根据窗帘长度样式调整最终高度
-        //   const { wholePart, fracPart } = convertToMixedNumber(_h, denominator) // 转成带分数
-        //   h = `${wholePart} ${fracPart}`
-        // })
-        // #endregion
       }
     }
 
