@@ -106,51 +106,59 @@ export default function MeasurementTool() {
     return 'step-1'
   }
 
+  const getLastVisitedStepForMainStep = (mainStepId: string): string | null => {
+    const historyForMainStep = stepHistory.filter(step => {
+      const mainStep = getMainStepFromActualStep(step)
+      return mainStep === mainStepId && CozyologyConfig.measurementConfig[step]
+    })
+
+    return historyForMainStep.length > 0 ? historyForMainStep[historyForMainStep.length - 1] : null
+  }
+
+  const getDefaultStepFromMainStep = (mainStepId: string): string => {
+    switch (mainStepId) {
+      case 'step-1':
+        return 'step-1'
+      case 'step-2':
+        if (headerStyle === 'pleated') return 'step-2-0-0'
+        if (headerStyle === 'ripple-fold') return 'step-2-2-8'
+        return 'step-2-0'
+      case 'step-3':
+        if (headerStyle === 'pleated') {
+          if (selectedOptions['step-2-0-0'] === 'rod-or-track-installed-yes') {
+            return selectedOptions['step-2-0-2'] === 'hardware-Track-2' ? 'step-3-1-7' : 'step-3-1-1'
+          }
+
+          if (selectedOptions['step-2-0-1'] === 'hardware-Track') {
+            return selectedOptions['step-2-2-7'] === 'hardware-wall-mount' ? 'step-3-2-3' : 'step-3-1-4'
+          }
+
+          return 'step-3-2-1'
+        }
+
+        if (headerStyle === 'ripple-fold') {
+          return selectedOptions['step-2-2-10'] === 'ripplefold-hardware-wall-mount' ? 'step-3-2-8' : 'step-3-2-6'
+        }
+
+        const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
+        return hasRodInstalled ? 'step-3-1-0' : 'step-3-2-0'
+      case 'step-4':
+        return headerStyle === 'ripple-fold' ? 'step-4-2' : 'step-4-1'
+      default:
+        return 'step-1'
+    }
+  }
+
   const getActualStepFromMainStep = (mainStepId: string): string => {
     switch (mainStepId) {
       case 'step-1':
         return 'step-1'
       case 'step-2':
-        // 返回已完成的最后一个step-2子步骤，或第一个step-2步骤
-        const step2Options = [
-          'step-2-0',
-          'step-2-0-0',
-          'step-2-0-1',
-          'step-2-0-2',
-          'step-2-1-1',
-          'step-2-2-1',
-          'step-2-2-2',
-          'step-2-2-3',
-          'step-2-2-4',
-        ]
-        const completedStep2 = step2Options.filter(step => completedSteps.includes(step))
-        return completedStep2.length > 0 ? completedStep2[completedStep2.length - 1] : 'step-2-0'
+        return getLastVisitedStepForMainStep('step-2') || getDefaultStepFromMainStep('step-2')
       case 'step-3':
-        // 返回已完成的最后一个step-3子步骤，或根据Rod Installed状态确定第一个step-3步骤
-        const step3Options = [
-          'step-3-1-1',
-          'step-3-2-1',
-          'step-3-1-2',
-          'step-3-1-3',
-          'step-3-1-4',
-          'step-3-1-5',
-          'step-3-2-2',
-        ]
-        const completedStep3 = step3Options.filter(step => completedSteps.includes(step))
-        if (completedStep3.length > 0) {
-          return completedStep3[completedStep3.length - 1]
-        }
-        // 根据Rod Installed状态决定起始步骤
-        const hasRodInstalled = selectedOptions['step-2-0'] === 'rod-installed-yes'
-        return hasRodInstalled ? 'step-3-1-1' : 'step-3-2-1'
+        return getLastVisitedStepForMainStep('step-3') || getDefaultStepFromMainStep('step-3')
       case 'step-4':
-        // 返回已完成的最后一个step-4子步骤，或第一个step-4步骤
-        let defaultStep = 'step-4-1'
-        // ripple-fold 没有 step-4-1这一步
-        if (selectedOptions?.['step-1'] === 'ripple-fold') defaultStep = 'step-4-2'
-        const step4Options = ['step-4-1', 'step-4-2']
-        const completedStep4 = step4Options.filter(step => completedSteps.includes(step))
-        return completedStep4.length > 0 ? completedStep4[completedStep4.length - 1] : defaultStep
+        return getLastVisitedStepForMainStep('step-4') || getDefaultStepFromMainStep('step-4')
       default:
         return 'step-1'
     }
