@@ -65,6 +65,87 @@ export default function MeasurementTool() {
     return CozyologyConfig.stepTitles?.[stepKey] || 'Step'
   }
 
+  const allowFractionInput = (option: any): boolean => {
+    return Boolean(option?.isTrackSelector || option?.isSingleSelector)
+  }
+
+  const parseMeasurementInputValue = (
+    value: string,
+    option: any
+  ): { isValid: boolean; numericValue?: number; storedValue?: string | number } => {
+    const trimmedValue = value.trim()
+
+    if (!trimmedValue) {
+      return { isValid: false }
+    }
+
+    const numericValue = Number(trimmedValue)
+    if (Number.isFinite(numericValue)) {
+      return {
+        isValid: true,
+        numericValue,
+        storedValue: numericValue,
+      }
+    }
+
+    if (!allowFractionInput(option)) {
+      return { isValid: false }
+    }
+
+    const fractionResult = mixNumberOrFractionHandle(trimmedValue)
+    if (fractionResult.type === 'mixnumber' || fractionResult.type === 'fraction') {
+      return {
+        isValid: true,
+        numericValue: fractionResult.decimalValue,
+        storedValue: trimmedValue,
+      }
+    }
+
+    return { isValid: false }
+  }
+
+  const getInputValidationMessage = (option: any, value: string, showFieldName: boolean = true): string | null => {
+    const fieldName = option.title || option.label || option.id
+    const prefix = showFieldName ? `${fieldName}: ` : ''
+    const hasRangeLimit = option.min !== undefined || option.max !== undefined
+
+    if (!value || value.trim() === '') {
+      if (allowFractionInput(option)) {
+        return `${prefix}Please enter a valid number, fraction, or mixed number`
+      }
+      if (!hasRangeLimit) {
+        return `${prefix}Please enter a valid number`
+      }
+      if (option.max) {
+        return `${prefix}Please enter a number between ${option.min} and ${option.max}`
+      }
+      return `${prefix}Please enter a number between ${option.min} and above`
+    }
+
+    const parsedValue = parseMeasurementInputValue(value, option)
+    if (!parsedValue.isValid || parsedValue.numericValue === undefined) {
+      if (allowFractionInput(option)) {
+        return `${prefix}Please enter a valid number, fraction, or mixed number`
+      }
+      if (!hasRangeLimit) {
+        return `${prefix}Please enter a valid number`
+      }
+      if (option.max) {
+        return `${prefix}Please enter a number between ${option.min} and ${option.max}`
+      }
+      return `${prefix}Please enter a number between ${option.min} and above`
+    }
+
+    if (parsedValue.numericValue < option.min || (option.max && parsedValue.numericValue > option.max)) {
+      if (option.max) {
+        return `${prefix}Please enter a number between ${option.min} and ${option.max}`
+      }
+      return `${prefix}Please enter a number between ${option.min} and above`
+    }
+
+    return null
+  }
+
   const getPreviousStep = () => {
     // 基于历史记录返回上一步
     const currentIndex = stepHistory.indexOf(currentStep)
@@ -172,8 +253,8 @@ export default function MeasurementTool() {
 
     currentStepData.options.forEach(option => {
       const value = currentStepInputs[option.id]
-      const numValue = parseFloat(value)
       const fieldName = option.title || option.label || option.id
+      const parsedValue = parseMeasurementInputValue(value || '', option)
 
       // 检查是否有值且为有效数字
       if (!value || value.trim() === '') {
@@ -181,19 +262,23 @@ export default function MeasurementTool() {
         return
       }
 
-      if (isNaN(numValue)) {
-        errors.push(`${fieldName} must be a valid number`)
+      if (!parsedValue.isValid || parsedValue.numericValue === undefined) {
+        errors.push(
+          allowFractionInput(option)
+            ? `${fieldName} must be a valid number, fraction, or mixed number`
+            : `${fieldName} must be a valid number`
+        )
         return
       }
 
       // 检查是否满足最小值要求
-      if (numValue < option.min) {
+      if (parsedValue.numericValue < option.min) {
         errors.push(`${fieldName} must be at least ${option.min} inches`)
         return
       }
 
       // 检查是否满足最大值要求（如果有）
-      if (option.max && numValue > option.max) {
+      if (option.max && parsedValue.numericValue > option.max) {
         errors.push(`${fieldName} must be no more than ${option.max} inches`)
         return
       }
@@ -209,9 +294,10 @@ export default function MeasurementTool() {
     currentStepData.options.forEach(option => {
       const value = currentStepInputs[option.id]
       if (value) {
-        // 非合规数字字符串保留原始值，数字字符串转成浮点数
-        const isInvalidNumber = isNaN(Number(value))
-        newInputs[option.id] = isInvalidNumber ? value : parseFloat(value)
+        const parsedValue = parseMeasurementInputValue(value, option)
+        if (parsedValue.isValid) {
+          newInputs[option.id] = parsedValue.storedValue
+        }
       }
     })
 
@@ -243,13 +329,15 @@ export default function MeasurementTool() {
     let error = ''
 
     if (value && value.trim() !== '') {
-      const numValue = parseFloat(value)
+      const parsedValue = parseMeasurementInputValue(value, option)
 
-      if (isNaN(numValue)) {
-        error = `${fieldName} must be a valid number`
-      } else if (numValue < option.min) {
+      if (!parsedValue.isValid || parsedValue.numericValue === undefined) {
+        error = allowFractionInput(option)
+          ? `${fieldName} must be a valid number, fraction, or mixed number`
+          : `${fieldName} must be a valid number`
+      } else if (parsedValue.numericValue < option.min) {
         error = `${fieldName} must be at least ${option.min} inches`
-      } else if (option.max && numValue > option.max) {
+      } else if (option.max && parsedValue.numericValue > option.max) {
         error = `${fieldName} must be no more than ${option.max} inches`
       }
     }
@@ -879,35 +967,8 @@ export default function MeasurementTool() {
         const errorMessages = currentStepData.options
           .map(option => {
             const value = currentStepInputs[option.id]
-            const fieldName = option.title || option.label || option.id
             const showFieldName = currentStepData.options.length > 1
-
-            if (!value || value.trim() === '' || isNaN(parseFloat(value))) {
-              if (option.max) {
-                return showFieldName
-                  ? `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
-                  : `Please enter a number between ${option.min} and ${option.max}`
-              } else {
-                return showFieldName
-                  ? `${fieldName}: Please enter a number between ${option.min} and above`
-                  : `Please enter a number between ${option.min} and above`
-              }
-            }
-
-            const numValue = parseFloat(value)
-            if (numValue < option.min || (option.max && numValue > option.max)) {
-              if (option.max) {
-                return showFieldName
-                  ? `${fieldName}: Please enter a number between ${option.min} and ${option.max}`
-                  : `Please enter a number between ${option.min} and ${option.max}`
-              } else {
-                return showFieldName
-                  ? `${fieldName}: Please enter a number between ${option.min} and above`
-                  : `Please enter a number between ${option.min} and above`
-              }
-            }
-
-            return null
+            return getInputValidationMessage(option, value || '', showFieldName)
           })
           .filter(msg => msg !== null)
 
