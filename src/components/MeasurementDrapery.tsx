@@ -624,7 +624,7 @@ export default function MeasurementDrapery() {
 
         const heightExt = inputValues['rod-extension-above-frame'] || '0'
         const height = inputValues['top-to-floor-height'] || '0'
-        h = heightExt + height - 1
+        h = calculateByCurtainStyle(heightExt + height - 1)
       }
     }
 
