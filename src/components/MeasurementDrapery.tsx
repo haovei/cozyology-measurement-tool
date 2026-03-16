@@ -1414,8 +1414,9 @@ export default function MeasurementDrapery() {
                             return (
                               <>
                                 {/* web */}
-                                <div className="not-md:hidden text-6xl">
-                                  {width}" W * {height}" L
+                                <div className="not-md:hidden flex flex-col items-center text-[50px] text-center">
+                                  <div>{width}" W</div>
+                                  <div>{height}" L</div>
                                 </div>
                                 {/* mobile */}
                                 <div className="text-center md:hidden">
@@ -1454,7 +1455,7 @@ export default function MeasurementDrapery() {
                       </div>
 
                       {CozyologyConfig.resultPageTip && (
-                        <div className="not-md:hidden mt-1 text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
+                        <div className="not-md:hidden mt-[8px] text-[16px] text-center text-[#999999] not-md:text-[12px] not-md:mt-[0]">
                           <span
                             dangerouslySetInnerHTML={{
                               __html: CozyologyConfig.resultPageTip,
