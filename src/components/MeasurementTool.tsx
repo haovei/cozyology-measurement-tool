@@ -634,10 +634,10 @@ export default function MeasurementTool() {
                     <div className="w-full not-md:w-[60%]">
                       <div className={`step-image ${currentStepData.imageClass}`} />
                     </div>
-                    <div className="md:hidden not-md:w-[40%] text-[14px]">{currentStepData.description}</div>
+                    <div className="md:hidden not-md:w-[40%] text-[14px]" dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
                   </div>
                   <div className="flex-1 flex flex-col not-md:w-full">
-                    <div className="not-md:hidden text-[16px]">{currentStepData.description}</div>
+                    <div className="not-md:hidden text-[16px]" dangerouslySetInnerHTML={{ __html: currentStepData.description }}></div>
                     <div className="flex-1 flex flex-col justify-end gap-[20px] not-md:gap-[15px]">
                       {currentStepData.options.map(option => (
                         <div className="flex not-md:flex-col" key={option.id}>
