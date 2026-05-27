@@ -4,11 +4,12 @@ import React, { useState } from 'react'
 
 interface TrackSelectorProps {
   value: string
+  selectedKey?: string // 父组件存储的选中项唯一 key，用于精确回显（value 可能重复）
   headerStyle: string
   min?: number
   max?: number
   selectedOptions?: any
-  handleSelectChange?: (value: string) => void
+  handleSelectChange?: (value: string, key?: string) => void
 }
 
 const trackSelectorSingleOptions = window.CozyologyConfig_Drapery?.trackSelectorSingleOptions || {}
@@ -40,7 +41,11 @@ export default function TrackSelectorSingle(props: TrackSelectorProps) {
   }, [props.headerStyle, props.selectedOptions])
 
   React.useEffect(() => {
-    // value 可能重复，回显时映射到首个匹配项的唯一 key
+    // 优先用父组件存储的 key 精确回显；缺失时退回按 value 匹配首个
+    if (props.selectedKey) {
+      setSelectValue(props.selectedKey)
+      return
+    }
     const matched = options.find(o => String(o.value) === String(props.value))
     setSelectValue(matched ? String(matched.key) : '')
   }, [])
@@ -50,7 +55,7 @@ export default function TrackSelectorSingle(props: TrackSelectorProps) {
       const key = selectRef.current.value || '' // 下拉项现以唯一 key 作为 DOM value
       const matched = options.find(o => String(o.key) === key)
       setSelectValue(key)
-      props.handleSelectChange?.(matched?.value || '') // 仍向父组件回传真实测量值
+      props.handleSelectChange?.(matched?.value || '', key) // 回传真实测量值 + 唯一 key
     }
   }
 

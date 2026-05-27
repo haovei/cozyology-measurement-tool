@@ -9,13 +9,14 @@ export enum TRACK_SELECTOR_TYPE {
 
 interface TrackSelectorProps {
   value: string
+  selectedKey?: string // 父组件存储的选中项唯一 key，用于精确回显（value 可能重复）
   headerStyle: string
   initialTabKey?: TRACK_SELECTOR_TYPE
   min?: number
   max?: number
   selectedOptions?: any
   handleInputChange?: (value: string) => void
-  handleSelectChange?: (value: string) => void
+  handleSelectChange?: (value: string, key?: string) => void
   handleTabSwitch?: (value: TRACK_SELECTOR_TYPE) => void
 }
 
@@ -63,9 +64,13 @@ export default function TrackSelector(props: TrackSelectorProps) {
     props.handleTabSwitch?.(initTabKey) // 切换到对应的tab
     if (!props.value) return // 没有值不回显
     if (initTabKey === TRACK_SELECTOR_TYPE.CT) {
-      // value 可能重复，回显时映射到首个匹配项的唯一 key
-      const matched = options.find(o => String(o.value) === String(props.value))
-      setSelectValue(matched ? String(matched.key) : '')
+      // 优先用父组件存储的 key 精确回显；缺失时退回按 value 匹配首个
+      if (props.selectedKey) {
+        setSelectValue(props.selectedKey)
+      } else {
+        const matched = options.find(o => String(o.value) === String(props.value))
+        setSelectValue(matched ? String(matched.key) : '')
+      }
     } else {
       setInputValue(props.value) // 设置输入框的值
     }
@@ -90,7 +95,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
     setSelectValue('')
     setInputValue('')
     setShowTip(false)
-    props.handleSelectChange('') // 清空当前输入值，让用户重新输入
+    props.handleSelectChange('', '') // 清空当前输入值与 key，让用户重新选择
     props.handleTabSwitch(value)
   }
 
@@ -117,7 +122,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
       const label = selectRef.current.options[selectRef.current.selectedIndex]?.text || ''
       setShowTip(label.includes('Wall Mount'))
       setSelectValue(key)
-      props.handleSelectChange?.(matched?.value || '') // 仍向父组件回传真实测量值，计算逻辑不变
+      props.handleSelectChange?.(matched?.value || '', key) // 回传真实测量值 + 唯一 key，计算仍用 value
     }
   }
 

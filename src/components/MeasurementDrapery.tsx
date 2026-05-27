@@ -20,6 +20,8 @@ export default function MeasurementDrapery() {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({}) // 记录每个步骤选择的选项ID
   const [showTooltip, setShowTooltip] = useState(false) // 控制工具提示显示
   const [selectorTabKey, setSelectorTabKey] = useState<TRACK_SELECTOR_TYPE>()
+  // 轨道下拉选中项的唯一 key（仅下拉来源，手填时为空），用于精确回显与硬件匹配；计算仍只用 inputValues 里的真实 value
+  const [selectorKeys, setSelectorKeys] = useState<Record<string, string>>({})
 
   const headerStyle = useMemo(() => {
     return selectedOptions['step-1']
@@ -740,15 +742,16 @@ export default function MeasurementDrapery() {
         const mountType = selectedOptions['step-2-2-7'] || ''
         const selectorOptionsMap = CozyologyConfig?.trackSelectorOptions?.[headerStyle] || {}
         let targetOpts = [],
-          v = ''
+          k = ''
         if (mountType === 'hardware-ceiling-mount') {
           targetOpts = selectorOptionsMap['ceiling']
-          v = inputValues['track-ring-ceiling-to-bottom-height'] || ''
+          k = selectorKeys['track-ring-ceiling-to-bottom-height'] || ''
         } else if (mountType === 'hardware-wall-mount') {
           targetOpts = selectorOptionsMap['wall']
-          v = inputValues['track-ring-ceiling-to-bottom-height-2'] || ''
+          k = selectorKeys['track-ring-ceiling-to-bottom-height-2'] || ''
         }
-        const target = (targetOpts || []).find(item => item.value === v.toString())
+        // key 为 1-based 下标（来自 generateOptionKey）；手填来源 key 为空 → 回退 getHardware()
+        const target = k ? (targetOpts || [])[Number(k) - 1] : undefined
         if (target) {
           return (
             <a href={target.link} target="_blank">
@@ -765,15 +768,16 @@ export default function MeasurementDrapery() {
         const mountType = selectedOptions['step-2-2-10'] || ''
         const selectorOptionsMap = CozyologyConfig?.trackSelectorSingleOptions?.[headerStyle] || {}
         let targetOpts = [],
-          v = ''
+          k = ''
         if (mountType === 'ripplefold-hardware-ceiling-mount') {
           targetOpts = selectorOptionsMap['ceiling']
-          v = inputValues['ripplefold-ring-ceiling-to-bottom-height'] || ''
+          k = selectorKeys['ripplefold-ring-ceiling-to-bottom-height'] || ''
         } else if (mountType === 'ripplefold-hardware-wall-mount') {
           targetOpts = selectorOptionsMap['wall']
-          v = inputValues['ripplefold-how-to-hardware-height'] || ''
+          k = selectorKeys['ripplefold-how-to-hardware-height'] || ''
         }
-        const target = (targetOpts || []).find(item => item.value === v.toString())
+        // key 为 1-based 下标（来自 generateOptionKey）；手填来源 key 为空 → 回退 getHardware()
+        const target = k ? (targetOpts || [])[Number(k) - 1] : undefined
         if (target) {
           return (
             <a href={target.link} target="_blank">
@@ -875,6 +879,7 @@ export default function MeasurementDrapery() {
       setCompletedSteps([currentStep])
       setStepHistory(['step-1', actualJump])
       setInputValues({}) // 清空所有之前的输入值
+      setSelectorKeys({}) // 清空轨道下拉的 key
       setSelectedOptions(newSelectedOptions) // 保留当前步骤的选择
     } else {
       // 记录当前步骤为已完成
@@ -911,6 +916,7 @@ export default function MeasurementDrapery() {
     setCurrentStepInputs({}) // 重置当前步骤输入
     setInputErrors({}) // 重置错误信息
     setSelectedOptions({}) // 重置选择的选项
+    setSelectorKeys({}) // 重置轨道下拉的 key
   }
 
   const handleShopNow = () => {
@@ -1348,11 +1354,19 @@ export default function MeasurementDrapery() {
                               <TrackSelector
                                 key={option.id}
                                 value={currentStepInputs[option.id] || ''}
+                                selectedKey={selectorKeys[option.id] || ''}
                                 headerStyle={headerStyle}
                                 initialTabKey={selectorTabKey}
                                 selectedOptions={selectedOptions}
-                                handleInputChange={value => handleInputChange(option.id, value)}
-                                handleSelectChange={value => handleInputChange(option.id, value)}
+                                handleInputChange={value => {
+                                  handleInputChange(option.id, value)
+                                  // 手填来源没有 key，清空避免误用旧 key
+                                  setSelectorKeys(prev => ({ ...prev, [option.id]: '' }))
+                                }}
+                                handleSelectChange={(value, key) => {
+                                  handleInputChange(option.id, value)
+                                  setSelectorKeys(prev => ({ ...prev, [option.id]: key || '' }))
+                                }}
                                 handleTabSwitch={value => handleTabSwitch(option, value)}
                               />
                             </div>
@@ -1361,9 +1375,13 @@ export default function MeasurementDrapery() {
                               <TrackSelectorSingle
                                 key={option.id}
                                 value={currentStepInputs[option.id] || ''}
+                                selectedKey={selectorKeys[option.id] || ''}
                                 headerStyle={headerStyle}
                                 selectedOptions={selectedOptions}
-                                handleSelectChange={value => handleInputChange(option.id, value)}
+                                handleSelectChange={(value, key) => {
+                                  handleInputChange(option.id, value)
+                                  setSelectorKeys(prev => ({ ...prev, [option.id]: key || '' }))
+                                }}
                               />
                             </div>
                           ) : (
