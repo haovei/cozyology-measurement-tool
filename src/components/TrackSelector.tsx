@@ -24,43 +24,38 @@ const trackSelectorOptions = window.CozyologyConfig_Drapery?.trackSelectorOption
 export default function TrackSelector(props: TrackSelectorProps) {
   const [selected, setSelected] = useState<TRACK_SELECTOR_TYPE>()
   const [inputValue, setInputValue] = useState('')
+  // selectValue 存储当前选中项的唯一 key（而非 value），以支持同组内 value 重复
   const [selectValue, setSelectValue] = useState('')
   const [showTip, setShowTip] = useState(false)
-  const [options, setOptions] = useState<Array<SelectOptionPropReturns>>([])
 
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
 
   console.log('--------trackSelector--------', props.selectedOptions)
 
-  // const options = (trackSelectorOptions?.[props.headerStyle] || []).map((option, index) => ({ ...option, key: index }))
-
   const showMyTip = React.useMemo(() => {
     return selected === TRACK_SELECTOR_TYPE.MT
   }, [selected])
 
-  const initOptions = () => {
-    let opts = []
+  // 同步计算下拉选项，保证挂载时（含回显）即可同步读取；每项带唯一 key
+  const options = React.useMemo<Array<SelectOptionPropReturns>>(() => {
     const optMap = trackSelectorOptions?.[props.headerStyle]
 
     // pleated
     if (props.headerStyle === 'pleated' && optMap) {
-      const mountType = props.selectedOptions['step-2-2-7'] || ''
+      const mountType = props.selectedOptions?.['step-2-2-7'] || ''
       if (mountType === 'hardware-ceiling-mount') {
-        opts = generateOptionKey(optMap['ceiling'] || [])
-      } else if (mountType === 'hardware-wall-mount') {
-        opts = generateOptionKey(optMap['wall'] || [])
+        return generateOptionKey(optMap['ceiling'] || [])
+      }
+      if (mountType === 'hardware-wall-mount') {
+        return generateOptionKey(optMap['wall'] || [])
       }
     }
 
     // others...
 
-    setOptions(opts)
-  }
-
-  React.useEffect(() => {
-    initOptions()
-  }, [])
+    return []
+  }, [props.headerStyle, props.selectedOptions])
 
   React.useEffect(() => {
     const initTabKey = props.initialTabKey ?? TRACK_SELECTOR_TYPE.CT
@@ -68,7 +63,9 @@ export default function TrackSelector(props: TrackSelectorProps) {
     props.handleTabSwitch?.(initTabKey) // 切换到对应的tab
     if (!props.value) return // 没有值不回显
     if (initTabKey === TRACK_SELECTOR_TYPE.CT) {
-      setSelectValue(props.value) // 设置下拉框的值
+      // value 可能重复，回显时映射到首个匹配项的唯一 key
+      const matched = options.find(o => String(o.value) === String(props.value))
+      setSelectValue(matched ? String(matched.key) : '')
     } else {
       setInputValue(props.value) // 设置输入框的值
     }
@@ -115,16 +112,17 @@ export default function TrackSelector(props: TrackSelectorProps) {
 
   const handleSelectChange = () => {
     if (selectRef.current) {
-      const value = selectRef.current.value || ''
+      const key = selectRef.current.value || '' // 下拉项现以唯一 key 作为 DOM value
+      const matched = options.find(o => String(o.key) === key)
       const label = selectRef.current.options[selectRef.current.selectedIndex]?.text || ''
       setShowTip(label.includes('Wall Mount'))
-      setSelectValue(value)
-      props.handleSelectChange?.(value)
+      setSelectValue(key)
+      props.handleSelectChange?.(matched?.value || '') // 仍向父组件回传真实测量值，计算逻辑不变
     }
   }
 
   const viewTheTrack = (): void => {
-    const link = options.find(item => item.value === selectValue)?.link
+    const link = options.find(item => String(item.key) === selectValue)?.link
     if (!link) return
     window.open(link)
   }
@@ -193,7 +191,7 @@ export default function TrackSelector(props: TrackSelectorProps) {
                 --
               </option>
               {options.map(option => (
-                <option key={option.value} value={option.value}>
+                <option key={option.key} value={option.key}>
                   {option.label}
                 </option>
               ))}

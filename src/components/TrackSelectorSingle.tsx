@@ -14,44 +14,43 @@ interface TrackSelectorProps {
 const trackSelectorSingleOptions = window.CozyologyConfig_Drapery?.trackSelectorSingleOptions || {}
 
 export default function TrackSelectorSingle(props: TrackSelectorProps) {
+  // selectValue 存储选中项的唯一 key（而非 value），以支持同组内 value 重复
   const [selectValue, setSelectValue] = useState('')
-  const [options, setOptions] = useState<Array<SelectOptionPropReturns>>([])
 
   const selectRef = React.useRef<HTMLSelectElement | null>(null)
 
-  const initOptions = () => {
-    let opts = []
+  // 同步计算下拉选项，挂载时（含回显）即可同步读取；每项带唯一 key
+  const options = React.useMemo<Array<SelectOptionPropReturns>>(() => {
     const optMap = trackSelectorSingleOptions?.[props.headerStyle]
 
     // ripple-fold
     if (optMap && props.headerStyle === 'ripple-fold') {
-      const mountType = props.selectedOptions['step-2-2-10'] || ''
+      const mountType = props.selectedOptions?.['step-2-2-10'] || ''
       if (mountType === 'ripplefold-hardware-ceiling-mount') {
-        opts = generateOptionKey(optMap['ceiling'] || [])
-      } else if (mountType === 'ripplefold-hardware-wall-mount') {
-        opts = generateOptionKey(optMap['wall'] || [])
+        return generateOptionKey(optMap['ceiling'] || [])
+      }
+      if (mountType === 'ripplefold-hardware-wall-mount') {
+        return generateOptionKey(optMap['wall'] || [])
       }
     }
 
     // others...
 
-    setOptions(opts)
-  }
+    return []
+  }, [props.headerStyle, props.selectedOptions])
 
   React.useEffect(() => {
-    console.log('props.............', props.selectedOptions)
-    initOptions()
-  }, [])
-
-  React.useEffect(() => {
-    setSelectValue(props.value) // 设置下拉框的值
+    // value 可能重复，回显时映射到首个匹配项的唯一 key
+    const matched = options.find(o => String(o.value) === String(props.value))
+    setSelectValue(matched ? String(matched.key) : '')
   }, [])
 
   const handleSelectChange = () => {
     if (selectRef.current) {
-      const value = selectRef.current.value || ''
-      setSelectValue(value)
-      props.handleSelectChange?.(value)
+      const key = selectRef.current.value || '' // 下拉项现以唯一 key 作为 DOM value
+      const matched = options.find(o => String(o.key) === key)
+      setSelectValue(key)
+      props.handleSelectChange?.(matched?.value || '') // 仍向父组件回传真实测量值
     }
   }
 
@@ -73,7 +72,7 @@ export default function TrackSelectorSingle(props: TrackSelectorProps) {
             --
           </option>
           {options.map(option => (
-            <option key={option.key} value={option.value}>
+            <option key={option.key} value={option.key}>
               {option.label}
             </option>
           ))}
